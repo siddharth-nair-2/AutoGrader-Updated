@@ -49,28 +49,52 @@ const { protect } = require("../middleware/authMiddleware");
 const router = express.Router();
 
 // Course Routes
-router.route("/course").post(courseCreate);
-router.route("/courseGet").post(getCourses);
-router.route("/allStudentCourses").post(getStudentCourses);
-router.route("/singleCourse").post(getSingleCourse);
+router.post("/courses", courseCreate);
+router.get("/courses", getCourses);
+router.get("/courses/:courseID", getSingleCourse);
+router.get("/studentCourses", getStudentCourses);
+
+/* FIX ON FRONTEND */
+// router.route("/course").post(courseCreate);
+// router.route("/courseGet").post(getCourses);
+// router.route("/allStudentCourses").post(getStudentCourses);
+// router.route("/singleCourse").post(getSingleCourse);
 
 // Submission Routes
-router.route("/submission").post(createSubmission);
-router.route("/comparesubmission").post(compareSubmission);
-router.route("/updatesubmission").post(updateSubmission);
-router.route("/getAllSubmissions").post(getAllSubmissions);
-router.route("/getCustomSubmissions").post(getCustomSubmissions);
+router.post("/submission", createSubmission);
+router.get("/submission/compare", compareSubmission);
+router.get("/submission/custom", getCustomSubmissions);
+router.get("/submissions", getAllSubmissions);
+router.patch("/submission/update", updateSubmission);
+
+/* FIX ON FRONTEND */
+// router.route("/submission").post(createSubmission);
+// router.route("/comparesubmission").post(compareSubmission);
+// router.route("/updatesubmission").post(updateSubmission);
+// router.route("/getAllSubmissions").post(getAllSubmissions);
+// router.route("/getCustomSubmissions").post(getCustomSubmissions);
 
 // Plagiarism Routes
-router.route("/getAllPlagiarism").post(getAllPlagiarisms);
-router.route("/createComparison").post(plagiarismCreate);
+router.get("/plagiarism", getAllPlagiarisms);
+router.post("/createComparison", plagiarismCreate);
+
+/* FIX ON FRONTEND */
+// router.route("/getAllPlagiarism").post(getAllPlagiarisms);
+// router.route("/createComparison").post(plagiarismCreate);
 
 // Assignment Routes
-router.route("/assignment").post(AssignmentCreate);
-router.route("/assignmentDelete").post(AssignmentDelete);
-router.route("/assignmentGet").post(getAssignments);
-router.route("/updateAssignment").post(updateAssignment);
-router.route("/studentAssignmentsGet").post(getStudentAssignments);
+router.post("/assignments", AssignmentCreate);
+router.patch("/assignments/:assignmentID", updateAssignment);
+router.delete("/assignments/:assignmentID", AssignmentDelete);
+router.get("/assignments", getAssignments);
+router.get("/studentAssignments", getStudentAssignments);
+
+/* FIX ON FRONTEND */
+// router.route("/assignmentGet").post(getAssignments);
+// router.route("/assignment").post(AssignmentCreate);
+// router.route("/assignmentDelete").post(AssignmentDelete);
+// router.route("/updateAssignment").post(updateAssignment);
+// router.route("/studentAssignmentsGet").post(getStudentAssignments);
 
 // Test Routes
 router.route("/createTest").post(createTest);

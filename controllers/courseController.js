@@ -55,41 +55,43 @@ const courseCreate = asyncHandler(async (req, res) => {
 
 // Get all courses for an instructor
 const getCourses = asyncHandler(async (req, res) => {
-  try {
-    const { _id } = req.body;
-    const courses = await Course.find({ instructor: _id });
-
-    res.status(200).send(courses);
-  } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
-  }
+  const instructorId = req.query.instructor; // Assuming instructor ID comes from query string
+  const courses = await Course.find({ instructor: instructorId });
+  res.status(200).json(courses);
 });
 
 // Get a single course by ID
 const getSingleCourse = asyncHandler(async (req, res) => {
-  try {
-    const { courseID } = req.body;
-    const courses = await Course.find({ _id: courseID });
+  const courseId = req.params.courseID; // Assuming course ID comes from URL parameter
+  const course = await Course.findById(courseId);
 
-    res.status(200).send(courses);
-  } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+  if (!course) {
+    res.status(404);
+    throw new Error("Course not found");
   }
+
+  res.status(200).json(course);
 });
 
 // Get courses for a student
 const getStudentCourses = asyncHandler(async (req, res) => {
   try {
-    const { courses } = req.body;
+    // Assuming the student's course IDs are passed as a comma-separated string in the query parameter
+    const courseIds = req.query.courseIds;
+    if (!courseIds) {
+      res.status(400);
+      throw new Error("No course IDs provided");
+    }
 
-    const promises = courses.map((course) => {
-      return Course.find({ _id: course.courseID });
+    // Split the courseIds string into an array
+    const courseIDArray = courseIds.split(",");
+
+    const promises = courseIDArray.map((courseID) => {
+      return Course.findById(courseID);
     });
 
     const courseInformation = await Promise.all(promises);
-    res.status(200).send(courseInformation);
+    res.status(200).json(courseInformation);
   } catch (error) {
     res.status(400);
     throw new Error(error.message);
