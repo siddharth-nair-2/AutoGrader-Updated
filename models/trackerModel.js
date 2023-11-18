@@ -196,7 +196,6 @@ const TestSchema = new mongoose.Schema(
       required: [true, "Test name required"],
       minLength: [1, "Test name must be atleast 1 character long"],
       maxLength: [64, "Test name must be less than 65 characters long"],
-      unique: true,
     },
     description: {
       type: String,
@@ -261,6 +260,10 @@ const TestSchema = new mongoose.Schema(
   }
 );
 
+// Compound index for test name and course ID
+TestSchema.index({ name: 1, courseID: 1 }, { unique: true });
+
+// Create models
 const Assignment = mongoose.model("Assignment", AssignmentSchema);
 const Course = mongoose.model("Course", CourseSchema);
 const Submission = mongoose.model("Submission", SubmissionsSchema);

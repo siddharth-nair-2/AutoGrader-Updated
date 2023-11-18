@@ -22,27 +22,46 @@ const {
   getAllPlagiarisms,
   // test imports
   createTest,
+  updateTest,
+  deleteTest,
+  getTests,
+  getStudentTests,
+  getAllTests,
 } = require("../controllers/trackerControllers");
 const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
+// Course Routes
 router.route("/course").post(courseCreate);
-router.route("/submission").post(createSubmission);
-router.route("/comparesubmission").post(compareSubmission);
-router.route("/updatesubmission").post(updateSubmission);
-router.route("/getAllSubmissions").post(getAllSubmissions);
-router.route("/getAllPlagiarism").post(getAllPlagiarisms);
-router.route("/getCustomSubmissions").post(getCustomSubmissions);
 router.route("/courseGet").post(getCourses);
 router.route("/allStudentCourses").post(getStudentCourses);
 router.route("/singleCourse").post(getSingleCourse);
+router.route("/submission").post(createSubmission);
+
+// Submission Routes
+router.route("/comparesubmission").post(compareSubmission);
+router.route("/updatesubmission").post(updateSubmission);
+router.route("/getAllSubmissions").post(getAllSubmissions);
+router.route("/getCustomSubmissions").post(getCustomSubmissions);
+
+// Plagiarism Routes
+router.route("/getAllPlagiarism").post(getAllPlagiarisms);
+router.route("/createComparison").post(plagiarismCreate);
+
+// Assignment Routes
 router.route("/assignment").post(AssignmentCreate);
 router.route("/assignmentDelete").post(AssignmentDelete);
 router.route("/assignmentGet").post(getAssignments);
 router.route("/updateAssignment").post(updateAssignment);
 router.route("/studentAssignmentsGet").post(getStudentAssignments);
-router.route("/createComparison").post(plagiarismCreate);
+
+// Test Routes
 router.route("/createTest").post(createTest);
+router.route("/updateTest").post(updateTest);
+router.route("/deleteTest").post(deleteTest);
+router.route("/getTestsForCourse").post(getTests);
+router.route("/getStudentTests").post(getStudentTests);
+router.route("/getAllTests").post(getAllTests);
 
 module.exports = router;

@@ -572,6 +572,83 @@ const createTest = asyncHandler(async (req, res) => {
   }
 });
 
+// Update an existing test
+const updateTest = asyncHandler(async (req, res) => {
+  try {
+    const { testID, courseID, visibleToStudents } = req.body;
+    const test = await Test.updateOne(
+      {
+        courseID: courseID,
+        _id: testID,
+      },
+      {
+        visibleToStudents,
+      }
+    );
+    res.status(200).send(test);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
+// Delete a test
+const deleteTest = asyncHandler(async (req, res) => {
+  const { testID } = req.body;
+
+  if (!testID) {
+    res.status(400);
+    throw new Error("Please enter all the fields!");
+  }
+
+  try {
+    await Test.deleteOne({ _id: testID });
+    // Include any additional cleanup if necessary
+    res.status(200).send("Test successfully deleted");
+  } catch (error) {
+    res.status(400);
+    throw new Error("Test deletion failed");
+  }
+});
+
+// Get tests for a course
+const getTests = asyncHandler(async (req, res) => {
+  try {
+    const { courseID } = req.body;
+    const tests = await Test.find({ courseID: courseID });
+    res.status(200).send(tests);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
+// Get tests visible to students
+const getStudentTests = asyncHandler(async (req, res) => {
+  try {
+    const { courseID } = req.body;
+    const tests = await Test.find({
+      courseID: courseID,
+      visibleToStudents: true,
+    });
+    res.status(200).send(tests);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
+// Get all tests
+const getAllTests = asyncHandler(async (req, res) => {
+  try {
+    const tests = await Test.find({});
+    res.status(200).send(tests);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
 // Exporting all controllers
 module.exports = {
   // course exports
@@ -596,4 +673,9 @@ module.exports = {
   getAllPlagiarisms,
   // test exports
   createTest,
+  updateTest,
+  deleteTest,
+  getTests,
+  getStudentTests,
+  getAllTests,
 };
