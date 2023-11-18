@@ -231,6 +231,18 @@ const TestSchema = new mongoose.Schema(
       type: Boolean,
       required: true,
     },
+    files: [
+      {
+        fileName: {
+          type: String,
+          required: true,
+        },
+        filePath: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
     questions: [
       {
         questionNum: {

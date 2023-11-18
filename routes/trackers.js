@@ -1,36 +1,49 @@
 const express = require("express");
 const {
-  // course imports
   courseCreate,
   getCourses,
   getSingleCourse,
   getStudentCourses,
-  // assignment imports
+} = require("../controllers/courseController");
+const {
   AssignmentCreate,
   updateAssignment,
   getAssignments,
   getStudentAssignments,
   AssignmentDelete,
-  // submission imports
+} = require("../controllers/assignmentController");
+
+const {
   createSubmission,
   compareSubmission,
   getAllSubmissions,
   getCustomSubmissions,
   updateSubmission,
-  // plagiarism imports
+} = require("../controllers/submissionController");
+
+const {
   plagiarismCreate,
   getAllPlagiarisms,
-  // test imports
+} = require("../controllers/plagiarismController");
+
+const {
   createTest,
   updateTest,
   deleteTest,
-  getTests,
+  getTestsForCourse,
   getStudentTests,
   getAllTests,
-  // module imports
+  getSingleTest,
+} = require("../controllers/testController");
+
+const {
   createModule,
   updateModule,
-} = require("../controllers/trackerControllers");
+  deleteModule,
+  getSingleModule,
+  getModulesForCourse,
+  getAllModules,
+} = require("../controllers/moduleController");
 const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
@@ -40,9 +53,9 @@ router.route("/course").post(courseCreate);
 router.route("/courseGet").post(getCourses);
 router.route("/allStudentCourses").post(getStudentCourses);
 router.route("/singleCourse").post(getSingleCourse);
-router.route("/submission").post(createSubmission);
 
 // Submission Routes
+router.route("/submission").post(createSubmission);
 router.route("/comparesubmission").post(compareSubmission);
 router.route("/updatesubmission").post(updateSubmission);
 router.route("/getAllSubmissions").post(getAllSubmissions);
@@ -63,12 +76,17 @@ router.route("/studentAssignmentsGet").post(getStudentAssignments);
 router.route("/createTest").post(createTest);
 router.route("/updateTest").post(updateTest);
 router.route("/deleteTest").post(deleteTest);
-router.route("/getTestsForCourse").post(getTests);
+router.route("/getSingleTest").post(getSingleTest);
+router.route("/getTestsForCourse").post(getTestsForCourse);
 router.route("/getStudentTests").post(getStudentTests);
 router.route("/getAllTests").post(getAllTests);
 
 // Module Routes
 router.route("/createModule").post(createModule);
 router.route("/updateModule").post(updateModule);
+router.route("/deleteModule").post(deleteModule);
+router.route("/getSingleModule").post(getSingleModule);
+router.route("/getModulesForCourse").post(getModulesForCourse);
+router.route("/getAllModules").post(getAllModules);
 
 module.exports = router;
