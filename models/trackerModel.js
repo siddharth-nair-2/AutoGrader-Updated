@@ -189,14 +189,88 @@ const PlagiarismSchema = new mongoose.Schema({
   },
 });
 
+const TestSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Test name required"],
+      minLength: [1, "Test name must be atleast 1 character long"],
+      maxLength: [64, "Test name must be less than 65 characters long"],
+      unique: true,
+    },
+    description: {
+      type: String,
+      maxLength: [
+        2000,
+        "Test description must be less than 2001 characters long",
+      ],
+    },
+    notes: {
+      type: String,
+      default: "No Notes",
+      maxLength: [256, "Test notes must be less than 257 characters long"],
+    },
+    courseID: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: [true, "Course ID required"],
+      ref: "Course",
+    },
+    scheduledAt: {
+      type: Date,
+      required: true,
+    },
+    duration: {
+      type: Number,
+      required: true,
+    },
+    visibleToStudents: {
+      type: Boolean,
+      required: true,
+    },
+    questions: [
+      {
+        questionNum: {
+          type: Number,
+          required: true,
+        },
+        questionInfo: {
+          type: String,
+          required: true,
+          maxLength: [
+            2000,
+            "Question information must be less than 2000 characters.",
+          ],
+        },
+        options: [
+          {
+            value: {
+              type: String,
+              required: true,
+            },
+            isCorrect: {
+              type: Boolean,
+              required: true,
+            },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    timestamps: true,
+  }
+);
+
 const Assignment = mongoose.model("Assignment", AssignmentSchema);
 const Course = mongoose.model("Course", CourseSchema);
 const Submission = mongoose.model("Submission", SubmissionsSchema);
 const Plagiarism = mongoose.model("Plagiarism", PlagiarismSchema);
+const Test = mongoose.model("Test", TestSchema);
 
 module.exports = {
   Assignment,
   Course,
   Plagiarism,
   Submission,
+  Test,
 };

@@ -1,21 +1,27 @@
 const express = require("express");
 const {
+  // course imports
   courseCreate,
   getCourses,
-  AssignmentCreate,
-  getAssignments,
   getSingleCourse,
   getStudentCourses,
+  // assignment imports
+  AssignmentCreate,
+  updateAssignment,
+  getAssignments,
   getStudentAssignments,
+  AssignmentDelete,
+  // submission imports
   createSubmission,
   compareSubmission,
   getAllSubmissions,
-  plagiarismCreate,
   getCustomSubmissions,
   updateSubmission,
+  // plagiarism imports
+  plagiarismCreate,
   getAllPlagiarisms,
-  AssignmentDelete,
-  updateAssignment,
+  // test imports
+  createTest,
 } = require("../controllers/trackerControllers");
 const { protect } = require("../middleware/authMiddleware");
 
@@ -37,5 +43,6 @@ router.route("/assignmentGet").post(getAssignments);
 router.route("/updateAssignment").post(updateAssignment);
 router.route("/studentAssignmentsGet").post(getStudentAssignments);
 router.route("/createComparison").post(plagiarismCreate);
+router.route("/createTest").post(createTest);
 
 module.exports = router;

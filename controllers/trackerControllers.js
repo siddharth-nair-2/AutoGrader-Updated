@@ -5,6 +5,7 @@ const {
   Course,
   Submission,
   Plagiarism,
+  Test,
 } = require("../models/trackerModel");
 
 // -----------------------------
@@ -124,7 +125,7 @@ const AssignmentCreate = asyncHandler(async (req, res) => {
     !description ||
     !due_date ||
     !questions ||
-    !visibleToStudents
+    visibleToStudents === null
   ) {
     res.status(400);
     throw new Error("Please enter all the fields!");
@@ -513,22 +514,86 @@ const getAllPlagiarisms = asyncHandler(async (req, res) => {
   }
 });
 
+// -----------------------------
+// Test Management Controllers
+// -----------------------------
+
+// Create a new test record
+const createTest = asyncHandler(async (req, res) => {
+  const {
+    name,
+    description,
+    notes,
+    courseID,
+    scheduledAt,
+    duration,
+    visibleToStudents,
+    questions,
+  } = req.body;
+
+  if (
+    !name ||
+    !description ||
+    !notes ||
+    !courseID ||
+    !scheduledAt ||
+    !duration ||
+    visibleToStudents === null ||
+    !questions
+  ) {
+    res.status(400);
+    throw new Error("Please enter all the fields!");
+  }
+
+  // Create and save the test
+  const test = await Test.create({
+    name,
+    description,
+    notes,
+    courseID,
+    scheduledAt,
+    duration,
+    visibleToStudents,
+    questions,
+  });
+
+  if (test) {
+    res.status(201).json({
+      _id: test._id,
+      name: test.name,
+      description: test.description,
+      notes: test.notes,
+      courseID: test.courseID,
+      scheduledAt: test.scheduledAt,
+      duration: test.duration,
+      visibleToStudents: test.visibleToStudents,
+      questions: test.questions,
+    });
+  }
+});
+
 // Exporting all controllers
 module.exports = {
+  // course exports
   courseCreate,
   getCourses,
+  getSingleCourse,
+  getStudentCourses,
+  // assignment exports
   AssignmentCreate,
   updateAssignment,
   getAssignments,
-  getSingleCourse,
-  getStudentCourses,
   getStudentAssignments,
+  AssignmentDelete,
+  // submission exports
   createSubmission,
   compareSubmission,
-  plagiarismCreate,
   getAllSubmissions,
   getCustomSubmissions,
   updateSubmission,
+  // plagiarism exports
+  plagiarismCreate,
   getAllPlagiarisms,
-  AssignmentDelete,
+  // test exports
+  createTest,
 };

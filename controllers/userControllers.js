@@ -2,6 +2,11 @@ const asyncHandler = require("express-async-handler");
 const generateToken = require("../config/generateToken");
 const User = require("../models/userModel");
 
+// -----------------------------
+// User Authentication Controllers
+// -----------------------------
+
+// Register a new user
 const registerUser = asyncHandler(async (req, res) => {
   const { firstName, lastName, email, password, userType } = req.body;
 
@@ -39,6 +44,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
+// Authenticate a user and return token
 const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -77,6 +83,12 @@ const authUser = asyncHandler(async (req, res) => {
   }
 });
 
+
+// -----------------------------
+// Course Enrollment Controllers
+// -----------------------------
+
+// Add a course to a user's profile
 const addCourses = asyncHandler(async (req, res) => {
   const { _id, courseID } = req.body;
 
@@ -112,6 +124,7 @@ const addCourses = asyncHandler(async (req, res) => {
   }
 });
 
+// Remove a course from a user's profile
 const removeCourses = asyncHandler(async (req, res) => {
   const { _id, courseID } = req.body;
 
@@ -147,6 +160,12 @@ const removeCourses = asyncHandler(async (req, res) => {
   }
 });
 
+
+// -----------------------------
+// User Information Retrieval Controllers
+// -----------------------------
+
+// Get all students
 const getAllStudents = asyncHandler(async (req, res) => {
   try {
     const students = await User.find({ userType: "Student" });
@@ -158,6 +177,7 @@ const getAllStudents = asyncHandler(async (req, res) => {
   }
 });
 
+// Get students for a specific course
 const getStudentsForCourse = asyncHandler(async (req, res) => {
   try {
     const { _id } = req.body;
@@ -170,6 +190,7 @@ const getStudentsForCourse = asyncHandler(async (req, res) => {
   }
 });
 
+// Retrieve all users based on a search query
 const allUsers = asyncHandler(async (req, res) => {
   const keyword = req.query.search
     ? {
@@ -184,6 +205,8 @@ const allUsers = asyncHandler(async (req, res) => {
   res.send(users);
 });
 
+
+// Exporting all controllers
 module.exports = {
   registerUser,
   authUser,
