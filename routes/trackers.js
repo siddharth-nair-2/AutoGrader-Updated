@@ -27,6 +27,9 @@ const {
   getTests,
   getStudentTests,
   getAllTests,
+  // module imports
+  createModule,
+  updateModule,
 } = require("../controllers/trackerControllers");
 const { protect } = require("../middleware/authMiddleware");
 
@@ -63,5 +66,9 @@ router.route("/deleteTest").post(deleteTest);
 router.route("/getTestsForCourse").post(getTests);
 router.route("/getStudentTests").post(getStudentTests);
 router.route("/getAllTests").post(getAllTests);
+
+// Module Routes
+router.route("/createModule").post(createModule);
+router.route("/updateModule").post(updateModule);
 
 module.exports = router;

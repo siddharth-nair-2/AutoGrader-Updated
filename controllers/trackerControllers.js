@@ -6,6 +6,7 @@ const {
   Submission,
   Plagiarism,
   Test,
+  Module,
 } = require("../models/trackerModel");
 
 // -----------------------------
@@ -649,6 +650,104 @@ const getAllTests = asyncHandler(async (req, res) => {
   }
 });
 
+// -----------------------------
+// Module Management Controllers
+// -----------------------------
+
+// Create a new module
+const createModule = asyncHandler(async (req, res) => {
+  const { title, courseID, content, isLocked, assignments, tests, files } =
+    req.body;
+
+  if (
+    !title ||
+    !courseID ||
+    !content ||
+    isLocked === null ||
+    !assignments ||
+    !tests ||
+    !files
+  ) {
+    res.status(400);
+    throw new Error("Please enter all the fields!");
+  }
+
+  // Create and save the module
+  const module = await Module.create({
+    title,
+    courseID,
+    content,
+    isLocked,
+    assignments,
+    tests,
+    files,
+  });
+
+  if (module) {
+    res.status(201).json({
+      _id: module._id,
+      title: module.title,
+      courseID: module.courseID,
+      content: module.content,
+      isLocked: module.isLocked,
+      assignments: module.assignments,
+      tests: module.tests,
+      files: module.files,
+    });
+  }
+});
+
+// Update an existing module
+const updateModule = asyncHandler(async (req, res) => {
+  try {
+    const {
+      moduleID,
+      title,
+      content,
+      isLocked,
+      newAssignments,
+      newTests,
+      newFiles,
+    } = req.body;
+
+    if (!moduleID) {
+      res.status(400);
+      throw new Error("Module ID is required");
+    }
+    const module = await Module.findById(moduleID);
+
+    if (!module) {
+      res.status(404);
+      throw new Error("Module not found!");
+    }
+
+    if (title) {
+      module.title = title;
+    }
+    if (content) {
+      module.content = content;
+    }
+    if (isLocked !== undefined) {
+      module.isLocked = isLocked;
+    }
+    if (newAssignments && newAssignments.length > 0) {
+      module.assignments.push(...newAssignments);
+    }
+    if (newTests && newTests.length > 0) {
+      module.tests.push(...newTests);
+    }
+    if (newFiles && newFiles.length > 0) {
+      module.files.push(...newFiles);
+    }
+
+    const updatedModule = await module.save();
+
+    res.status(200).send(updatedModule);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
 // Exporting all controllers
 module.exports = {
   // course exports
@@ -678,4 +777,7 @@ module.exports = {
   getTests,
   getStudentTests,
   getAllTests,
+  // module exports
+  createModule,
+  updateModule,
 };

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// Assignment Schema
 const AssignmentSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -60,6 +61,7 @@ const AssignmentSchema = new mongoose.Schema({
   ],
 });
 
+// Submission Schema
 const SubmissionsSchema = new mongoose.Schema(
   {
     studentName: {
@@ -110,6 +112,7 @@ const SubmissionsSchema = new mongoose.Schema(
   }
 );
 
+// Course Schema
 const CourseSchema = new mongoose.Schema({
   courseID: {
     type: String,
@@ -146,6 +149,7 @@ const CourseSchema = new mongoose.Schema({
   },
 });
 
+// Plagiarism Schema
 const PlagiarismSchema = new mongoose.Schema({
   courseID: {
     type: String,
@@ -189,6 +193,7 @@ const PlagiarismSchema = new mongoose.Schema({
   },
 });
 
+// Test Schema
 const TestSchema = new mongoose.Schema(
   {
     name: {
@@ -263,12 +268,66 @@ const TestSchema = new mongoose.Schema(
 // Compound index for test name and course ID
 TestSchema.index({ name: 1, courseID: 1 }, { unique: true });
 
+// Module Schema
+const ModuleSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: [true, "Module title is required"],
+      minLength: [1, "Test name must be atleast 1 character long"],
+      maxLength: [64, "Test name must be less than 65 characters long"],
+    },
+    courseID: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Course",
+      required: [true, "Course ID is required"],
+    },
+    content: {
+      type: String,
+      maxLength: [16777216, "Content exceeds maximum length"], // 16MB, the maximum BSON document size
+    },
+    assignments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Assignment",
+      },
+    ],
+    isLocked: {
+      type: Boolean,
+      required: true,
+    },
+    tests: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Test",
+      },
+    ],
+    files: [
+      {
+        fileName: {
+          type: String,
+          required: true,
+        },
+        filePath: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+  },
+  { timestamps: true }
+);
+
+// Ensure unique title within the same course
+ModuleSchema.index({ title: 1, courseID: 1 }, { unique: true });
+
 // Create models
 const Assignment = mongoose.model("Assignment", AssignmentSchema);
 const Course = mongoose.model("Course", CourseSchema);
 const Submission = mongoose.model("Submission", SubmissionsSchema);
 const Plagiarism = mongoose.model("Plagiarism", PlagiarismSchema);
 const Test = mongoose.model("Test", TestSchema);
+const Module = mongoose.model("Module", ModuleSchema);
 
 module.exports = {
   Assignment,
@@ -276,4 +335,5 @@ module.exports = {
   Plagiarism,
   Submission,
   Test,
+  Module,
 };
