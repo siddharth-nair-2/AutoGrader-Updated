@@ -183,7 +183,8 @@ const searchUsers = asyncHandler(async (req, res) => {
     const keyword = req.query.search
       ? {
           $or: [
-            { name: { $regex: req.query.search, $options: "i" } },
+            { firstName: { $regex: req.query.search, $options: "i" } },
+            { lastName: { $regex: req.query.search, $options: "i" } },
             { email: { $regex: req.query.search, $options: "i" } },
           ],
         }
@@ -191,7 +192,7 @@ const searchUsers = asyncHandler(async (req, res) => {
 
     const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
 
-    if (!users) {
+    if (!users.length) {
       return res.status(404).json({ message: "No users found" });
     }
 
