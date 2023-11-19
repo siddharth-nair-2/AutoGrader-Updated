@@ -51,25 +51,15 @@ const createModule = asyncHandler(async (req, res) => {
 // Update an existing module
 const updateModule = asyncHandler(async (req, res) => {
   try {
-    const {
-      moduleID,
-      title,
-      content,
-      isLocked,
-      newAssignments,
-      newTests,
-      newFiles,
-    } = req.body;
+    const moduleID = req.params.moduleID;
+    const { title, content, isLocked, newAssignments, newTests, newFiles } =
+      req.body;
 
-    if (!moduleID) {
-      res.status(400);
-      throw new Error("Module ID is required");
-    }
     const module = await Module.findById(moduleID);
 
     if (!module) {
-      res.status(404);
-      throw new Error("Module not found!");
+      res.status(404).json({ message: "Module not found!" });
+      return;
     }
 
     if (title) {
@@ -93,48 +83,36 @@ const updateModule = asyncHandler(async (req, res) => {
 
     const updatedModule = await module.save();
 
-    res.status(200).send(updatedModule);
+    res.status(200).json(updatedModule);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(400).json({ message: error.message });
   }
 });
 
 // Delete a module
 const deleteModule = asyncHandler(async (req, res) => {
-  const { moduleID } = req.body;
-
-  if (!moduleID) {
-    res.status(400);
-    throw new Error("Module ID is required!");
-  }
+  const moduleID = req.params.moduleID;
 
   const module = await Module.findById(moduleID);
 
   if (!module) {
-    res.status(404);
-    throw new Error("Module not found!");
+    return res.status(404).json({ message: "Module not found!" });
   }
 
   await module.remove();
-
   res.status(200).json({ message: "Module successfully deleted" });
 });
 
 // Get all modules for a course
 const getModulesForCourse = asyncHandler(async (req, res) => {
-  const { courseID } = req.body;
-
-  if (!courseID) {
-    res.status(400);
-    throw new Error("Course ID is required!");
-  }
+  const courseID = req.params.courseID;
 
   const modules = await Module.find({ courseID: courseID });
 
   if (!modules || modules.length === 0) {
-    res.status(404);
-    throw new Error("No modules found for this course!");
+    return res
+      .status(404)
+      .json({ message: "No modules found for this course!" });
   }
 
   res.status(200).json(modules);
@@ -142,25 +120,18 @@ const getModulesForCourse = asyncHandler(async (req, res) => {
 
 // Get a single module by ID
 const getSingleModule = asyncHandler(async (req, res) => {
+  const moduleID = req.params.moduleID;
+
   try {
-    const { moduleID } = req.body;
+    const module = await Module.findById(moduleID);
 
-    if (!moduleID) {
-      res.status(400);
-      throw new Error("Module ID is required!");
+    if (!module) {
+      return res.status(404).json({ message: "Module not found" });
     }
 
-    const modules = await Module.findById(moduleID);
-
-    if (!modules) {
-      res.status(404);
-      throw new Error("Module not found!");
-    }
-
-    res.status(200).send(modules);
+    res.status(200).json(module);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
 
@@ -170,8 +141,7 @@ const getAllModules = asyncHandler(async (req, res) => {
     const modules = await Module.find({});
 
     if (!modules || modules.length === 0) {
-      res.status(404);
-      throw new Error("No modules found!");
+      return res.status(404).json({ message: "Modules not found" });
     }
 
     res.status(200).send(modules);

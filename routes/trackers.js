@@ -97,20 +97,20 @@ router.get("/studentAssignments", getStudentAssignments);
 // router.route("/studentAssignmentsGet").post(getStudentAssignments);
 
 // Test Routes
-router.route("/createTest").post(createTest);
-router.route("/updateTest").post(updateTest);
-router.route("/deleteTest").post(deleteTest);
-router.route("/getSingleTest").post(getSingleTest);
-router.route("/getTestsForCourse").post(getTestsForCourse);
-router.route("/getStudentTests").post(getStudentTests);
-router.route("/getAllTests").post(getAllTests);
+router.post("/test", createTest);
+router.patch("/test/:testID", updateTest);
+router.delete("/test/:testID", deleteTest);
+router.get("/tests/course/:courseID", getTestsForCourse);
+router.get("/tests/student/:courseID", getStudentTests);
+router.get("/test/:testID", getSingleTest);
+router.get("/tests", getAllTests);
 
 // Module Routes
-router.route("/createModule").post(createModule);
-router.route("/updateModule").post(updateModule);
-router.route("/deleteModule").post(deleteModule);
-router.route("/getSingleModule").post(getSingleModule);
-router.route("/getModulesForCourse").post(getModulesForCourse);
-router.route("/getAllModules").post(getAllModules);
+router.post("/module", createModule);
+router.patch("/module/:moduleID", updateModule);
+router.delete("/module/:moduleID", deleteModule);
+router.get("/modules/course/:courseID", getModulesForCourse);
+router.get("/module/:moduleID", getSingleModule);
+router.get("/modules", getAllModules);
 
 module.exports = router;
