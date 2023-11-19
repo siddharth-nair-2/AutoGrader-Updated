@@ -76,7 +76,7 @@ router.patch("/submission/update", updateSubmission);
 
 // Plagiarism Routes
 router.get("/plagiarism", getAllPlagiarisms);
-router.post("/createComparison", plagiarismCreate);
+router.post("/plagiarism", plagiarismCreate);
 
 /* FIX ON FRONTEND */
 // router.route("/getAllPlagiarism").post(getAllPlagiarisms);

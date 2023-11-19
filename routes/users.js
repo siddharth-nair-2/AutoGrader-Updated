@@ -1,22 +1,35 @@
 const express = require("express");
 const {
   registerUser,
-  authUser,
-  allUsers,
+  authenticateUser,
+  searchUsers,
   getStudentsForCourse,
-  addCourses,
+  addCourseToUser,
   getAllStudents,
-  removeCourses,
+  removeCourseFromUser,
 } = require("../controllers/userControllers");
 const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.route("/").post(registerUser).get(protect, allUsers);
-router.route("/allStudents").get(getAllStudents);
-router.route("/courseStudentsGet").post(getStudentsForCourse);
-router.route("/addCourseToStudents").put(addCourses);
-router.route("/removeCourseStudent").put(removeCourses);
-router.post("/login", authUser);
+// User Registration and Authentication
+router.post("", registerUser);
+router.post("/login", authenticateUser);
+
+// Course Enrollment
+router.put("/:userID/courses/add/:courseID", addCourseToUser);
+router.put("/:userID/courses/remove/:courseID", removeCourseFromUser);
+
+// User Information Retrieval
+router.get("/students", getAllStudents);
+router.get("/students/course/:courseID", getStudentsForCourse);
+router.get("", protect, searchUsers);
+/* FIX ON FRONTEND */
+// router.route("/").post(registerUser).get(protect, searchUsers );
+// router.route("/allStudents").get(getAllStudents);
+// router.route("/courseStudentsGet").post(getStudentsForCourse);
+// router.route("/addCourseToStudents").put(addCourseToUser);
+// router.route("/removeCourseStudent").put(removeCourseFromUser);
+// router.post("/login", authenticateUser);
 
 module.exports = router;

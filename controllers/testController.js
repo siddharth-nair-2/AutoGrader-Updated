@@ -170,8 +170,7 @@ const getAllTests = asyncHandler(async (req, res) => {
     }
     res.status(200).send(tests);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
 
