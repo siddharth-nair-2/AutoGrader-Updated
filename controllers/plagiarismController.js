@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { Plagiarism } = require("../models/trackerModel");
+const { Plagiarism } = require("../models/plagiarismModel");
 
 // -----------------------------
 // Plagiarism Management Controllers

@@ -1,9 +1,7 @@
 const asyncHandler = require("express-async-handler");
-const {
-  Assignment,
-  Submission,
-  Plagiarism,
-} = require("../models/trackerModel");
+const { Assignment } = require("../models/assignmentModel");
+const { Submission } = require("../models/submissionModel");
+const { Plagiarism } = require("../models/plagiarismModel");
 
 // -----------------------------
 // Assignment Management Controllers
@@ -133,9 +131,10 @@ const getStudentAssignments = asyncHandler(async (req, res) => {
 
     if (assignments.length === 0) {
       // No assignments found for the given courseID
-      return res
-        .status(200)
-        .json({ message: "No assignments found for this course, that are avaiable for the students." });
+      return res.status(200).json({
+        message:
+          "No assignments found for this course, that are avaiable for the students.",
+      });
     }
 
     res.status(200).json(assignments);

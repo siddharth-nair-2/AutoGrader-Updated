@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { Submission } = require("../models/trackerModel");
+const { Submission } = require("../models/submissionModel");
 
 // -----------------------------
 // Submission Management Controllers

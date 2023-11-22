@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { Module } = require("../models/trackerModel");
+const { Module } = require("../models/moduleModel");
 
 // -----------------------------
 // Module Management Controllers

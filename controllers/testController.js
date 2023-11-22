@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { Test } = require("../models/trackerModel");
+const { Test } = require("../models/testModel");
 
 // -----------------------------
 // Test Management Controllers
