@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const { Assignment } = require("../models/assignmentModel");
 const { Submission } = require("../models/submissionModel");
 const { Plagiarism } = require("../models/plagiarismModel");
+const { TheoryAssignment } = require("../models/theoryAssignmentModel");
 
 // -----------------------------
 // Assignment Management Controllers
@@ -27,14 +28,21 @@ const AssignmentCreate = asyncHandler(async (req, res) => {
     !questions ||
     visibleToStudents === null
   ) {
-    res.status(400);
-    throw new Error("Please enter all the fields!");
+    return res.status(400).json({ message: "Missing required fields" });
   }
-  const assignmentExists = await Assignment.findOne({ courseID, name });
-  if (assignmentExists) {
-    res.status(400).send("Exists");
-    throw new Error("This assignment name already exists!");
+
+  const theoryAssignmentExists = await TheoryAssignment.findOne({
+    courseID,
+    name,
+  });
+  const existingAssignment = await Assignment.findOne({ courseID, name });
+
+  if (theoryAssignmentExists || existingAssignment) {
+    return res.status(409).json({
+      message: "An assignment with this name already exists in this course.",
+    });
   }
+
   let finalDue = new Date(due_date);
   const assignment = await Assignment.create({
     courseID,

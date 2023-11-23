@@ -5,6 +5,7 @@ const {
   getSingleCourse,
   getStudentCourses,
 } = require("../controllers/courseController");
+
 const {
   AssignmentCreate,
   updateAssignment,
@@ -12,6 +13,21 @@ const {
   getStudentAssignments,
   AssignmentDelete,
 } = require("../controllers/assignmentController");
+
+const {
+  createTheoryAssignment,
+  updateTheoryAssignment,
+  deleteTheoryAssignment,
+  getTheoryAssignments,
+  getStudentTheoryAssignments,
+} = require("../controllers/theoryAssignmentController");
+
+const {
+  getCombinedAssignments,
+  getStudentVisibleAssignments,
+  searchAssignmentsByName,
+  filterAssignmentsByDate,
+} = require("../controllers/combinedAssignmentController");
 
 const {
   createSubmission,
@@ -95,6 +111,19 @@ router.get("/studentAssignments", getStudentAssignments);
 // router.route("/assignmentDelete").post(AssignmentDelete);
 // router.route("/updateAssignment").post(updateAssignment);
 // router.route("/studentAssignmentsGet").post(getStudentAssignments);
+
+// Theory Assignment Routes
+router.post("/theoryAssignments", createTheoryAssignment);
+router.patch("/theoryAssignments/:assignmentID", updateTheoryAssignment);
+router.delete("/theoryAssignments/:assignmentID", deleteTheoryAssignment);
+router.get("/theoryAssignments", getTheoryAssignments);
+router.get("/studentTheoryAssignments", getStudentTheoryAssignments);
+
+// Combined Assignment Routes
+router.get("/allAssignments", getCombinedAssignments);
+router.get("/allAssignments/visible", getStudentVisibleAssignments);
+router.get("/allAssignments/filterByDate", filterAssignmentsByDate);
+router.get("/allAssignments/searchByName", searchAssignmentsByName);
 
 // Test Routes
 router.post("/test", createTest);

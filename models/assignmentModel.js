@@ -21,11 +21,13 @@ const AssignmentSchema = new mongoose.Schema({
     maxLength: [256, "Assignment notes must be less than 257 characters long"],
   },
   courseID: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     require: [true, "Course ID required"],
+    ref: "Course"
   },
   due_date: {
     type: mongoose.Schema.Types.Date,
+    required: [true, "Due date is required"],
   },
   visibleToStudents: {
     type: Boolean,
@@ -72,41 +74,8 @@ const AssignmentSchema = new mongoose.Schema({
     },
   ],
 });
-
-AssignmentSchema.pre("save", async function (next) {
-  const assignment = this;
-
-  // Check in Assignment collection
-  const existingAssignment = await this.constructor.findOne({
-    name: assignment.name,
-    courseID: assignment.courseID,
-  });
-
-  if (
-    existingAssignment &&
-    existingAssignment._id.toString() !== assignment._id.toString()
-  ) {
-    throw new Error(
-      "An assignment with this name already exists in this course."
-    );
-  }
-
-  // Check in TheoryAssignment collection
-  const existingTheoryAssignment = await mongoose
-    .model("TheoryAssignment")
-    .findOne({
-      title: assignment.name,
-      courseID: assignment.courseID,
-    });
-
-  if (existingTheoryAssignment) {
-    throw new Error(
-      "A theory assignment with this name already exists in this course."
-    );
-  }
-
-  next();
-});
+// Compound index for assignment name and course ID
+AssignmentSchema.index({ name: 1, courseID: 1 }, { unique: true });
 
 const Assignment = mongoose.model("Assignment", AssignmentSchema);
 

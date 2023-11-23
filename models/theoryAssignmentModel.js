@@ -19,10 +19,10 @@ const TheoryAssignmentSchema = new mongoose.Schema(
     },
     courseID: {
       type: mongoose.Schema.Types.ObjectId,
-      required: [true, "Course ID is required"],
-      ref: "Course",
+      require: [true, "Course ID required"],
+      ref: "Course"
     },
-    dueDate: {
+    due_date: {
       type: Date,
       required: [true, "Due date is required"],
     },
@@ -50,39 +50,6 @@ const TheoryAssignmentSchema = new mongoose.Schema(
 );
 // Compound index for assignment name and course ID
 TheoryAssignmentSchema.index({ name: 1, courseID: 1 }, { unique: true });
-
-TheoryAssignmentSchema.pre("save", async function (next) {
-  const theoryAssignment = this;
-
-  // Check in TheoryAssignment collection
-  const existingTheoryAssignment = await this.constructor.findOne({
-    title: theoryAssignment.title,
-    courseID: theoryAssignment.courseID,
-  });
-
-  if (
-    existingTheoryAssignment &&
-    existingTheoryAssignment._id.toString() !== theoryAssignment._id.toString()
-  ) {
-    throw new Error(
-      "A theory assignment with this title already exists in this course."
-    );
-  }
-
-  // Check in Assignment collection
-  const existingAssignment = await mongoose.model("Assignment").findOne({
-    name: theoryAssignment.title,
-    courseID: theoryAssignment.courseID,
-  });
-
-  if (existingAssignment) {
-    throw new Error(
-      "An assignment with this name already exists in this course."
-    );
-  }
-
-  next();
-});
 
 const TheoryAssignment = mongoose.model(
   "TheoryAssignment",
