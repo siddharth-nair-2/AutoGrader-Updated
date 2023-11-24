@@ -71,10 +71,10 @@ router.get("/courses/:courseID", getSingleCourse);
 router.get("/studentCourses", getStudentCourses);
 
 /* FIX ON FRONTEND */
-// router.route("/course").post(courseCreate);
-// router.route("/courseGet").post(getCourses);
-// router.route("/allStudentCourses").post(getStudentCourses);
-// router.route("/singleCourse").post(getSingleCourse);
+// router.route("/course").post(courseCreate); - DONE
+// router.route("/courseGet").post(getCourses); - DONE
+// router.route("/singleCourse").post(getSingleCourse); - DONE
+// router.route("/allStudentCourses").post(getStudentCourses); - DONE
 
 // Submission Routes
 router.post("/submission", createSubmission);
@@ -84,19 +84,19 @@ router.get("/submissions", getAllSubmissions);
 router.patch("/submission/update", updateSubmission);
 
 /* FIX ON FRONTEND */
-// router.route("/submission").post(createSubmission);
-// router.route("/comparesubmission").post(compareSubmission);
-// router.route("/updatesubmission").post(updateSubmission);
-// router.route("/getAllSubmissions").post(getAllSubmissions);
-// router.route("/getCustomSubmissions").post(getCustomSubmissions);
+// router.route("/submission").post(createSubmission); - DONE
+// router.route("/comparesubmission").post(compareSubmission); - DONE
+// router.route("/updatesubmission").post(updateSubmission); - DONE
+// router.route("/getAllSubmissions").post(getAllSubmissions); - DONE
+// router.route("/getCustomSubmissions").post(getCustomSubmissions); - DONE
 
 // Plagiarism Routes
 router.get("/plagiarism", getAllPlagiarisms);
 router.post("/plagiarism", plagiarismCreate);
 
 /* FIX ON FRONTEND */
-// router.route("/getAllPlagiarism").post(getAllPlagiarisms);
-// router.route("/createComparison").post(plagiarismCreate);
+// router.route("/getAllPlagiarism").post(getAllPlagiarisms); - DONE
+// router.route("/createComparison").post(plagiarismCreate); - DONE
 
 // Assignment Routes
 router.post("/assignments", AssignmentCreate);
@@ -106,11 +106,11 @@ router.get("/assignments", getAssignments);
 router.get("/studentAssignments", getStudentAssignments);
 
 /* FIX ON FRONTEND */
-// router.route("/assignmentGet").post(getAssignments);
-// router.route("/assignment").post(AssignmentCreate);
-// router.route("/assignmentDelete").post(AssignmentDelete);
-// router.route("/updateAssignment").post(updateAssignment);
-// router.route("/studentAssignmentsGet").post(getStudentAssignments);
+// router.route("/assignmentGet").post(getAssignments); - DONE
+// router.route("/assignment").post(AssignmentCreate); - DONE
+// router.route("/assignmentDelete").post(AssignmentDelete); - DONE
+// router.route("/updateAssignment").post(updateAssignment); - DONE
+// router.route("/studentAssignmentsGet").post(getStudentAssignments); - DONE
 
 // Theory Assignment Routes
 router.post("/theoryAssignments", createTheoryAssignment);

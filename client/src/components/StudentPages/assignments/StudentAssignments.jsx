@@ -523,18 +523,8 @@ const StudentAssignments = () => {
     }
     setDisabled(true);
     try {
-      const config = {
-        Headers: {
-          "Content-type": "application/json",
-        },
-      };
-      const { data } = await axios.post(
-        "http://localhost:5000/api/tracker/comparesubmission",
-        {
-          studentID: user._id,
-          questionID: selectedQuestion._id,
-        },
-        config
+      const { data } = await axios.get(
+        `http://localhost:5000/api/tracker/submission/compare?studentID=${user._id}&questionID=${selectedQuestion._id}`
       );
       if (data.length > 0) {
         if (
@@ -558,13 +548,9 @@ const StudentAssignments = () => {
                 "Content-type": "application/json",
               },
             };
-            const { data } = await axios.post(
-              "http://localhost:5000/api/tracker/updatesubmission",
+            const { data } = await axios.patch(
+              `http://localhost:5000/api/tracker/submission/update?courseID=${selectedCourse._id}&assignmentID=${selectedAssignment._id}&questionID=${selectedQuestion._id}&studentID=${user._id}`,
               {
-                courseID: selectedCourse._id,
-                assignmentID: selectedAssignment._id,
-                questionID: selectedQuestion._id,
-                studentID: user._id,
                 answer: userCode,
                 languageName: userLang,
                 testCases: `${passedCases}/${arrVal.length}`,
@@ -635,22 +621,8 @@ const StudentAssignments = () => {
       console.log(error);
     }
     try {
-      const config = {
-        Headers: {
-          "Content-type": "application/json",
-        },
-      };
-      const { data } = await axios.post(
-        "http://localhost:5000/api/tracker/getCustomSubmissions",
-        {
-          courseID: selectedCourse._id,
-          assignmentID: selectedAssignment._id,
-          questionID: selectedQuestion._id,
-          languageName: userLang,
-          studentID: user._id,
-        },
-        config
-      );
+      let url = `http://localhost:5000/api/tracker/submission/custom?courseID=${selectedCourse._id}&assignmentID=${selectedAssignment._id}&questionID=${selectedQuestion._id}&languageName=${userLang}&studentID=${user._id}`;
+      const { data } = await axios.get(url);
       if (data.length > 0) {
         const otherSubmissions = data;
         try {

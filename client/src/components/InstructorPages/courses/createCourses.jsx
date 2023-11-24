@@ -193,7 +193,7 @@ const CreateCourses = () => {
         },
       };
       const { data } = await axios.post(
-        "http://localhost:5000/api/tracker/course",
+        "http://localhost:5000/api/tracker/courses",
         {
           courseID,
           name,

@@ -24,12 +24,14 @@ router.put("/:userID/courses/remove/:courseID", removeCourseFromUser);
 router.get("/students", getAllStudents);
 router.get("/students/course/:courseID", getStudentsForCourse);
 router.get("", protect, searchUsers);
+
+
 /* FIX ON FRONTEND */
-// router.route("/").post(registerUser).get(protect, searchUsers );
-// router.route("/allStudents").get(getAllStudents);
-// router.route("/courseStudentsGet").post(getStudentsForCourse);
-// router.route("/addCourseToStudents").put(addCourseToUser);
-// router.route("/removeCourseStudent").put(removeCourseFromUser);
-// router.post("/login", authenticateUser);
+// router.route("/").post(registerUser).get(protect, searchUsers ); - DONE
+// router.route("/allStudents").get(getAllStudents); - DONE
+// router.route("/courseStudentsGet").post(getStudentsForCourse); - DONE
+// router.route("/addCourseToStudents").put(addCourseToUser); - DONE
+// router.route("/removeCourseStudent").put(removeCourseFromUser); - DONE
+// router.post("/login", authenticateUser); - DONE
 
 module.exports = router;

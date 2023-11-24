@@ -128,11 +128,10 @@ const Input = styled.input`
 const CourseStudents = () => {
   const fetchCourseStudents = async () => {
     try {
-      const data = await axios.post(
-        "http://localhost:5000/api/user/courseStudentsGet",
-        {
-          _id: JSON.parse(localStorage.getItem("courseInfo"))._id,
-        }
+      const data = await axios.get(
+        `http://localhost:5000/api/user/students/course/${
+          JSON.parse(localStorage.getItem("courseInfo"))._id
+        }`
       );
       setStudents(data.data);
     } catch (error) {
@@ -149,9 +148,7 @@ const CourseStudents = () => {
 
   const fetchAllStudents = async () => {
     try {
-      const data = await axios.get(
-        "http://localhost:5000/api/user/allStudents"
-      );
+      const data = await axios.get("http://localhost:5000/api/user/students");
       const filteredData = data.data.filter((student) => {
         return (
           student.courses.findIndex((x) => {
@@ -178,11 +175,9 @@ const CourseStudents = () => {
     const addHandler = async () => {
       try {
         const data = await axios.put(
-          "http://localhost:5000/api/user/addCourseToStudents",
-          {
-            _id: params.data._id,
-            courseID: JSON.parse(localStorage.getItem("courseInfo"))._id,
-          }
+          `http://localhost:5000/api/user/${params.data._id}/courses/add/${
+            JSON.parse(localStorage.getItem("courseInfo"))._id
+          }`
         );
         fetchCourseStudents();
         fetchAllStudents();
@@ -211,11 +206,9 @@ const CourseStudents = () => {
     const removeHandler = async () => {
       try {
         const data = await axios.put(
-          "http://localhost:5000/api/user/removeCourseStudent",
-          {
-            _id: params.data._id,
-            courseID: JSON.parse(localStorage.getItem("courseInfo"))._id,
-          }
+          `http://localhost:5000/api/user/${params.data._id}/courses/remove/${
+            JSON.parse(localStorage.getItem("courseInfo"))._id
+          }`
         );
         fetchCourseStudents();
         fetchAllStudents();

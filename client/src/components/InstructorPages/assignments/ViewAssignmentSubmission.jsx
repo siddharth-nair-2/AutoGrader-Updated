@@ -80,12 +80,12 @@ const Input = styled.input`
 const ViewAssignmentSubmission = () => {
   const fetchAllAssignments = async () => {
     try {
-      const data = await axios.post(
-        "http://localhost:5000/api/tracker/getAllSubmissions",
-        {
-          courseID: JSON.parse(localStorage.getItem("assignmentInfo")).courseID,
-          assignmentID: JSON.parse(localStorage.getItem("assignmentInfo"))._id,
-        }
+      const data = await axios.get(
+        `http://localhost:5000/api/tracker/submissions?courseID=${
+          JSON.parse(localStorage.getItem("assignmentInfo")).courseID
+        }&assignmentID=${
+          JSON.parse(localStorage.getItem("assignmentInfo"))._id
+        }`
       );
       setAllStudents(data.data);
     } catch (error) {
@@ -213,15 +213,16 @@ const ViewAssignmentSubmission = () => {
     ) {
       try {
         const data = await axios
-          .post("http://localhost:5000/api/tracker/updateAssignment", {
-            assignmentID: JSON.parse(localStorage.getItem("assignmentInfo"))
-              ._id,
-            courseID: JSON.parse(localStorage.getItem("assignmentInfo"))
-              .courseID,
-            visibleToStudents: !JSON.parse(
-              localStorage.getItem("assignmentInfo")
-            ).visibleToStudents,
-          })
+          .patch(
+            `http://localhost:5000/api/tracker/assignments/${
+              JSON.parse(localStorage.getItem("assignmentInfo"))._id
+            }`,
+            {
+              visibleToStudents: !JSON.parse(
+                localStorage.getItem("assignmentInfo")
+              ).visibleToStudents,
+            }
+          )
           .then(() =>
             toast({
               title: "Visibility Changed!",
@@ -241,7 +242,7 @@ const ViewAssignmentSubmission = () => {
       } catch (error) {
         toast({
           title: "Error Occured!",
-          description: "Failed to Delete the assignment",
+          description: "Failed to change the assignment visibility",
           status: "error",
           duration: 5000,
           isClosable: true,
@@ -255,10 +256,11 @@ const ViewAssignmentSubmission = () => {
     if (window.confirm("Are you sure you want to delete this assignment?")) {
       try {
         const data = await axios
-          .post("http://localhost:5000/api/tracker/assignmentDelete", {
-            assignmentID: JSON.parse(localStorage.getItem("assignmentInfo"))
-              ._id,
-          })
+          .delete(
+            `http://localhost:5000/api/tracker/assignments/${
+              JSON.parse(localStorage.getItem("assignmentInfo"))._id
+            }`
+          )
           .then(() => navigate("/course"));
       } catch (error) {
         toast({

@@ -276,7 +276,7 @@ const CreateAssignments = () => {
         },
       };
       const { data } = await axios.post(
-        "http://localhost:5000/api/tracker/assignment",
+        "http://localhost:5000/api/tracker/assignments",
         {
           courseID: JSON.parse(localStorage.getItem("courseInfo"))._id,
           name,

@@ -78,15 +78,14 @@ const Input = styled.input`
 `;
 
 const PlagiarismPage = () => {
-  const fetchAllAssignments = async () => {
+  const fetchAllPlagiarismComparisons = async () => {
     try {
-      const data = await axios.post(
-        "http://localhost:5000/api/tracker/getAllPlagiarism",
-        {
-          courseID: JSON.parse(localStorage.getItem("assignmentInfo")).courseID,
-          assignmentID: JSON.parse(localStorage.getItem("assignmentInfo"))._id,
-        }
-      );
+      let url = `http://localhost:5000/api/tracker/plagiarism?assignmentID=${
+        JSON.parse(localStorage.getItem("assignmentInfo"))._id
+      }&courseID=${JSON.parse(localStorage.getItem("assignmentInfo")).courseID}`;
+      const data = await axios.get(url);
+      console.log(url);
+      console.log(data.data);
       setAllStudents(data.data);
     } catch (error) {
       toast({
@@ -174,7 +173,7 @@ const PlagiarismPage = () => {
     } else {
       setSelectedCourse(JSON.parse(localStorage.getItem("courseInfo")));
       setSelectedAssignment(JSON.parse(localStorage.getItem("assignmentInfo")));
-      fetchAllAssignments();
+      fetchAllPlagiarismComparisons();
     }
   }, []);
 

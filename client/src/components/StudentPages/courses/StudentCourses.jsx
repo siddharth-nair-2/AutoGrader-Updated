@@ -93,11 +93,10 @@ const StudentCourses = () => {
 
   const fetchAssignments = async () => {
     try {
-      const data = await axios.post(
-        "http://localhost:5000/api/tracker/studentAssignmentsGet",
-        {
-          _id: JSON.parse(localStorage.getItem("courseInfo"))._id,
-        }
+      const data = await axios.get(
+        `http://localhost:5000/api/tracker/studentAssignments?courseID=${
+          JSON.parse(localStorage.getItem("courseInfo"))._id
+        }`
       );
       setAssignments(data.data);
     } catch (error) {

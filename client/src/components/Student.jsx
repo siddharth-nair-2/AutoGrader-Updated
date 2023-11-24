@@ -82,13 +82,22 @@ const Student = () => {
   }, []);
 
   const fetchAllCourses = async () => {
-    try {
-      const data = await axios.post(
-        "http://localhost:5000/api/tracker/allStudentCourses",
-        {
-          courses: JSON.parse(localStorage.getItem("userInfo")).courses,
-        }
+    let urlCourses = [];
+    for (
+      let i = 0;
+      i < JSON.parse(localStorage.getItem("userInfo"))?.courses?.length;
+      i++
+    ) {
+      urlCourses.push(
+        JSON.parse(localStorage.getItem("userInfo")).courses[i].courseID
       );
+    }
+    if (urlCourses.length < 1) {
+      return;
+    }
+    const url = `http://localhost:5000/api/tracker/studentCourses?courseIds=${urlCourses.toString()}`;
+    try {
+      const data = await axios.get(url);
       setCourses(data.data);
     } catch (error) {
       toast({
@@ -109,8 +118,9 @@ const Student = () => {
           <Heading>COURSES</Heading>
           <CourseBox>
             {courses &&
+              courses.length > 0 &&
               courses.slice(0, 8).map((course) => {
-                let desc = course[0].description;
+                let desc = course.description;
                 if (desc.length > 120) {
                   desc = desc.substring(0, 114);
                   desc += "...";
@@ -118,8 +128,8 @@ const Student = () => {
                 return (
                   <CourseCardMain
                     isStudent={true}
-                    key={course[0]._id}
-                    course={course[0]}
+                    key={course._id}
+                    course={course}
                     description={desc}
                   />
                 );
