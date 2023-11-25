@@ -4,7 +4,7 @@ import { useToast } from "@chakra-ui/react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../misc/Navbar";
-import { TrackerState } from "../../../Context/TrackerProvider";
+import { TrackerState } from "../../../context/TrackerProvider";
 import Heading from "../../misc/Heading";
 import DateTimePicker from "react-datetime-picker";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";

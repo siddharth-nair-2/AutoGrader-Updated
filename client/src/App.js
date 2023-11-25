@@ -1,25 +1,16 @@
 import { Route, Routes, Navigate } from "react-router-dom";
-import Instructor from "./components/Instructor";
-import Signup from "./components/Auth/SignUp";
-import Login from "./components/Auth/Login";
 import { ChakraProvider } from "@chakra-ui/react";
-import Student from "./components/Student";
+import { instructorRoutes, studentRoutes } from "./routes";
+
+import { useAuth } from "./context/AuthProvider"; // Adjust the path as needed
+
+import Login from "./components/Auth/Login";
+import Signup from "./components/Auth/SignUp";
 import NotFound from "./components/NotFound";
-import CreateCourses from "./components/InstructorPages/courses/createCourses";
-import Courses from "./components/InstructorPages/courses/Courses";
-import CreateAssignments from "./components/InstructorPages/assignments/CreateAssignments";
-import CourseStudents from "./components/InstructorPages/courses/CourseStudents";
-import StudentCourses from "./components/StudentPages/courses/StudentCourses";
-import StudentAssignments from "./components/StudentPages/assignments/StudentAssignments";
-import ViewAssignmentSubmission from "./components/InstructorPages/assignments/ViewAssignmentSubmission";
-import SingleSubmission from "./components/InstructorPages/assignments/SingleSubmission";
-import PlagiarismPage from "./components/InstructorPages/assignments/PlagiarismPage";
-import ViewAllAssignments from "./components/InstructorPages/assignments/ViewAllAssignments";
-import ViewAllModules from "./components/InstructorPages/modules/ViewAllModules";
-import ViewAllTests from "./components/InstructorPages/tests/ViewAllTests";
 
 function App() {
-  const user = JSON.parse(localStorage.getItem("userInfo"));
+  const { user } = useAuth();
+
   // Function to render routes specific to a user type
   const renderRoutesForUser = (userType, routes) => {
     return (
@@ -29,30 +20,6 @@ function App() {
     );
   };
 
-  // Define routes specific to 'Instructor' and 'Student'
-  const instructorRoutes = [
-    { path: "/", exact: true, element: <Instructor /> },
-    { path: "/createcourses", exact: true, element: <CreateCourses /> },
-    { path: "/createassignment", exact: true, element: <CreateAssignments /> },
-    { path: "/course", exact: true, element: <Courses /> },
-    {
-      path: "/viewassignment",
-      exact: true,
-      element: <ViewAssignmentSubmission />,
-    },
-    { path: "/viewallassignments", exact: true, element: <ViewAllAssignments />},
-    { path: "/viewallmodules", exact: true, element: <ViewAllModules />},
-    { path: "/viewalltests", exact: true, element: <ViewAllTests />},
-    { path: "/courseStudents", exact: true, element: <CourseStudents /> },
-    { path: "/viewSubmission", exact: true, element: <SingleSubmission /> },
-    { path: "/plagiarism", exact: true, element: <PlagiarismPage /> },
-  ];
-
-  const studentRoutes = [
-    { path: "/", exact: true, element: <Student /> },
-    { path: "/course", exact: true, element: <StudentCourses /> },
-    { path: "/viewassignment", exact: true, element: <StudentAssignments /> },
-  ];
   return (
     <ChakraProvider>
       <Routes>
@@ -70,8 +37,8 @@ function App() {
         {/* Public routes */}
         {!user && (
           <>
-            <Route path="/signup" exact element={<Signup />} />
-            <Route path="/login" exact element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/" element={<Navigate replace to="/login" />} />
           </>
         )}

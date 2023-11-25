@@ -3,7 +3,7 @@ import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { TrackerState } from "../../../Context/TrackerProvider";
+import { TrackerState } from "../../../context/TrackerProvider";
 import Heading from "../../misc/Heading";
 import Navbar from "../../misc/Navbar";
 import { AgGridReact } from "ag-grid-react";

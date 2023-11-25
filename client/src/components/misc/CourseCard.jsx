@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { TrackerState } from "../../Context/TrackerProvider";
+import { TrackerState } from "../../context/TrackerProvider";
 import { useNavigate } from "react-router-dom";
 import { HiUserGroup } from "react-icons/hi";
 

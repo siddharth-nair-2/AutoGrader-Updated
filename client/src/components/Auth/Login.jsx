@@ -1,8 +1,8 @@
-import { useState } from "react";
-import axios from "axios";
-import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useToast } from "@chakra-ui/react";
+import { useAuth } from "../../context/AuthProvider";
 
 const Container = styled.div`
   width: 100vw;
@@ -154,51 +154,24 @@ const BlackBtn = styled(WhiteBtn)`
 const Login = () => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
+  const { login } = useAuth();
   const toast = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const config = {
-        Headers: {
-          "Content-type": "application/json",
-        },
-      };
-      const { data } = await axios.post(
-        "http://localhost:5000/api/user/login",
-        {
-          email,
-          password,
-        },
-        config
-      );
-      localStorage.setItem("userInfo", JSON.stringify(data));
+      await login(email, password);
       window.location = "/";
     } catch (error) {
-      console.log(error);
-      if (
-        error.response &&
-        error.response.status >= 400 &&
-        error.response.status <= 500
-      ) {
-        if (error.response.data === "Invalid Credentials") {
-          toast({
-            title: "Incorrect credentials!",
-            description: "Please check your email or password.",
-            status: "error",
-            duration: 4000,
-            isClosable: true,
-          });
-        } else {
-          toast({
-            title: "Error",
-            description: error.response.statusText,
-            status: "error",
-            duration: 4000,
-            isClosable: true,
-          });
-        }
-      }
+      const errorMessage =
+        error.response?.data?.message || "Login failed. Please try again.";
+      toast({
+        title: "Error",
+        description: errorMessage,
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
     }
   };
 
@@ -234,7 +207,7 @@ const Login = () => {
                 required
               />
               <ForgetPas>Forget Password?</ForgetPas>
-              <BlackBtn>Login</BlackBtn>
+              <BlackBtn type="submit">Login</BlackBtn>
               <Label style={{ fontWeight: 400 }}>
                 Not registered yet?
                 <Link to="/signup" style={{ fontWeight: 600 }}>

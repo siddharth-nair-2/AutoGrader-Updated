@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { TrackerState } from "../../../Context/TrackerProvider";
+import { TrackerState } from "../../../context/TrackerProvider";
 import Editor from "@monaco-editor/react";
 import Navbar from "../../misc/Navbar";
 import { useToast } from "@chakra-ui/react";

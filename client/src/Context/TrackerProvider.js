@@ -1,25 +1,17 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { createContext, useContext, useState } from "react";
+import { useAuth } from "./AuthProvider";
 
 const trackerContext = createContext();
 
 const TrackerProvider = ({ children }) => {
-  const [user, setUser] = useState();
+  const { user } = useAuth(); // Get user from AuthProvider
   const [selectedCourse, setSelectedCourse] = useState();
   const [courses, setCourses] = useState([]);
 
-  const navigate = useNavigate();
-  useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    setUser(userInfo);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate]);
   return (
     <trackerContext.Provider
       value={{
         user,
-        setUser,
         selectedCourse,
         setSelectedCourse,
         courses,
@@ -30,8 +22,6 @@ const TrackerProvider = ({ children }) => {
     </trackerContext.Provider>
   );
 };
-export const TrackerState = () => {
-  return useContext(trackerContext);
-};
+export const TrackerState = () => useContext(trackerContext);
 
 export default TrackerProvider;

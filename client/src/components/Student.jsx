@@ -1,12 +1,14 @@
-import { useToast } from "@chakra-ui/react";
 import axios from "axios";
+import styled from "styled-components";
+
+import { useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
+import { useAuth } from "../context/AuthProvider";
+
 import CourseCardMain from "./misc/CourseCard";
 import Heading from "./misc/Heading";
 import Navbar from "./misc/Navbar";
-import styles from "./styles.module.css";
 
 const Container = styled.div`
   font-family: "Poppins", sans-serif;
@@ -68,37 +70,43 @@ const CourseButtons = styled.button`
     transform: scale(1.01);
   }
 `;
+
+const NoCoursesMessage = styled(CourseCard)`
+  margin: auto;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: 500;
+`;
+
 const Student = () => {
-  const [userData, setUserData] = useState();
+  const { user } = useAuth();
   const [courses, setCourses] = useState([]);
   const toast = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    setUserData(JSON.parse(localStorage.getItem("userInfo")));
     localStorage.removeItem("courseInfo");
     localStorage.removeItem("assignmentInfo");
+    localStorage.removeItem("submissionInfo");
+    localStorage.removeItem("testCases");
     fetchAllCourses();
-  }, []);
+  }, [user]);
 
   const fetchAllCourses = async () => {
-    let urlCourses = [];
-    for (
-      let i = 0;
-      i < JSON.parse(localStorage.getItem("userInfo"))?.courses?.length;
-      i++
-    ) {
-      urlCourses.push(
-        JSON.parse(localStorage.getItem("userInfo")).courses[i].courseID
-      );
-    }
-    if (urlCourses.length < 1) {
-      return;
-    }
-    const url = `http://localhost:5000/api/tracker/studentCourses?courseIds=${urlCourses.toString()}`;
+    const courseIDs = user?.courses?.map((course) => course.courseID) || [];
+    if (courseIDs.length === 0) return;
+
+    const url = `http://localhost:5000/api/tracker/studentCourses?courseIds=${courseIDs.join(
+      ","
+    )}`;
+
     try {
-      const data = await axios.get(url);
-      setCourses(data.data);
+      const res = await axios.get(url);
+      setCourses(res.data);
     } catch (error) {
       toast({
         title: "Error Occured!",
@@ -113,52 +121,33 @@ const Student = () => {
   return (
     <Container>
       <Navbar />
-      {courses && courses.length > 0 && (
+      {courses && courses.length > 0 ? (
         <>
           <Heading>COURSES</Heading>
           <CourseBox>
-            {courses &&
-              courses.length > 0 &&
-              courses.slice(0, 8).map((course) => {
-                let desc = course.description;
-                if (desc.length > 120) {
-                  desc = desc.substring(0, 114);
-                  desc += "...";
-                }
-                return (
-                  <CourseCardMain
-                    isStudent={true}
-                    key={course._id}
-                    course={course}
-                    description={desc}
-                  />
-                );
-              })}
+            {courses.slice(0, 8).map((course) => {
+              let desc = course.description;
+              if (desc.length > 120) {
+                desc = desc.substring(0, 114) + "...";
+              }
+              return (
+                <CourseCardMain
+                  isStudent={true}
+                  key={course._id}
+                  course={course}
+                  description={desc}
+                />
+              );
+            })}
           </CourseBox>
-          <ViewCreateDiv>
-            {courses.length > 8 && (
+          {courses.length > 8 && (
+            <ViewCreateDiv>
               <CourseButtons>View All Courses</CourseButtons>
-            )}
-          </ViewCreateDiv>
+            </ViewCreateDiv>
+          )}
         </>
-      )}
-      {courses && courses.length < 1 && (
-        <>
-          <CourseCard
-            style={{
-              margin: "auto",
-              marginTop: "50px",
-              marginBottom: "50px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              fontSize: "24px",
-              fontWeight: "500",
-            }}
-          >
-            You have no courses!
-          </CourseCard>
-        </>
+      ) : (
+        <NoCoursesMessage>You have no courses!</NoCoursesMessage>
       )}
     </Container>
   );

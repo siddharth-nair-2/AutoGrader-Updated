@@ -3,7 +3,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { TrackerState } from "../../../Context/TrackerProvider";
+import { TrackerState } from "../../../context/TrackerProvider";
 import AssignmentCard from "../../misc/AssignmentCard";
 import Heading from "../../misc/Heading";
 import Navbar from "../../misc/Navbar";

@@ -2,7 +2,7 @@ import React from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { TrackerState } from "../../Context/TrackerProvider";
+import { TrackerState } from "../../context/TrackerProvider";
 
 const CourseCard = styled.div`
   position: relative;

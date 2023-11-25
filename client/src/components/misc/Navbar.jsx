@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
-import { TrackerState } from "../../Context/TrackerProvider";
+import { TrackerState } from "../../context/TrackerProvider";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthProvider";
 
 const NavBar = styled.nav`
   width: 100%;
@@ -53,27 +54,22 @@ const LogoImg = styled.img`
   cursor: pointer;
 `;
 const Navbar = () => {
-  const { user, setUser } = TrackerState();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setUser(JSON.parse(localStorage.getItem("userInfo")));
-  }, []);
 
   const handleLogoClick = () => {
     localStorage.removeItem("courseInfo");
     localStorage.removeItem("assignmentInfo");
     localStorage.removeItem("submissionInfo");
-    navigate("/")
-  }
+    localStorage.removeItem("testCases");
+    navigate("/");
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem("userInfo");
-    localStorage.removeItem("courseInfo");
-    localStorage.removeItem("assignmentInfo");
-    localStorage.removeItem("submissionInfo");
-    window.location = ("/");
+    logout();
+    window.location = "/";
   };
+
   return (
     <NavBar>
       {user && (
@@ -84,7 +80,11 @@ const Navbar = () => {
           <H2Nav>{user.userType}</H2Nav>
         </NavLeftDiv>
       )}
-      <LogoImg src="userLogo.jpg" alt="Autograder logo" onClick={handleLogoClick} />
+      <LogoImg
+        src="userLogo.jpg"
+        alt="Autograder logo"
+        onClick={handleLogoClick}
+      />
       <div style={{ flex: "1", textAlign: "right" }}>
         <LogoutBtn onClick={handleLogout}>Logout</LogoutBtn>
       </div>

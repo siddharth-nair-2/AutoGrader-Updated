@@ -1,8 +1,8 @@
 import { useState } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { useToast } from "@chakra-ui/react";
+import { useAuth } from "../../context/AuthProvider";
 
 const Container = styled.div`
   width: 100vw;
@@ -171,10 +171,11 @@ const BlackBtn = styled(WhiteBtn)`
 const Signup = () => {
   const [firstName, setFirstName] = useState();
   const [lastName, setLastName] = useState();
-  const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [userType, setUserType] = useState();
   const [terms, setTerms] = useState(false);
+  const [email, setEmail] = useState();
+  const { registerUser } = useAuth();
   const toast = useToast();
 
   const handleSubmit = async (e) => {
@@ -224,22 +225,7 @@ const Signup = () => {
       return;
     }
     try {
-      const config = {
-        Headers: {
-          "Content-type": "application/json",
-        },
-      };
-      const { data } = await axios.post(
-        "http://localhost:5000/api/user",
-        {
-          firstName,
-          lastName,
-          email,
-          password,
-          userType,
-        },
-        config
-      );
+      await registerUser(firstName, lastName, email, password, userType);
       setTimeout(() => {
         window.location = "/login";
       }, "500");
@@ -251,34 +237,17 @@ const Signup = () => {
         isClosable: true,
       });
     } catch (error) {
-      console.log(error);
-      if (
-        error.response &&
-        error.response.status >= 400 &&
-        error.response.status <= 500
-      ) {
-        if (error.response.data === "InUse") {
-          toast({
-            title: "Error",
-            description: "Email already in use!",
-            status: "error",
-            duration: 4000,
-            isClosable: true,
-          });
-        } else {
-          toast({
-            title: "Error",
-            description: error.response.statusText,
-            status: "error",
-            duration: 4000,
-            isClosable: true,
-          });
-        }
-      }
+      const errorMessage =
+        error.response?.data?.message || "Login failed. Please try again.";
+      toast({
+        title: "Error",
+        description: errorMessage,
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
     }
   };
-
-  // colorful-bell-bottoms-newt.cyclic.app/judge0
 
   return (
     <Container>
@@ -350,7 +319,7 @@ const Signup = () => {
               >
                 <input
                   type="checkbox"
-                  class="checkBoxSignup"
+                  className="checkBoxSignup"
                   name="checkBox2"
                   id="checkBox2"
                   value="checked"

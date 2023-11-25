@@ -1,12 +1,15 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { useToast } from "@chakra-ui/react";
 import styled from "styled-components";
-import { TrackerState } from "../Context/TrackerProvider";
+
+import { useEffect } from "react";
+import { useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthProvider";
+import { TrackerState } from "../context/TrackerProvider";
+
 import Navbar from "./misc/Navbar";
-import CourseCardMain from "./misc/CourseCard";
 import Heading from "./misc/Heading";
+import CourseCardMain from "./misc/CourseCard";
 
 const Container = styled.div`
   font-family: "Poppins", sans-serif;
@@ -69,9 +72,21 @@ const CourseButtons = styled.button`
   }
 `;
 
+const NoCoursesMessage = styled(CourseCard)`
+  margin: auto;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: 500;
+`;
+
 const Instructor = () => {
   const toast = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { courses, setCourses } = TrackerState();
 
   useEffect(() => {
@@ -83,9 +98,7 @@ const Instructor = () => {
   const fetchCourses = async () => {
     try {
       const data = await axios.get(
-        `http://localhost:5000/api/tracker/courses?instructor=${
-          JSON.parse(localStorage.getItem("userInfo"))._id
-        }`
+        `http://localhost:5000/api/tracker/courses?instructor=${user._id}`
       );
       setCourses(data.data);
     } catch (error) {
@@ -136,20 +149,7 @@ const Instructor = () => {
       )}
       {courses && courses.length < 1 && (
         <>
-          <CourseCard
-            style={{
-              margin: "auto",
-              marginTop: "50px",
-              marginBottom: "50px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              fontSize: "24px",
-              fontWeight: "500",
-            }}
-          >
-            You have no courses!
-          </CourseCard>
+          <NoCoursesMessage>You have no courses!</NoCoursesMessage>
           <ViewCreateDiv>
             <CourseButtons onClick={(e) => navigate("/createcourses")}>
               + New Course
