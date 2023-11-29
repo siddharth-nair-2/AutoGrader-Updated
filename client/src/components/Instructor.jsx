@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
-import { TrackerState } from "../context/TrackerProvider";
+import { useTracker } from "../context/TrackerProvider";
 
 import Navbar from "./misc/Navbar";
 import Heading from "./misc/Heading";
@@ -87,7 +87,7 @@ const Instructor = () => {
   const toast = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { courses, setCourses } = TrackerState();
+  const { courses, setCourses } = useTracker();
 
   useEffect(() => {
     fetchCourses();

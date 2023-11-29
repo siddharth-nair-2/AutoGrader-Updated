@@ -22,6 +22,6 @@ const TrackerProvider = ({ children }) => {
     </trackerContext.Provider>
   );
 };
-export const TrackerState = () => useContext(trackerContext);
+export const useTracker = () => useContext(trackerContext);
 
 export default TrackerProvider;

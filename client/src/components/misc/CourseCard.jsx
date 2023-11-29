@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { TrackerState } from "../../context/TrackerProvider";
+import { useTracker } from "../../context/TrackerProvider";
 import { useNavigate } from "react-router-dom";
 import { HiUserGroup } from "react-icons/hi";
 
@@ -90,7 +90,7 @@ const ViewStudents = styled.div`
 `;
 
 const CourseCardMain = ({ course, description, isStudent}) => {
-  const { setSelectedCourse } = TrackerState();
+  const { setSelectedCourse } = useTracker();
   const navigate = useNavigate();
 
   const handleCourseClick = () => {

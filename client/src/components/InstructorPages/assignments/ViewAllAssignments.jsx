@@ -3,7 +3,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { TrackerState } from "../../../context/TrackerProvider";
+import { useTracker } from "../../../context/TrackerProvider";
 import AssignmentCard from "../../misc/AssignmentCard";
 import Heading from "../../misc/Heading";
 import Navbar from "../../misc/Navbar";
@@ -77,7 +77,7 @@ const CourseBox = styled.div`
 `;
 
 const ViewAllAssignments = () => {
-  const { selectedCourse, setSelectedCourse } = TrackerState();
+  const { selectedCourse, setSelectedCourse } = useTracker();
   const [assignments, setAssignments] = useState([]);
   const navigate = useNavigate();
 
@@ -148,6 +148,9 @@ const ViewAllAssignments = () => {
           )}
           <ViewCreateDiv>
             <CourseButtons onClick={(e) => navigate("/createAssignment")}>
+              + New coding Assignment
+            </CourseButtons>
+            <CourseButtons onClick={(e) => navigate("/createTheoryAssignment")}>
               + New Assignment
             </CourseButtons>
           </ViewCreateDiv>

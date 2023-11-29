@@ -3,7 +3,7 @@ import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { TrackerState } from "../../../context/TrackerProvider";
+import { useTracker } from "../../../context/TrackerProvider";
 import Heading from "../../misc/Heading";
 import Navbar from "../../misc/Navbar";
 import { AgGridReact } from "ag-grid-react";
@@ -262,7 +262,7 @@ const CourseStudents = () => {
   const [gridApi, setGridApi] = useState(null);
   const [gridColumnApi, setGridColumnApi] = useState(null);
 
-  const { selectedCourse, setSelectedCourse } = TrackerState();
+  const { selectedCourse, setSelectedCourse } = useTracker();
   const [students, setStudents] = useState([]);
   const [allStudents, setAllStudents] = useState([]);
   const [showAddStudents, setShowAddStudents] = useState(false);

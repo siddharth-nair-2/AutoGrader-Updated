@@ -1,9 +1,9 @@
-import { useToast } from "@chakra-ui/react";
 import axios from "axios";
+import { useToast } from "@chakra-ui/react";
 import React, { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { TrackerState } from "../../../context/TrackerProvider";
+import { Link, useNavigate } from "react-router-dom";
+import { useTracker } from "../../../context/TrackerProvider";
 import Heading from "../../misc/Heading";
 import Navbar from "../../misc/Navbar";
 import { AgGridReact } from "ag-grid-react";
@@ -84,8 +84,6 @@ const PlagiarismPage = () => {
         JSON.parse(localStorage.getItem("assignmentInfo"))._id
       }&courseID=${JSON.parse(localStorage.getItem("assignmentInfo")).courseID}`;
       const data = await axios.get(url);
-      console.log(url);
-      console.log(data.data);
       setAllStudents(data.data);
     } catch (error) {
       toast({
@@ -162,7 +160,7 @@ const PlagiarismPage = () => {
 
   const [gridApi, setGridApi] = useState(null);
   const [gridColumnApi, setGridColumnApi] = useState(null);
-  const { selectedCourse, setSelectedCourse } = TrackerState();
+  const { selectedCourse, setSelectedCourse } = useTracker();
   const [allStudents, setAllStudents] = useState([]);
   const [selectedAssignment, setSelectedAssignment] = useState();
 

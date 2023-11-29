@@ -2,7 +2,7 @@ import Editor from "@monaco-editor/react";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { TrackerState } from "../../../context/TrackerProvider";
+import { useTracker } from "../../../context/TrackerProvider";
 import Navbar from "../../misc/Navbar";
 
 const Container = styled.div`
@@ -102,7 +102,7 @@ const UserInfoBox = styled.div`
 
 const SingleSubmission = () => {
   const [activeSubmission, setActiveSubmission] = useState();
-  const { selectedCourse, setSelectedCourse, user } = TrackerState();
+  const { selectedCourse, setSelectedCourse, user } = useTracker();
   const [selectedAssignment, setSelectedAssignment] = useState();
   const [userTheme, setUserTheme] = useState("vs-dark");
   const [fontSize, setFontSize] = useState(16);

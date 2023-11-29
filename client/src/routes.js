@@ -3,6 +3,7 @@ import Student from "./components/Student";
 import CreateCourses from "./components/InstructorPages/courses/createCourses";
 import Courses from "./components/InstructorPages/courses/Courses";
 import CreateAssignments from "./components/InstructorPages/assignments/CreateAssignments";
+import CreateTheoryAssignment from "./components/InstructorPages/assignments/CreateTheoryAssignment";
 import CourseStudents from "./components/InstructorPages/courses/CourseStudents";
 import StudentCourses from "./components/StudentPages/courses/StudentCourses";
 import StudentAssignments from "./components/StudentPages/assignments/StudentAssignments";
@@ -17,10 +18,10 @@ export const instructorRoutes = [
   { path: "/", element: <Instructor /> },
   { path: "/createcourses", element: <CreateCourses /> },
   { path: "/createassignment", element: <CreateAssignments /> },
+  { path: "/createTheoryAssignment", element: <CreateTheoryAssignment /> },
   { path: "/course", element: <Courses /> },
   {
     path: "/viewassignment",
-    exact: true,
     element: <ViewAssignmentSubmission />,
   },
   { path: "/viewallassignments", element: <ViewAllAssignments /> },

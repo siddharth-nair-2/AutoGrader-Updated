@@ -2,7 +2,7 @@ import React from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { TrackerState } from "../../context/TrackerProvider";
+import { useTracker } from "../../context/TrackerProvider";
 
 const CourseCard = styled.div`
   position: relative;
@@ -73,7 +73,7 @@ const OpenAssignment = styled.div`
 `;
 
 const AssignmentCard = ({ assignment }) => {
-  const { setSelectedCourse } = TrackerState();
+  const { setSelectedCourse } = useTracker();
   const navigate = useNavigate();
 
   const handleAssignmentOpen = () => {

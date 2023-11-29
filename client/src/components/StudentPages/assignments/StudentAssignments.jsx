@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { TrackerState } from "../../../context/TrackerProvider";
+import { useTracker } from "../../../context/TrackerProvider";
 import Editor from "@monaco-editor/react";
 import Navbar from "../../misc/Navbar";
 import { useToast } from "@chakra-ui/react";
@@ -240,7 +240,7 @@ const TestBodyContent = styled.div`
 `;
 
 const StudentAssignments = () => {
-  const { selectedCourse, setSelectedCourse, user } = TrackerState();
+  const { selectedCourse, setSelectedCourse, user } = useTracker();
   const [selectedAssignment, setSelectedAssignment] = useState();
   const [allQuestions, setAllQuestions] = useState();
   const [selectedQuestion, setSelectedQuestion] = useState();

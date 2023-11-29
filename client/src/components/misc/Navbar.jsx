@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { TrackerState } from "../../context/TrackerProvider";
+import { useTracker } from "../../context/TrackerProvider";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";

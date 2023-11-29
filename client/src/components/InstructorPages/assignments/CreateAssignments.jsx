@@ -1,13 +1,16 @@
 import axios from "axios";
+import styled from "styled-components";
+import DateTimePicker from "react-datetime-picker";
+
 import { useEffect, useState } from "react";
 import { useToast } from "@chakra-ui/react";
-import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
-import Navbar from "../../misc/Navbar";
-import { TrackerState } from "../../../context/TrackerProvider";
-import Heading from "../../misc/Heading";
-import DateTimePicker from "react-datetime-picker";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
+
+import Navbar from "../../misc/Navbar";
+import Heading from "../../misc/Heading";
+import { useAuth } from "../../../context/AuthProvider";
+import { useTracker } from "../../../context/TrackerProvider";
 
 const Container = styled.div`
   font-family: "Poppins", sans-serif;
@@ -140,6 +143,10 @@ const Select = styled.select`
 const CreateAssignments = () => {
   const toast = useToast();
   const navigate = useNavigate();
+  const { selectedCourse, setSelectedCourse } = useTracker();
+  const { user } = useAuth();
+
+  const [visibility, setVisiblity] = useState();
   const [description, setDesc] = useState();
   const [notes, setNotes] = useState("");
   const [name, setName] = useState();
@@ -151,15 +158,18 @@ const CreateAssignments = () => {
       testCases: [{ inputCase: "", expectedOutput: "" }],
     },
   ]);
-  const [visibility, setVisiblity] = useState();
-
-  const { selectedCourse, setSelectedCourse } = TrackerState();
 
   useEffect(() => {
-    if (!JSON.parse(localStorage.getItem("courseInfo"))) {
-      navigate("/");
+    if (!user) {
+      navigate("/login"); // Redirect to login if not authenticated
+      return;
     }
-    setSelectedCourse(JSON.parse(localStorage.getItem("courseInfo")));
+
+    if (localStorage.getItem("courseInfo") === null) {
+      navigate("/"); // Redirect if no course is selected
+    } else {
+      setSelectedCourse(JSON.parse(localStorage.getItem("courseInfo")));
+    }
   }, []);
 
   const handleQuestionChange = (e, index) => {
@@ -242,7 +252,7 @@ const CreateAssignments = () => {
     if (name.length > 64) {
       toast({
         title: "Name is too lengthy!",
-        description: "Course Name should be less than 65 characters.",
+        description: "Assignment Name should be less than 65 characters.",
         status: "error",
         duration: 4000,
         isClosable: true,
@@ -278,7 +288,7 @@ const CreateAssignments = () => {
       const { data } = await axios.post(
         "http://localhost:5000/api/tracker/assignments",
         {
-          courseID: JSON.parse(localStorage.getItem("courseInfo"))._id,
+          courseID: selectedCourse._id,
           name,
           description,
           notes,
@@ -288,10 +298,9 @@ const CreateAssignments = () => {
         },
         config
       );
-      window.location = "/course";
+      window.location = "/viewallassignments";
     } catch (error) {
-      console.log(error);
-      if(error.response.data === "Exists"){
+      if (error.response.status === 409) {
         toast({
           title: "Error",
           description: "An assignment with the same name already exists!",
@@ -299,8 +308,7 @@ const CreateAssignments = () => {
           duration: 4000,
           isClosable: true,
         });
-      }
-      else if (
+      } else if (
         error.response &&
         error.response.status >= 400 &&
         error.response.status <= 500
@@ -320,7 +328,7 @@ const CreateAssignments = () => {
     <Container>
       <Navbar />
       <Heading>
-        <Link to={"/course"}>
+        <Link to={"/viewallassignments"}>
           <CourseButtons
             style={{
               position: "absolute",
