@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { useToast } from "@chakra-ui/react";
+import { notification } from "antd";
 import { useAuth } from "../../context/AuthProvider";
 
 const Container = styled.div`
@@ -176,37 +176,33 @@ const Signup = () => {
   const [terms, setTerms] = useState(false);
   const [email, setEmail] = useState();
   const { registerUser } = useAuth();
-  const toast = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!terms) {
-      toast({
-        title: "Terms & Conditions!",
+      notification.error({
+        message: "Terms & Conditions!",
         description: "Please read through and accept the Terms & Conditions!",
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        placement: "bottomLeft",
+        duration: 4,
       });
       return;
     }
     if (!firstName || !lastName || !email || !password || userType === "") {
-      toast({
-        title: "Missing Information",
+      notification.error({
+        message: "Missing Information",
         description: "Pleast enter all information!",
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        duration: 4,
+        placement: "bottomLeft",
       });
       return;
     }
     if (password.length < 8) {
-      toast({
-        title: "Invalid Password",
+      notification.error({
+        message: "Invalid Password",
         description: "Password should be at least 8 characters!",
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        duration: 4,
+        placement: "bottomLeft",
       });
       return;
     }
@@ -215,12 +211,11 @@ const Signup = () => {
       "gm"
     );
     if (!emailRegex.test(email)) {
-      toast({
-        title: "Invalid Email",
+      notification.error({
+        message: "Invalid Email",
         description: "Your email has an invalid format!",
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        duration: 4,
+        placement: "bottomLeft",
       });
       return;
     }
@@ -229,22 +224,20 @@ const Signup = () => {
       setTimeout(() => {
         window.location = "/login";
       }, "500");
-      toast({
-        title: "Success!",
+      notification.success({
+        message: "Success!",
         description: "Your account has been created!",
-        status: "success",
-        duration: 1000,
-        isClosable: true,
+        duration: 1,
+        placement: "bottomLeft",
       });
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Login failed. Please try again.";
-      toast({
-        title: "Error",
+      notification.error({
+        message: "Error!",
         description: errorMessage,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        duration: 5,
+        placement: "bottomLeft",
       });
     }
   };

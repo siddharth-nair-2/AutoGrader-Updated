@@ -41,6 +41,10 @@ const TheoryAssignmentSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
+        extension: {
+          type: String,
+          required: true,
+        },
       },
     ],
   },

@@ -17,15 +17,16 @@ const NavBar = styled.nav`
 const H1Nav = styled.h1`
   color: white;
   font-size: 25px;
+  margin: 0;
   margin-left: 20px;
 `;
 
 const H2Nav = styled.h1`
   color: white;
   font-size: 14px;
+  margin: 0;
   margin-left: 20px;
   font-weight: 600;
-  margin-top: -5px;
 `;
 
 const NavLeftDiv = styled.div`

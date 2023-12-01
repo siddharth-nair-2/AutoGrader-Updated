@@ -1,9 +1,9 @@
 import axios from "axios";
 import styled from "styled-components";
 
-import { useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { notification } from 'antd';
 import { useAuth } from "../context/AuthProvider";
 
 import CourseCardMain from "./misc/CourseCard";
@@ -85,7 +85,6 @@ const NoCoursesMessage = styled(CourseCard)`
 const Student = () => {
   const { user } = useAuth();
   const [courses, setCourses] = useState([]);
-  const toast = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -108,13 +107,11 @@ const Student = () => {
       const res = await axios.get(url);
       setCourses(res.data);
     } catch (error) {
-      toast({
-        title: "Error Occured!",
+      notification.error({
+        message: "Error Occured!",
         description: "Failed to Load the courses",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
+        duration: 5,
+        placement: "bottomLeft",
       });
     }
   };

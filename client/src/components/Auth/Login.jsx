@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useToast } from "@chakra-ui/react";
+import { notification } from "antd";
 import { useAuth } from "../../context/AuthProvider";
 
 const Container = styled.div`
@@ -155,7 +155,6 @@ const Login = () => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const { login } = useAuth();
-  const toast = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -165,12 +164,11 @@ const Login = () => {
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Login failed. Please try again.";
-      toast({
-        title: "Error",
+      notification.error({
+        message: "Error!",
         description: errorMessage,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        duration: 5,
+        placement: "bottomLeft",
       });
     }
   };

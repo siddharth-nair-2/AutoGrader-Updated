@@ -1,4 +1,4 @@
-import { useToast } from "@chakra-ui/react";
+import { notification } from "antd";
 import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -89,13 +89,11 @@ const ViewAssignmentSubmission = () => {
       );
       setAllStudents(data.data);
     } catch (error) {
-      toast({
-        title: "Error Occured!",
-        description: "Failed to Load the students",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
+      notification.error({
+        message: "Error Occured!",
+        description: "Failed to load the submissions",
+        duration: 5,
+        placement: "bottomLeft",
       });
     }
   };
@@ -168,8 +166,6 @@ const ViewAssignmentSubmission = () => {
     },
   ]);
 
-  const toast = useToast();
-
   const [gridApi, setGridApi] = useState(null);
   const [gridColumnApi, setGridColumnApi] = useState(null);
   const { selectedCourse, setSelectedCourse } = useTracker();
@@ -224,29 +220,25 @@ const ViewAssignmentSubmission = () => {
             }
           )
           .then(() =>
-            toast({
-              title: "Visibility Changed!",
+            notification.success({
+              message: "Visibility Changed!",
               description: `The assignment is ${
                 JSON.parse(localStorage.getItem("assignmentInfo"))
                   .visibleToStudents
                   ? "not "
                   : ""
               }visible to students!`,
-              status: "success",
-              duration: 3000,
-              isClosable: true,
-              position: "bottom-left",
+              duration: 3,
+              position: "bottomLeft",
             })
           )
           .then(() => navigate("/course"));
       } catch (error) {
-        toast({
-          title: "Error Occured!",
+        notification.error({
+          message: "Error Occured!",
           description: "Failed to change the assignment visibility",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom-left",
+          duration: 5,
+          placement: "bottomLeft",
         });
       }
     }
@@ -263,13 +255,11 @@ const ViewAssignmentSubmission = () => {
           )
           .then(() => navigate("/course"));
       } catch (error) {
-        toast({
-          title: "Error Occured!",
-          description: "Failed to Delete the assignment",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom-left",
+        notification.error({
+          message: "Error Occured!",
+          description: "Failed to delete the assignment",
+          duration: 5,
+          placement: "bottomLeft",
         });
       }
     }

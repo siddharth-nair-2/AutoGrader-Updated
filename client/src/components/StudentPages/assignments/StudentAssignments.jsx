@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { useTracker } from "../../../context/TrackerProvider";
 import Editor from "@monaco-editor/react";
 import Navbar from "../../misc/Navbar";
-import { useToast } from "@chakra-ui/react";
+import { notification } from "antd";
 import axios from "axios";
 
 const Container = styled.div`
@@ -253,7 +253,6 @@ const StudentAssignments = () => {
   );
   const [disabled, setDisabled] = useState(false);
   const [submitDisabled, setSubmitDisabled] = useState(true);
-  const toast = useToast();
 
   const options = {
     fontSize: fontSize,
@@ -400,12 +399,11 @@ const StudentAssignments = () => {
             let error = err.response ? err.response.data : err;
             setDisabled(false);
             console.log(error);
-            toast({
-              title: "Error",
+            notification.error({
+              message: "Error",
               description: error.response.statusText,
-              status: "error",
-              duration: 4000,
-              isClosable: true,
+              duration: 5,
+              placement: "bottomLeft",
             });
           });
       }
@@ -455,12 +453,11 @@ const StudentAssignments = () => {
         setDisabled(false);
         let totalCases = selectedQuestion.testCases.length;
         if (totalCases - 1 === caseIndex) {
-          toast({
-            title: "Success",
+          notification.success({
+            message: "Success",
             description: "Compiled successfully!",
-            status: "success",
-            duration: 4000,
-            isClosable: true,
+            duration: 5,
+            placement: "bottomLeft",
           });
 
           setSubmitDisabled(false);
@@ -470,12 +467,11 @@ const StudentAssignments = () => {
     } catch (error) {
       console.log("err", error);
       setDisabled(false);
-      toast({
-        title: "Error",
+      notification.error({
+        message: "Error",
         description: error.response.statusText,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        duration: 5,
+        placement: "bottomLeft",
       });
     }
   };
@@ -490,11 +486,10 @@ const StudentAssignments = () => {
     };
 
     reader.onerror = () => {
-      toast({
-        title: "Error reading file",
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+      notification.error({
+        message: "Error reading file",
+        duration: 5,
+        placement: "bottomLeft",
       });
       return;
     };
@@ -511,13 +506,11 @@ const StudentAssignments = () => {
       userCode === "// Enter your code here, and name the class Main" ||
       userCode === ""
     ) {
-      toast({
-        title: "No answer entered!",
+      notification.warning({
+        message: "No answer entered!",
         description: "Please enter an answer to submit this question!",
-        status: "warning",
-        duration: 4000,
-        isClosable: true,
-        position: "bottom",
+        duration: 5,
+        placement: "bottomLeft",
       });
       return;
     }
@@ -593,12 +586,11 @@ const StudentAssignments = () => {
             },
             config
           );
-          toast({
-            title: `Question ${selectedQuestion.questionNum} submitted!`,
+          notification.success({
+            message: `Question ${selectedQuestion.questionNum} submitted!`,
             description: "You have submitted the answer for this question!",
-            status: "success",
-            duration: 4000,
-            isClosable: true,
+            duration: 5,
+            placement: "bottomLeft",
           });
         } catch (error) {
           console.log(error);
@@ -607,12 +599,11 @@ const StudentAssignments = () => {
             error.response.status >= 400 &&
             error.response.status <= 500
           ) {
-            toast({
-              title: "Error",
+            notification.error({
+              message: "Error",
               description: error.response.statusText,
-              status: "error",
-              duration: 4000,
-              isClosable: true,
+              duration: 5,
+              placement: "bottomLeft",
             });
           }
         }

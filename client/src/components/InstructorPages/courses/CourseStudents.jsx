@@ -1,4 +1,4 @@
-import { useToast } from "@chakra-ui/react";
+import { notification } from "antd";
 import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -135,13 +135,11 @@ const CourseStudents = () => {
       );
       setStudents(data.data);
     } catch (error) {
-      toast({
-        title: "Error Occured!",
-        description: "Failed to Load the students",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
+      notification.error({
+        message: "Error Occured!",
+        description: "Failed to load the courses",
+        duration: 5,
+        placement: "bottomLeft",
       });
     }
   };
@@ -160,13 +158,11 @@ const CourseStudents = () => {
       });
       setAllStudents(filteredData);
     } catch (error) {
-      toast({
-        title: "Error Occured!",
-        description: "Failed to Load the students",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
+      notification.error({
+        message: "Error Occured!",
+        description: "Failed to load the students",
+        duration: 5,
+        placement: "bottomLeft",
       });
     }
   };
@@ -181,22 +177,18 @@ const CourseStudents = () => {
         );
         fetchCourseStudents();
         fetchAllStudents();
-        toast({
-          title: "Student added!",
+        notification.success({
+          message: "Student added!",
           description: `${params.data.firstName} ${params.data.lastName} has been added to the course!`,
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom-left",
+          duration: 5,
+          placement: "bottomLeft",
         });
       } catch (error) {
-        toast({
-          title: "Error Occured!",
-          description: "Failed to Add the student!",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom-left",
+        notification.error({
+          message: "Error Occured!",
+          description: "Failed to add the student!",
+          duration: 5,
+          placement: "bottomLeft",
         });
       }
     };
@@ -212,22 +204,18 @@ const CourseStudents = () => {
         );
         fetchCourseStudents();
         fetchAllStudents();
-        toast({
-          title: "Student removed!",
+        notification.success({
+          message: "Student removed!",
           description: `${params.data.firstName} ${params.data.lastName} has been removed from the course!`,
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
+          duration: 5,
+          placement: "bottomLeft",
         });
       } catch (error) {
-        toast({
-          title: "Error Occured!",
+        notification.error({
+          message: "Error Occured!",
           description: "Failed to remove the student!",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom-left",
+          duration: 5,
+          placement: "bottomLeft",
         });
       }
     };
@@ -256,8 +244,6 @@ const CourseStudents = () => {
     { field: "email" },
     { headerName: "Add", maxWidth: 150, cellRenderer: AddButton },
   ]);
-
-  const toast = useToast();
 
   const [gridApi, setGridApi] = useState(null);
   const [gridColumnApi, setGridColumnApi] = useState(null);

@@ -3,10 +3,9 @@ import styled from "styled-components";
 import DateTimePicker from "react-datetime-picker";
 
 import { useEffect, useState } from "react";
-import { useToast } from "@chakra-ui/react";
+import { notification } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
-
+import { useDropzone } from "react-dropzone";
 import Navbar from "../../misc/Navbar";
 import Heading from "../../misc/Heading";
 import { useAuth } from "../../../context/AuthProvider";
@@ -139,8 +138,8 @@ const Select = styled.select`
   margin: 5px 0;
   font-size: 12px;
 `;
+
 const CreateTheoryAssignment = () => {
-  const toast = useToast();
   const navigate = useNavigate();
   const { selectedCourse, setSelectedCourse } = useTracker();
   const { user } = useAuth();
@@ -150,6 +149,20 @@ const CreateTheoryAssignment = () => {
   const [dueDate, setDueDate] = useState(new Date());
   const [visibility, setVisibility] = useState(false);
   const [instructorFiles, setInstructorFiles] = useState([]);
+
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: ".pdf, .doc, .docx, .ppt, .pptx, .txt, .java, .c, .cpp, .py",
+    onDrop: (acceptedFiles) => {
+      // Update your state here with the new files
+      setInstructorFiles(
+        acceptedFiles.map((file) =>
+          Object.assign(file, {
+            preview: URL.createObjectURL(file),
+          })
+        )
+      );
+    },
+  });
 
   useEffect(() => {
     if (!user) {
@@ -176,68 +189,80 @@ const CreateTheoryAssignment = () => {
     e.preventDefault();
 
     if (!name || !description || !visibility || !instructorFiles) {
-      toast({
-        title: "Missing Information",
+      notification.error({
+        message: "Missing Information",
         description: "Pleast enter all information!",
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        duration: 4,
+        placement: "bottomLeft",
       });
       return;
     }
 
     if (name.length > 64) {
-      toast({
-        title: "Name is too lengthy!",
+      notification.error({
+        message: "Name is too lengthy!",
         description: "Assignment Name should be less than 65 characters.",
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        duration: 4,
+        placement: "bottomLeft",
       });
       return;
     }
     if (description.length > 2000) {
-      toast({
-        title: "Description is too lengthy!",
+      notification.error({
+        message: "Description is too lengthy!",
         description: "Description should be less than 2000 characters.",
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        duration: 4,
+        placement: "bottomLeft",
       });
       return;
     }
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("description", description);
-    formData.append("dueDate", dueDate);
-    formData.append("visibility", visibility);
-    formData.append("courseId", selectedCourse._id);
-    formData.append("instructorFiles", instructorFiles);
+    const fileFormData = new FormData();
+    instructorFiles.forEach((file) => {
+      fileFormData.append("instructorFiles", file);
+    });
 
     try {
+      const fileUploadResponse = await axios.post(
+        "http://localhost:5000/api/tracker/upload-files",
+        fileFormData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      const instructorFilesData = fileUploadResponse.data.urls.map(
+        (url, index) => ({
+          fileName: instructorFiles[index].name,
+          filePath: url,
+          extension: instructorFiles[index].name.split(".").pop(),
+        })
+      );
+
+      const assignmentData = {
+        name,
+        description,
+        due_date: dueDate,
+        visibleToStudents: visibility,
+        instructorFiles: instructorFilesData,
+        courseID: selectedCourse._id,
+      };
+
       const res = await axios.post(
         "http://localhost:5000/api/tracker/theoryAssignments",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        assignmentData
       );
-      toast({
-        title: "Assignment created successfully!",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
+      notification.success({
+        message: "Assignment created successfully!",
+        description: "The assignment has been created!",
+        duration: 3,
+        placement: "bottomLeft",
       });
       window.location = "/viewallassignments";
     } catch (err) {
-      toast({
-        title: "Error creating assignment",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
+      notification.error({
+        message: "Error creating assignment",
+        description: "Failed to create the assignment",
+        duration: 5,
+        placement: "bottomLeft",
       });
     }
   };
@@ -291,12 +316,25 @@ const CreateTheoryAssignment = () => {
             <option value={true}>Visible to students</option>
           </Select>
           <Label htmlFor="instructor-files">Instructor Files</Label>
-          <input
+          {/* <input
             type="file"
             id="instructor-files"
             multiple
             onChange={handleFileChange}
-          />
+            accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.java, .c, .cpp, .py"
+          /> */}
+          <div {...getRootProps()}>
+            <input {...getInputProps()} />
+            <p>Drag 'n' drop some files here, or click to select files</p>
+          </div>
+          <div>
+            {instructorFiles.map((file) => (
+              <div key={file.name}>
+                <p>{file.name}</p>
+                {/* Implement logic to display file preview if needed */}
+              </div>
+            ))}
+          </div>
           <BlackBtn type="submit">Create Assignment</BlackBtn>
         </FormContainer>
       </FormBox>

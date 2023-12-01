@@ -61,12 +61,15 @@ const OpenAssignment = styled.div`
   left: 92%;
   height: 25px;
   width: 25px;
-  padding-left: 9px;
-  padding-top: 1px;
+  padding-left: 0px;
+  padding-bottom: 3px;
   cursor: pointer;
   color: white;
   background-color: black;
   border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   &:hover {
     transform: scale(1.1);
   }
@@ -82,9 +85,14 @@ const AssignmentCard = ({ assignment }) => {
   };
   return (
     <CourseCard>
-      <OpenAssignment onClick={handleAssignmentOpen}>&gt;</OpenAssignment>
+      <OpenAssignment onClick={handleAssignmentOpen}>&rarr;</OpenAssignment>
       <CardID>{assignment.name}</CardID>
-      <CardName>{`${assignment.questions.length} Questions`}</CardName>
+      {console.log(assignment.questions)}
+      {assignment.questions !== undefined ? (
+        <CardName>{`${assignment.questions?.length} Question(s)`}</CardName>
+      ) : (
+        <CardName>{`${assignment.instructorFiles?.length} Files`}</CardName>
+      )}
       <CardDesc>{assignment.description}</CardDesc>
       <CardSem>
         <hr style={{ marginBottom: "10px" }} />

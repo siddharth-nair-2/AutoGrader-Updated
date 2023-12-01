@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useToast } from "@chakra-ui/react";
+import { notification } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
@@ -86,13 +86,11 @@ const PlagiarismPage = () => {
       const data = await axios.get(url);
       setAllStudents(data.data);
     } catch (error) {
-      toast({
-        title: "Error Occured!",
-        description: "Failed to Load the students",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
+      notification.error({
+        message: "Error Occured!",
+        description: "Failed to load the students",
+        duration: 5,
+        placement: "bottomLeft",
       });
     }
   };
@@ -155,8 +153,6 @@ const PlagiarismPage = () => {
       field: "similarity",
     },
   ]);
-
-  const toast = useToast();
 
   const [gridApi, setGridApi] = useState(null);
   const [gridColumnApi, setGridColumnApi] = useState(null);

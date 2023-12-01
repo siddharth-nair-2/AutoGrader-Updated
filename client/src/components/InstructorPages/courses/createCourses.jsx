@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useToast } from "@chakra-ui/react";
+import { notification } from "antd";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../misc/Navbar";
@@ -118,10 +118,8 @@ const CourseButtons = styled.button`
   }
 `;
 
-
 const CreateCourses = () => {
   const [userData, setUserData] = useState();
-  const toast = useToast();
   const navigate = useNavigate();
   const [courseID, setCourseID] = useState();
   const [section, setSection] = useState();
@@ -136,53 +134,48 @@ const CreateCourses = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!courseID || !description || !name || semester === "" || !section) {
-      toast({
-        title: "Missing Information",
+      notification.error({
+        message: "Missing Information!",
         description: "Pleast enter all information!",
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        duration: 5,
+        placement: "bottomLeft",
       });
       return;
     }
     setSection(section.toUpperCase());
     if (!section.match(/[A-Z]/i)) {
-      toast({
-        title: "Invalid Course Section",
+      notification.error({
+        message: "Invalid Course Section",
         description: "Course Section should be between A and Z characters.",
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        duration: 5,
+        placement: "bottomLeft",
       });
       return;
     }
     if (courseID.length < 8 || courseID.length > 10) {
-      toast({
-        title: "Invalid Course ID",
+      notification.error({
+        message: "Invalid Course ID",
         description: "Course ID should be between 8 and 10 characters.",
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        duration: 5,
+        placement: "bottomLeft",
       });
       return;
     }
     if (name.length > 64) {
-      toast({
-        title: "Name is too lengthy!",
+      notification.error({
+        message: "Name is too lengthy!",
         description: "Course Name should be less than 65 characters.",
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        duration: 5,
+        placement: "bottomLeft",
       });
       return;
     }
     if (description.length > 2000) {
-      toast({
-        title: "Description is too lengthy!",
+      notification.error({
+        message: "Description is too lengthy!",
         description: "Description should be less than 2000 characters.",
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        duration: 5,
+        placement: "bottomLeft",
       });
       return;
     }
@@ -212,12 +205,11 @@ const CreateCourses = () => {
         error.response.status >= 400 &&
         error.response.status <= 500
       ) {
-        toast({
-          title: "Error",
+        notification.error({
+          message: "Error",
           description: error.response.statusText,
-          status: "error",
-          duration: 4000,
-          isClosable: true,
+          duration: 5,
+          placement: "bottomLeft",
         });
       }
     }

@@ -2,10 +2,10 @@ import axios from "axios";
 import styled from "styled-components";
 
 import { useEffect } from "react";
-import { useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
 import { useTracker } from "../context/TrackerProvider";
+import { notification } from 'antd';
 
 import Navbar from "./misc/Navbar";
 import Heading from "./misc/Heading";
@@ -84,7 +84,6 @@ const NoCoursesMessage = styled(CourseCard)`
 `;
 
 const Instructor = () => {
-  const toast = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { courses, setCourses } = useTracker();
@@ -102,13 +101,11 @@ const Instructor = () => {
       );
       setCourses(data.data);
     } catch (error) {
-      toast({
-        title: "Error Occured!",
+      notification.error({
+        message: "Error Occured!",
         description: "Failed to Load the courses",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
+        duration: 5,
+        placement: "bottomLeft",
       });
     }
   };

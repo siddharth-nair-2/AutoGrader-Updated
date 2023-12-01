@@ -3,9 +3,9 @@ import styled from "styled-components";
 import DateTimePicker from "react-datetime-picker";
 
 import { useEffect, useState } from "react";
-import { useToast } from "@chakra-ui/react";
+import { notification } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
+import { AiOutlinePlus, AiOutlineDelete } from "react-icons/ai";
 
 import Navbar from "../../misc/Navbar";
 import Heading from "../../misc/Heading";
@@ -141,7 +141,6 @@ const Select = styled.select`
 `;
 
 const CreateAssignments = () => {
-  const toast = useToast();
   const navigate = useNavigate();
   const { selectedCourse, setSelectedCourse } = useTracker();
   const { user } = useAuth();
@@ -227,12 +226,11 @@ const CreateAssignments = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name || !description || !value || !visibility) {
-      toast({
-        title: "Missing Information",
+      notification.error({
+        message: "Missing Information",
         description: "Pleast enter all information!",
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        duration: 4,
+        placement: "bottomLeft",
       });
       return;
     }
@@ -240,42 +238,38 @@ const CreateAssignments = () => {
       questionList.length < 2 &&
       (questionList[0].questionNum === "" || questionList[0].questionNum === "")
     ) {
-      toast({
-        title: "No Question!",
+      notification.error({
+        message: "No Question!",
         description: "Each assignment should have at least one question!",
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        duration: 4,
+        placement: "bottomLeft",
       });
       return;
     }
     if (name.length > 64) {
-      toast({
-        title: "Name is too lengthy!",
+      notification.error({
+        message: "Name is too lengthy!",
         description: "Assignment Name should be less than 65 characters.",
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        duration: 4,
+        placement: "bottomLeft",
       });
       return;
     }
     if (description.length > 2000) {
-      toast({
-        title: "Description is too lengthy!",
+      notification.error({
+        message: "Description is too lengthy!",
         description: "Description should be less than 2000 characters.",
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        duration: 4,
+        placement: "bottomLeft",
       });
       return;
     }
     if (notes.length > 256) {
-      toast({
-        title: "Notes are too lengthy!",
+      notification.error({
+        message: "Notes are too lengthy!",
         description: "Notes should be less than 256 characters.",
-        status: "error",
-        duration: 4000,
-        isClosable: true,
+        placement: "bottomLeft",
+        duration: 4,
       });
       return;
     }
@@ -301,24 +295,22 @@ const CreateAssignments = () => {
       window.location = "/viewallassignments";
     } catch (error) {
       if (error.response.status === 409) {
-        toast({
-          title: "Error",
+        notification.error({
+          message: "Error",
           description: "An assignment with the same name already exists!",
-          status: "error",
-          duration: 4000,
-          isClosable: true,
+          duration: 4,
+          placement: "bottomLeft",
         });
       } else if (
         error.response &&
         error.response.status >= 400 &&
         error.response.status <= 500
       ) {
-        toast({
-          title: "Error",
+        notification.error({
+          message: "Error",
           description: error.response.statusText,
-          status: "error",
-          duration: 4000,
-          isClosable: true,
+          duration: 4,
+          placement: "bottomLeft",
         });
       }
     }
@@ -423,7 +415,7 @@ const CreateAssignments = () => {
                   />
                   {questionList.length !== 1 && (
                     <AddLogo>
-                      <DeleteIcon
+                      <AiOutlineDelete
                         boxSize={4}
                         onClick={() => handleRemoveClick(index)}
                         color="red"
@@ -433,7 +425,7 @@ const CreateAssignments = () => {
                   )}
                   {questionList.length - 1 === index && (
                     <AddLogo>
-                      <AddIcon
+                      <AiOutlinePlus
                         boxSize={4}
                         onClick={handleAddClick}
                         color="green"
@@ -455,7 +447,7 @@ const CreateAssignments = () => {
                     >
                       {q.testCases.length !== 1 && (
                         <AddLogo>
-                          <DeleteIcon
+                          <AiOutlineDelete
                             boxSize={4}
                             onClick={() =>
                               handleCaseRemoveClick(index, innerIndex)
@@ -470,7 +462,7 @@ const CreateAssignments = () => {
                       )}
                       {q.testCases.length - 1 === innerIndex && (
                         <AddLogo>
-                          <AddIcon
+                          <AiOutlinePlus
                             boxSize={4}
                             onClick={(e) =>
                               handleCaseAddClick(index, innerIndex)

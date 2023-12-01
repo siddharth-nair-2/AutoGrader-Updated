@@ -61,7 +61,9 @@ const {
   getAllModules,
 } = require("../controllers/moduleController");
 const { protect } = require("../middleware/authMiddleware");
-
+const upload = require("../config/multerConfig");
+const cloudinary = require("../config/cloudinaryConfig");
+const bufferToStream = require("../config/streamUtils");
 const router = express.Router();
 
 // Course Routes
@@ -141,5 +143,59 @@ router.delete("/module/:moduleID", deleteModule);
 router.get("/modules/course/:courseID", getModulesForCourse);
 router.get("/module/:moduleID", getSingleModule);
 router.get("/modules", getAllModules);
+
+// Cloudinary uploader function adjusted to handle a stream
+const uploader = (fileStream, originalFilename) =>
+  new Promise((resolve, reject) => {
+    let stream = cloudinary.uploader.upload_stream(
+      {
+        resource_type: "raw",
+        use_filename: true,
+        unique_filename: false,
+        public_id: originalFilename.substring(
+          0,
+          originalFilename.lastIndexOf(".")
+        ),
+      },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+
+    fileStream.pipe(stream);
+  });
+
+// File Uploads
+router.post(
+  "/upload-files",
+  upload.array("instructorFiles"),
+  async (req, res) => {
+    try {
+      const urls = []; // Array to hold the URLs of uploaded files
+      const files = req.files; // Array of files from the request
+
+      // Iterate over each file, convert to stream and upload
+      for (const file of files) {
+        const fileStream = bufferToStream(file.buffer); // Convert buffer to stream
+        const originalFilename = file.originalname;
+        const result = await uploader(fileStream, originalFilename);
+        urls.push(result.url); // Add the URL of the uploaded file
+      }
+
+      // Send the URLs back in the response
+      res.status(200).json({
+        message: "Files uploaded successfully",
+        urls: urls,
+      });
+    } catch (error) {
+      console.error("Upload error:", error);
+      res.status(500).json({
+        message: "Failed to upload files",
+        error: error.message,
+      });
+    }
+  }
+);
 
 module.exports = router;

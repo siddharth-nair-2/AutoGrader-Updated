@@ -1,5 +1,4 @@
 import { Route, Routes, Navigate } from "react-router-dom";
-import { ChakraProvider } from "@chakra-ui/react";
 import { instructorRoutes, studentRoutes } from "./routes";
 
 import { useAuth } from "./context/AuthProvider"; // Adjust the path as needed
@@ -21,32 +20,30 @@ function App() {
   };
 
   return (
-    <ChakraProvider>
-      <Routes>
-        {renderRoutesForUser("Instructor", instructorRoutes)}
-        {renderRoutesForUser("Student", studentRoutes)}
+    <Routes>
+      {renderRoutesForUser("Instructor", instructorRoutes)}
+      {renderRoutesForUser("Student", studentRoutes)}
 
-        {/* Redirects for logged-in users */}
-        {user && (
-          <>
-            <Route path="/login" element={<Navigate replace to="/" />} />
-            <Route path="/signup" element={<Navigate replace to="/" />} />
-          </>
-        )}
+      {/* Redirects for logged-in users */}
+      {user && (
+        <>
+          <Route path="/login" element={<Navigate replace to="/" />} />
+          <Route path="/signup" element={<Navigate replace to="/" />} />
+        </>
+      )}
 
-        {/* Public routes */}
-        {!user && (
-          <>
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Navigate replace to="/login" />} />
-          </>
-        )}
+      {/* Public routes */}
+      {!user && (
+        <>
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Navigate replace to="/login" />} />
+        </>
+      )}
 
-        {/* Catch-all route */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </ChakraProvider>
+      {/* Catch-all route */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 

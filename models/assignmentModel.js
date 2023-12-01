@@ -33,6 +33,22 @@ const AssignmentSchema = new mongoose.Schema({
     type: Boolean,
     require: true,
   },
+  instructorFiles: [
+    {
+      fileName: {
+        type: String,
+        required: true,
+      },
+      filePath: {
+        type: String,
+        required: true,
+      },
+      extension: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
   questions: [
     {
       questionNum: {
@@ -47,18 +63,6 @@ const AssignmentSchema = new mongoose.Schema({
           "Question information must be less than 2000 characters.",
         ],
       },
-      files: [
-        {
-          fileName: {
-            type: String,
-            required: true,
-          },
-          filePath: {
-            type: String,
-            required: true,
-          },
-        },
-      ],
       testCases: [
         {
           inputCase: {

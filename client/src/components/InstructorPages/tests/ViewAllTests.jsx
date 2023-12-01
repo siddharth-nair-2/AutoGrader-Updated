@@ -1,5 +1,5 @@
-import { Toast } from "@chakra-ui/react";
 import axios from "axios";
+import { notification } from "antd";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -103,13 +103,11 @@ const ViewAllTests = () => {
       );
       settests(data.data);
     } catch (error) {
-      Toast({
-        title: "Error Occured!",
-        description: "Failed to Load the courses",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
+      notification.error({
+        message: "Error Occured!",
+        description: "Failed to load the tests",
+        duration: 5,
+        placement: "bottomLeft",
       });
     }
   };

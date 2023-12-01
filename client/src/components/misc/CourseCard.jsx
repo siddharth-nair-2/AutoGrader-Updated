@@ -59,14 +59,17 @@ const OpenCourse = styled.div`
   font-weight: 400;
   top: 88%;
   left: 92%;
-  height: 25px;
-  width: 25px;
-  padding-left: 9px;
-  padding-top: 1px;
+  height: 28px;
+  width: 28px;
+  padding-left: 0px;
+  padding-bottom: 3px;
   cursor: pointer;
   color: white;
   background-color: black;
   border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   &:hover {
     transform: scale(1.1);
   }
@@ -76,14 +79,17 @@ const ViewStudents = styled.div`
   font-weight: 400;
   top: 88%;
   right: 92%;
-  height: 25px;
-  width: 25px;
-  padding-left: 4px;
-  padding-top: 3px;
+  height: 28px;
+  width: 28px;
+  padding-left: 0px;
+  padding-bottom: 3px;
   cursor: pointer;
   color: white;
   background-color: black;
   border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   &:hover {
     transform: scale(1.1);
   }
@@ -111,7 +117,7 @@ const CourseCardMain = ({ course, description, isStudent}) => {
           <HiUserGroup />
         </ViewStudents>
       )}
-      <OpenCourse onClick={handleCourseClick}>&gt;</OpenCourse>
+      <OpenCourse onClick={handleCourseClick}>&rarr;</OpenCourse>
       <CardID>
         {course.courseID}
         {course.section}
