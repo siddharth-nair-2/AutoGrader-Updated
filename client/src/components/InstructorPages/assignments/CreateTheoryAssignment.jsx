@@ -3,7 +3,8 @@ import styled from "styled-components";
 import DateTimePicker from "react-datetime-picker";
 
 import { useEffect, useState } from "react";
-import { notification } from "antd";
+import { notification, Upload, Button } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { useDropzone } from "react-dropzone";
 import Navbar from "../../misc/Navbar";
@@ -267,6 +268,15 @@ const CreateTheoryAssignment = () => {
     }
   };
 
+  const antdFileProps = {
+    beforeUpload: (file) => {
+      setInstructorFiles([...instructorFiles, file]);
+      return false; // Prevent automatic upload
+    },
+    multiple: true,
+    accept: ".pdf,.doc,.docx,.ppt,.pptx,.txt,.java,.c,.cpp,.py",
+  };
+
   return (
     <Container>
       <Navbar />
@@ -316,25 +326,9 @@ const CreateTheoryAssignment = () => {
             <option value={true}>Visible to students</option>
           </Select>
           <Label htmlFor="instructor-files">Instructor Files</Label>
-          {/* <input
-            type="file"
-            id="instructor-files"
-            multiple
-            onChange={handleFileChange}
-            accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.java, .c, .cpp, .py"
-          /> */}
-          <div {...getRootProps()}>
-            <input {...getInputProps()} />
-            <p>Drag 'n' drop some files here, or click to select files</p>
-          </div>
-          <div>
-            {instructorFiles.map((file) => (
-              <div key={file.name}>
-                <p>{file.name}</p>
-                {/* Implement logic to display file preview if needed */}
-              </div>
-            ))}
-          </div>
+          <Upload {...antdFileProps}>
+            <Button icon={<UploadOutlined />}>Select Files</Button>
+          </Upload>
           <BlackBtn type="submit">Create Assignment</BlackBtn>
         </FormContainer>
       </FormBox>

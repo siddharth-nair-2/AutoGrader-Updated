@@ -1,165 +1,28 @@
-import styled from "styled-components";
-import { useState } from "react";
+import { Row, Col, Form, Input, Button } from "antd";
 import { Link } from "react-router-dom";
 import { notification } from "antd";
 import { useAuth } from "../../context/AuthProvider";
 
-const Container = styled.div`
-  width: 100vw;
-  height: 100vh;
-  background-color: #5c65ed;
-  display: flex;
-`;
-
-const LeftContainer = styled.div`
-  display: flex;
-  flex: 1;
-  background-color: white;
-  justify-content: center;
-  align-items: center;
-`;
-
-const RightContainer = styled.div`
-  display: flex;
-  flex: 1;
-  background-color: black;
-  @media (max-width: 1023px) {
-    display: none;
-  }
-`;
-
-const Left = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  width: 70%;
-  height: 85%;
-  @media (max-width: 425px) {
-    width: 100%;
-  }
-  @media (max-width: 1080px) {
-    width: 85%;
-  }
-`;
-
-const LeftLogo = styled.div`
-  display: flex;
-  width: 70%;
-  justify-content: start;
-`;
-
-const LogoImg = styled.img`
-  max-width: 50px;
-  @media (max-height: 425px) {
-    opacity: 0;
-  }
-`;
-
-const CopyrightText = styled.div`
-  display: flex;
-  justify-content: start;
-  width: 70%;
-  font-weight: 100;
-  font-size: 14px;
-`;
-
-const FormBox = styled.div`
-  width: 70%;
-  height: 65%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-`;
-
-const H1 = styled.h1`
-  font-size: 36px;
-  margin-top: 0;
-  font-weight: 600;
-  color: #0a071b;
-  font-family: "Poppins", sans-serif;
-`;
-
-const H4 = styled.h4`
-  font-size: 14px;
-  font-weight: 600;
-  color: #5b5675;
-  margin-top: 10px;
-  font-family: "Poppins", sans-serif;
-`;
-
-const FormContainer = styled.form`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  font-family: "Poppins", sans-serif;
-`;
-
-const Label = styled.label`
-  font-size: 12px;
-  font-weight: 600;
-  width: 100%;
-  margin-top: 12px;
-`;
-
-const Input = styled.input`
-  border: #e1dfec 2px solid;
-  width: 100%;
-  padding: 15px;
-  border-radius: 46px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
-
-const ForgetPas = styled.label`
-  font-size: 12px;
-  font-weight: 600;
-  width: 100%;
-  text-align: right;
-  margin-top: 12px;
-  cursor: pointer;
-`;
-
-const LoginBackgroundImg = styled.img`
-  opacity: 0.2;
-`;
-
-const WhiteBtn = styled.button`
-  border: none;
-  outline: none;
-  padding: 12px 0;
-  background-color: white;
-  border-radius: 20px;
-  width: 180px;
-  font-weight: bold;
-  font-size: 14px;
-  cursor: pointer;
-`;
-
-const BlackBtn = styled(WhiteBtn)`
-  background-color: #0a071b;
-  color: white;
-  width: 100%;
-  padding: 17px;
-  margin: 5px 0;
-  font-size: 14px;
-  border-radius: 46px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  margin-top: 12px;
-`;
-
 const Login = () => {
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+  const [form] = Form.useForm();
   const { login } = useAuth();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onFinish = async (values) => {
+    const emailRegex = new RegExp(
+      /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+      "gm"
+    );
+    if (!emailRegex.test(values.email)) {
+      notification.error({
+        message: "Invalid Email",
+        description: "Your email has an invalid format!",
+        duration: 4,
+        placement: "bottomLeft",
+      });
+      return;
+    }
     try {
-      await login(email, password);
+      await login(values.email, values.password);
       window.location = "/";
     } catch (error) {
       const errorMessage =
@@ -174,54 +37,88 @@ const Login = () => {
   };
 
   return (
-    <Container>
-      <LeftContainer>
-        <Left>
-          <LeftLogo>
-            <LogoImg src="loginLogo.png" alt="Autograder logo" />
-          </LeftLogo>
-          <FormBox>
-            <div>
-              <H1>Login</H1>
-              <H4>The easiest way to grade code for teachers!</H4>
+    <Row className="w-screen h-screen">
+      <Col
+        xs={24}
+        md={12}
+        className="bg-white flex justify-center items-center"
+      >
+        <div className="flex flex-col justify-between items-center w-full md:w-3/5 lg:w- h-5/6">
+          <div className="self-start w-full pl-6">
+            <img
+              src="loginLogo.png"
+              alt="Autograder logo"
+              className="w-12 h-12"
+            />
+          </div>
+          <div className="w-full px-6 space-y-6 flex flex-col gap-16">
+            <div className=" flex flex-col justify-center gap-4">
+              <h1 className="text-4xl font-semibold text-gray-800">Login</h1>
+              <h4 className="text-base font-semibold text-gray-500">
+                The easiest way to grade code for teachers!
+              </h4>
             </div>
-            <FormContainer onSubmit={handleSubmit}>
-              <Label htmlFor="email-login">Email</Label>
-              <Input
-                type="email"
-                id="email-login"
-                placeholder="mail@website.com"
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={onFinish}
+              className="w-full"
+            >
+              <Form.Item
+                label={<span className=" font-bold">Email</span>}
                 name="email"
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <Label htmlFor="password-login">Password</Label>
-              <Input
-                type="password"
-                id="password-login"
-                placeholder="Min. 8 character"
+                rules={[
+                  { required: true, message: "Please input your email!" },
+                ]}
+              >
+                <Input size="large" placeholder="mail@website.com" />
+              </Form.Item>
+              <Form.Item
+                label={<span className=" font-bold">Password</span>}
                 name="password"
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <ForgetPas>Forget Password?</ForgetPas>
-              <BlackBtn type="submit">Login</BlackBtn>
-              <Label style={{ fontWeight: 400 }}>
+                rules={[
+                  { required: true, message: "Please input your password!" },
+                ]}
+              >
+                <Input.Password size="large" placeholder="Min. 8 character" />
+              </Form.Item>
+              <div className="text-right">
+                <Link
+                  to="/forgot-password"
+                  className="text-sm font-semibold text-gray-800"
+                >
+                  Forget Password?
+                </Link>
+              </div>
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="w-full mt-3 bg-black border-black text-white rounded-lg text-sm font-medium h-10 flex items-center justify-center"
+              >
+                Login
+              </Button>
+
+              <div className="text-left mt-3 font-normal">
                 Not registered yet?
-                <Link to="/signup" style={{ fontWeight: 600 }}>
-                  {" "}
+                <Link to="/signup" className="font-semibold text-gray-800 ml-1">
                   Create an account
                 </Link>
-              </Label>
-            </FormContainer>
-          </FormBox>
-          <CopyrightText>©2023 Siddharth. All rights reserved.</CopyrightText>
-        </Left>
-      </LeftContainer>
-      <RightContainer>
-        <LoginBackgroundImg src="loginBackground.jpg" alt="Background Image" />
-      </RightContainer>
-    </Container>
+              </div>
+            </Form>
+          </div>
+          <div className="self-start w-full pl-6 text-xs font-light">
+            ©2023 Siddharth. All rights reserved.
+          </div>
+        </div>
+      </Col>
+      <Col xs={0} md={12} className="hidden md:flex bg-black">
+        <img
+          src="loginBackground.jpg"
+          alt="Background"
+          className="object-cover opacity-20 w-full h-full"
+        />
+      </Col>
+    </Row>
   );
 };
 

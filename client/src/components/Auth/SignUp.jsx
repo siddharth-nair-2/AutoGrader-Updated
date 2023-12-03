@@ -1,184 +1,28 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
-import { notification } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  Row,
+  Col,
+  Select,
+  Checkbox,
+  notification,
+} from "antd";
+
 import { useAuth } from "../../context/AuthProvider";
 
-const Container = styled.div`
-  width: 100vw;
-  height: 100vh;
-  background-color: #5c65ed;
-  display: flex;
-`;
-
-const LeftContainer = styled.div`
-  display: flex;
-  flex: 1;
-  background-color: white;
-  justify-content: center;
-  align-items: center;
-`;
-
-const RightContainer = styled.div`
-  display: flex;
-  flex: 1;
-  background-color: black;
-  @media (max-width: 1023px) {
-    display: none;
-  }
-`;
-
-const Left = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  width: 70%;
-  height: 85%;
-  @media (max-width: 300px) {
-    margin-top: 25px;
-    width: 100%;
-  }
-  @media (max-width: 425px) {
-    width: 100%;
-  }
-  @media (max-width: 1080px) {
-    width: 85%;
-  }
-`;
-
-const LeftLogo = styled.div`
-  display: flex;
-  width: 70%;
-  justify-content: start;
-`;
-
-const LogoImg = styled.img`
-  max-width: 50px;
-  @media (max-height: 650px) {
-    opacity: 0;
-    margin-top: 100px;
-  }
-  @media (max-height: 860px) {
-    opacity: 0;
-  }
-`;
-
-const CopyrightText = styled.div`
-  display: flex;
-  justify-content: start;
-  width: 70%;
-  font-weight: 100;
-  font-size: 14px;
-`;
-
-const FormBox = styled.div`
-  width: 70%;
-  height: 65%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-`;
-
-const H1 = styled.h1`
-  font-size: 36px;
-  margin-top: 0;
-  font-weight: 600;
-  color: #0a071b;
-  font-family: "Poppins", sans-serif;
-`;
-
-const H4 = styled.h4`
-  font-size: 14px;
-  font-weight: 600;
-  color: #5b5675;
-  margin-top: 10px;
-  font-family: "Poppins", sans-serif;
-`;
-
-const FormContainer = styled.form`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  font-family: "Poppins", sans-serif;
-`;
-
-const Label = styled.label`
-  font-size: 12px;
-  font-weight: 600;
-  width: 100%;
-  margin-top: 12px;
-`;
-
-const LabelTerms = styled.label`
-  font-size: 12px;
-  font-weight: 400;
-  width: 100%;
-  margin-left: 10px;
-`;
-
-const Input = styled.input`
-  border: #e1dfec 2px solid;
-  width: 100%;
-  padding: 15px;
-  border-radius: 46px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
-
-const Select = styled.select`
-  border: #e1dfec 2px solid;
-  width: 100%;
-  padding: 15px;
-  border-radius: 46px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
-
-const LoginBackgroundImg = styled.img`
-  opacity: 0.2;
-  object-fit: cover;
-`;
-
-const WhiteBtn = styled.button`
-  border: none;
-  outline: none;
-  padding: 12px 0;
-  background-color: white;
-  border-radius: 20px;
-  width: 180px;
-  font-weight: bold;
-  font-size: 14px;
-  cursor: pointer;
-`;
-
-const BlackBtn = styled(WhiteBtn)`
-  background-color: #0a071b;
-  color: white;
-  width: 100%;
-  padding: 17px;
-  margin: 5px 0;
-  font-size: 14px;
-  border-radius: 46px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  margin-top: 12px;
-`;
+const { Option } = Select;
 
 const Signup = () => {
-  const [firstName, setFirstName] = useState();
-  const [lastName, setLastName] = useState();
-  const [password, setPassword] = useState();
-  const [userType, setUserType] = useState();
   const [terms, setTerms] = useState(false);
-  const [email, setEmail] = useState();
   const { registerUser } = useAuth();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+
+  const [form] = Form.useForm();
+
+  const onFinish = async (values) => {
     if (!terms) {
       notification.error({
         message: "Terms & Conditions!",
@@ -188,7 +32,13 @@ const Signup = () => {
       });
       return;
     }
-    if (!firstName || !lastName || !email || !password || userType === "") {
+    if (
+      !values.firstName ||
+      !values.lastName ||
+      !values.email ||
+      !values.password ||
+      values.userType === ""
+    ) {
       notification.error({
         message: "Missing Information",
         description: "Pleast enter all information!",
@@ -197,7 +47,7 @@ const Signup = () => {
       });
       return;
     }
-    if (password.length < 8) {
+    if (values.password.length < 8) {
       notification.error({
         message: "Invalid Password",
         description: "Password should be at least 8 characters!",
@@ -210,7 +60,7 @@ const Signup = () => {
       /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
       "gm"
     );
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(values.email)) {
       notification.error({
         message: "Invalid Email",
         description: "Your email has an invalid format!",
@@ -219,20 +69,36 @@ const Signup = () => {
       });
       return;
     }
+    if (!terms) {
+      notification.error({
+        message: "Terms & Conditions!",
+        description: "Please read through and accept the Terms & Conditions!",
+        placement: "bottomLeft",
+        duration: 4,
+      });
+      return;
+    }
+
     try {
-      await registerUser(firstName, lastName, email, password, userType);
-      setTimeout(() => {
-        window.location = "/login";
-      }, "500");
+      await registerUser(
+        values.firstName,
+        values.lastName,
+        values.email,
+        values.password,
+        values.userType
+      );
       notification.success({
         message: "Success!",
         description: "Your account has been created!",
         duration: 1,
         placement: "bottomLeft",
       });
+      // Redirect the user to the login page after successful registration.
+      // Replace with your navigation logic if using react-router or similar.
+      window.location = "/login";
     } catch (error) {
       const errorMessage =
-        error.response?.data?.message || "Login failed. Please try again.";
+        error.response?.data?.message || "Signup failed. Please try again.";
       notification.error({
         message: "Error!",
         description: errorMessage,
@@ -243,108 +109,152 @@ const Signup = () => {
   };
 
   return (
-    <Container>
-      <RightContainer>
-        <LoginBackgroundImg src="signupBackground.jpg" alt="Background Image" />
-      </RightContainer>
-      <LeftContainer>
-        <Left>
-          <LeftLogo>
-            <LogoImg src="loginLogo.png" alt="Autograder logo" />
-          </LeftLogo>
-          <FormBox>
-            <div>
-              <H1>Sign Up</H1>
-              <H4>The easiest way to grade code for teachers!</H4>
+    <Row className="w-screen h-screen bg-blue-600">
+      {/* RightContainer with background image */}
+      <Col xs={0} md={12} className="hidden md:flex bg-black">
+        <img
+          src="signupBackground.jpg"
+          alt="Background"
+          className="object-cover opacity-20 w-full h-full"
+        />
+      </Col>
+      {/* LeftContainer with form */}
+
+      <Col
+        xs={24}
+        md={12}
+        className="bg-white flex justify-center items-center"
+      >
+        <div className="flex flex-col justify-between items-center w-full md:w-3/5 lg:w- h-5/6">
+          <div className="self-start w-full pl-6 sm:mb-0 mb-8">
+            <img
+              src="loginLogo.png"
+              alt="Autograder logo"
+              className="w-12 h-12"
+            />
+          </div>
+          <div className="w-full px-6 space-y-6 flex flex-col gap-2 sm:gap-16">
+            <div className=" flex flex-col justify-center gap-4">
+              <h1 className="text-4xl font-semibold text-gray-800">Sign Up</h1>
+              <h4 className="text-base font-semibold text-gray-500">
+                The easiest way to grade code for teachers!
+              </h4>
             </div>
-            <FormContainer onSubmit={handleSubmit}>
-              <Label htmlFor="fName-signup">First Name</Label>
-              <Input
-                type="text"
-                placeholder="First Name"
+
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={onFinish}
+              className="w-full"
+            >
+              <Form.Item
                 name="firstName"
-                id="fName-signup"
-                onChange={(e) => setFirstName(e.target.value)}
-                required
-              />
-              <Label htmlFor="lName-signup">Last Name</Label>
-              <Input
-                type="text"
-                placeholder="Last Name"
+                label={<span className=" font-bold">First Name</span>}
+                rules={[
+                  { required: true, message: "Please input your first name!" },
+                ]}
+              >
+                <Input placeholder="First Name" />
+              </Form.Item>
+
+              <Form.Item
                 name="lastName"
-                id="lName-signup"
-                onChange={(e) => setLastName(e.target.value)}
-                required
-              />
-              <Label htmlFor="email-signup">Email</Label>
-              <Input
-                type="email"
-                placeholder="mail@website.com"
+                label={<span className=" font-bold">Last Name</span>}
+                rules={[
+                  { required: true, message: "Please input your last name!" },
+                ]}
+              >
+                <Input placeholder="Last Name" />
+              </Form.Item>
+
+              <Form.Item
                 name="email"
-                id="email-signup"
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <Label htmlFor="password-signup">Password</Label>
-              <Input
-                type="password"
-                placeholder="Min. 8 Characters"
+                label={<span className=" font-bold">Email</span>}
+                rules={[
+                  { required: true, message: "Please input your email!" },
+                  { type: "email", message: "Please enter a valid email!" },
+                ]}
+              >
+                <Input placeholder="mail@website.com" />
+              </Form.Item>
+
+              <Form.Item
                 name="password"
-                id="password-signup"
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <Label htmlFor="type-signup">Role</Label>
-              <Select
-                required
+                label={<span className=" font-bold">Password</span>}
+                rules={[
+                  { required: true, message: "Please input your password!" },
+                ]}
+              >
+                <Input.Password placeholder="Min. 8 characters" />
+              </Form.Item>
+
+              <Form.Item
                 name="userType"
-                id="type-signup"
-                onChange={(e) => setUserType(e.target.value)}
+                label={<span className=" font-bold">Role</span>}
+                rules={[
+                  { required: true, message: "Please select your role!" },
+                ]}
               >
-                <option value="" selected disabled hidden>
-                  Choose role
-                </option>
-                <option value="Instructor">Instructor</option>
-                <option value="Student">Student</option>
-              </Select>
-              <div
-                style={{ display: "flex", width: "100%", marginTop: "12px" }}
+                <Select placeholder="Select a role">
+                  <Option value="Instructor">Instructor</Option>
+                  <Option value="Student">Student</Option>
+                </Select>
+              </Form.Item>
+
+              <Form.Item
+                name="terms"
+                valuePropName="checked"
+                rules={[
+                  {
+                    validator: (_, value) =>
+                      value
+                        ? Promise.resolve()
+                        : Promise.reject(
+                            new Error(
+                              "You need to accept the terms and conditions!"
+                            )
+                          ),
+                  },
+                ]}
               >
-                <input
-                  type="checkbox"
-                  className="checkBoxSignup"
-                  name="checkBox2"
-                  id="checkBox2"
-                  value="checked"
-                  onChange={(e) => setTerms(!terms)}
-                />
-                <LabelTerms style={{ width: "100%" }} htmlFor="checkBox2">
+                <Checkbox onChange={(e) => setTerms(e.target.checked)}>
                   I agree to the{" "}
                   <a
                     href="https://rb.gy/enaq3a"
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ fontWeight: 600, cursor: "pointer" }}
+                    className="font-semibold text-black"
                   >
                     Terms & Conditions
                   </a>
                   .
-                </LabelTerms>
-              </div>
-              <BlackBtn type="submit">Sign Up</BlackBtn>
-              <Label style={{ fontWeight: 400 }}>
-                Already have an account?
-                <Link to="/login" style={{ fontWeight: 600 }}>
-                  {" "}
-                  Sign in
+                </Checkbox>
+              </Form.Item>
+
+              <Form.Item>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  className="w-full bg-black border-black text-white rounded-lg text-sm font-medium h-10"
+                  disabled={!terms}
+                >
+                  Sign Up
+                </Button>
+              </Form.Item>
+              <div className="text-left mt-3 font-normal">
+              Already have an account?
+                <Link to="/login" className="font-semibold text-gray-800 ml-1">
+                Sign in
                 </Link>
-              </Label>
-            </FormContainer>
-          </FormBox>
-          <CopyrightText></CopyrightText>
-        </Left>
-      </LeftContainer>
-    </Container>
+              </div>
+            </Form>
+          </div>
+          <div className="hidden md:flex self-start w-full pl-6 text-xs font-light">
+            ©2023 Siddharth. All rights reserved.
+          </div>
+        </div>
+      </Col>
+    </Row>
   );
 };
 

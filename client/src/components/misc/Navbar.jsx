@@ -1,4 +1,6 @@
 import React, { useEffect } from "react";
+import { Layout, Menu, Button, Avatar, Typography, Space } from "antd";
+import { UserOutlined } from "@ant-design/icons";
 import { useTracker } from "../../context/TrackerProvider";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
@@ -54,6 +56,9 @@ const LogoImg = styled.img`
   flex: 1;
   cursor: pointer;
 `;
+
+const { Header } = Layout;
+const { Text } = Typography;
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -72,24 +77,50 @@ const Navbar = () => {
   };
 
   return (
-    <NavBar>
-      {user && (
-        <NavLeftDiv>
-          <H1Nav>
-            {user.firstName} {user.lastName}
-          </H1Nav>
-          <H2Nav>{user.userType}</H2Nav>
-        </NavLeftDiv>
-      )}
-      <LogoImg
-        src="userLogo.jpg"
-        alt="Autograder logo"
-        onClick={handleLogoClick}
-      />
-      <div style={{ flex: "1", textAlign: "right" }}>
-        <LogoutBtn onClick={handleLogout}>Logout</LogoutBtn>
-      </div>
-    </NavBar>
+    <Layout className="layout">
+      <Header
+        style={{
+          backgroundColor: "black",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        {/* Left Section: User Information */}
+        {user && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+            }}
+          >
+            <Text strong style={{ color: "white", marginBottom: "2px" }}>
+              {user.firstName} {user.lastName}
+            </Text>
+            <Text style={{ color: "white" }}>{user.userType}</Text>
+          </div>
+        )}
+
+        {/* Center Section: Logo */}
+        <Avatar
+          src="userLogo.jpg"
+          onClick={handleLogoClick}
+          style={{ cursor: "pointer", alignSelf: "center" }}
+        />
+
+        {/* Right Section: Logout Button */}
+        <Button
+          type="primary"
+          shape="round"
+          icon={<UserOutlined />}
+          onClick={handleLogout}
+          style={{ backgroundColor: "white", color: "black", border: "none" }}
+        >
+          Logout
+        </Button>
+      </Header>
+    </Layout>
   );
 };
 
