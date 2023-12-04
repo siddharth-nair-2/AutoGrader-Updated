@@ -43,7 +43,7 @@ const Login = () => {
         md={12}
         className="bg-white flex justify-center items-center"
       >
-        <div className="flex flex-col justify-between items-center w-full md:w-3/5 lg:w- h-5/6">
+        <div className="flex flex-col justify-between items-center w-full md:w-3/5 h-5/6">
           <div className="self-start w-full pl-6">
             <img
               src="loginLogo.png"

@@ -1,138 +1,20 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { notification } from "antd";
-import styled from "styled-components";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { notification, Form, Input, Button, Select, Typography } from "antd";
 import Navbar from "../../misc/Navbar";
+import { ArrowLeftOutlined } from "@ant-design/icons";
+import { useAuth } from "../../../context/AuthProvider";
 
-const Container = styled.div`
-  font-family: "Poppins", sans-serif;
-  height: 100vh;
-  padding-bottom: 20px;
-  background-color: #f4f3f6;
-`;
-
-const HeadingDiv = styled.div`
-  color: black;
-  font-size: 36px;
-  margin: 20px 80px 20px 80px;
-  font-weight: 600;
-  justify-content: center;
-  display: flex;
-`;
-
-const FormBox = styled.div`
-  width: 40%;
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-`;
-
-const FormContainer = styled.form`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  font-family: "Poppins", sans-serif;
-`;
-
-const Label = styled.label`
-  font-size: 12px;
-  font-weight: 600;
-  width: 100%;
-  margin-top: 12px;
-`;
-
-const Input = styled.input`
-  border: #e1dfec 2px solid;
-  width: 100%;
-  padding: 15px;
-  border-radius: 46px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
-
-const TextArea = styled.textarea`
-  border: #e1dfec 2px solid;
-  width: 100%;
-  padding: 15px;
-  border-radius: 23px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
-
-const WhiteBtn = styled.button`
-  border: none;
-  outline: none;
-  padding: 12px 0;
-  background-color: white;
-  border-radius: 20px;
-  width: 180px;
-  font-weight: bold;
-  font-size: 14px;
-  cursor: pointer;
-`;
-
-const BlackBtn = styled(WhiteBtn)`
-  background-color: #0a071b;
-  color: white;
-  width: 100%;
-  padding: 17px;
-  margin: 5px 0;
-  font-size: 14px;
-  border-radius: 46px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  margin-top: 40px;
-`;
-
-const Select = styled.select`
-  border: #e1dfec 2px solid;
-  width: 100%;
-  padding: 15px;
-  border-radius: 46px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
-
-const CourseButtons = styled.button`
-  border: none;
-  outline: none;
-  padding: 16px;
-  background-color: black;
-  border-radius: 24px;
-  font-weight: bold;
-  font-size: 14px;
-  color: white;
-  cursor: pointer;
-  margin-right: 20px;
-  box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  &:hover {
-    transform: scale(1.01);
-  }
-`;
+const { TextArea } = Input;
+const { Option } = Select;
+const { Title } = Typography;
 
 const CreateCourses = () => {
-  const [userData, setUserData] = useState();
-  const navigate = useNavigate();
-  const [courseID, setCourseID] = useState();
-  const [section, setSection] = useState();
-  const [semester, setSemester] = useState();
-  const [description, setDesc] = useState();
-  const [name, setName] = useState();
+  const { user } = useAuth();
+  const [form] = Form.useForm();
 
-  useEffect(() => {
-    setUserData(JSON.parse(localStorage.getItem("userInfo")));
-  }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onFinish = async (values) => {
+    const { courseID, description, name, semester, section } = values;
     if (!courseID || !description || !name || semester === "" || !section) {
       notification.error({
         message: "Missing Information!",
@@ -142,8 +24,8 @@ const CreateCourses = () => {
       });
       return;
     }
-    setSection(section.toUpperCase());
-    if (!section.match(/[A-Z]/i)) {
+    let capsSection = section.toUpperCase();
+    if (!capsSection.match(/[A-Z]/i)) {
       notification.error({
         message: "Invalid Course Section",
         description: "Course Section should be between A and Z characters.",
@@ -185,15 +67,15 @@ const CreateCourses = () => {
           "Content-type": "application/json",
         },
       };
-      const { data } = await axios.post(
+      await axios.post(
         "http://localhost:5000/api/tracker/courses",
         {
           courseID,
           name,
           description,
           semester,
-          section,
-          instructor: JSON.parse(localStorage.getItem("userInfo"))._id,
+          section: capsSection,
+          instructor: user._id,
         },
         config
       );
@@ -216,89 +98,110 @@ const CreateCourses = () => {
   };
 
   return (
-    <Container>
+    <>
       <Navbar />
-      <HeadingDiv>
-        <Link to={"/"}>
-          <CourseButtons
-            style={{
-              position: "absolute",
-              left: "1%",
-              fontSize: "14px",
-              padding: "5px 10px 5px 10px",
-              cursor: "pointer",
-            }}
-          >{`< Back`}</CourseButtons>
-        </Link>
-        CREATE A COURSE
-      </HeadingDiv>
-      <FormBox>
-        <FormContainer onSubmit={handleSubmit}>
-          <Label htmlFor="code-course">Course Code</Label>
-          <Input
-            type="text"
-            id="code-course"
-            placeholder="COSC4106"
-            name="codeCourse"
-            onChange={(e) => setCourseID(e.target.value)}
-            required
-          />
-          <Label htmlFor="code-section">Course Section</Label>
-          <Input
-            type="text"
-            id="code-section"
-            placeholder="A"
-            name="codeSection"
-            onChange={(e) => setSection(e.target.value)}
-            maxLength={1}
-            required
-          />
-          <Label htmlFor="course-name">Course Name</Label>
-          <Input
-            type="text"
-            id="course-name"
-            placeholder="Analysis of Algorithm"
-            name="nameCourse"
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <Label htmlFor="course-desc">Course Description</Label>
-          <TextArea
-            type="textarea"
-            id="course-desc"
-            placeholder="Please enter a description for your course!"
-            name="descCourse"
-            rows={8}
-            onChange={(e) => setDesc(e.target.value)}
-            required
-          />
-          <Label htmlFor="course-sem">Semester</Label>
-          <Select
-            required
-            name="semCourse"
-            id="course-sem"
-            onChange={(e) => setSemester(e.target.value)}
+      <div className="h-full overflow-auto bg-gray-100 p-6">
+        <div className="flex justify-start">
+          <Link to="/">
+            <Button
+              icon={<ArrowLeftOutlined />}
+              className=" mb-6 sm:mb-0 bg-black border-black text-white rounded-lg text-sm font-medium flex 
+              items-center justify-center hover:bg-white hover:text-black hover:border-black"
+            >
+              Back
+            </Button>
+          </Link>
+        </div>
+        <Title className="text-center mb-6 text-3xl font-extrabold">
+          CREATE A COURSE
+        </Title>
+        <Form
+          form={form}
+          onFinish={onFinish}
+          layout="vertical"
+          className=" max-w-3xl mx-auto"
+        >
+          <Form.Item
+            name="courseID"
+            label={<span className=" font-bold">Course Code</span>}
+            rules={[
+              { required: true, message: "Please input the course code!" },
+            ]}
           >
-            <option value="" selected disabled hidden>
-              Choose Semester
-            </option>
-            <option value="Winter 2023">Winter 2023</option>
-            <option value="Summer 2023">Summer 2023</option>
-            <option value="Spring 2023">Spring 2023</option>
-            <option value="Fall 2023">Fall 2023</option>
-            <option value="Winter 2024">Winter 2024</option>
-            <option value="Summer 2024">Summer 2024</option>
-            <option value="Spring 2024">Spring 2024</option>
-            <option value="Fall 2024">Fall 2024</option>
-            <option value="Winter 2025">Winter 2025</option>
-            <option value="Summer 2025">Summer 2025</option>
-            <option value="Spring 2025">Spring 2025</option>
-            <option value="Fall 2025">Fall 2025</option>
-          </Select>
-          <BlackBtn>Create Course</BlackBtn>
-        </FormContainer>
-      </FormBox>
-    </Container>
+            <Input placeholder="COSC4106" size="large" />
+          </Form.Item>
+
+          <Form.Item
+            name="section"
+            label={<span className=" font-bold">Course Section</span>}
+            rules={[
+              { required: true, message: "Please input the course section!" },
+            ]}
+          >
+            <Input placeholder="A" maxLength={1} size="large" />
+          </Form.Item>
+
+          <Form.Item
+            name="name"
+            label={<span className=" font-bold">Course Name</span>}
+            rules={[
+              { required: true, message: "Please input the course name!" },
+            ]}
+          >
+            <Input placeholder="Analysis of Algorithm" size="large" />
+          </Form.Item>
+
+          <Form.Item
+            name="description"
+            label={<span className=" font-bold">Course Description</span>}
+            rules={[
+              {
+                required: true,
+                message: "Please input the course description!",
+              },
+            ]}
+          >
+            <TextArea
+              placeholder="Please enter a description for your course!"
+              rows={6}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="semester"
+            label={<span className=" font-bold">Semester</span>}
+            rules={[{ required: true, message: "Please select the semester!" }]}
+          >
+            <Select placeholder="Choose Semester" size="large">
+              {/* Add more options as required */}
+              <Option value="Winter 2023">Winter 2023</Option>
+              <Option value="Summer 2023">Summer 2023</Option>
+              <Option value="Spring 2023">Spring 2023</Option>
+              <Option value="Fall 2023">Fall 2023</Option>
+              <Option value="Winter 2024">Winter 2024</Option>
+              <Option value="Summer 2024">Summer 2024</Option>
+              <Option value="Spring 2024">Spring 2024</Option>
+              <Option value="Fall 2024">Fall 2024</Option>
+              <Option value="Winter 2025">Winter 2025</Option>
+              <Option value="Summer 2025">Summer 2025</Option>
+              <Option value="Spring 2025">Spring 2025</Option>
+              <Option value="Fall 2025">Fall 2025</Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              size="large"
+              htmlType="submit"
+              className="w-full bg-black text-white rounded-lg text-sm font-medium flex 
+              items-center justify-center hover:bg-white hover:text-black hover:border-black"
+            >
+              Create Course
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+    </>
   );
 };
 

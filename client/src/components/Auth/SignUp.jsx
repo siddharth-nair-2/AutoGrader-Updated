@@ -133,7 +133,7 @@ const Signup = () => {
               className="w-12 h-12"
             />
           </div>
-          <div className="w-full px-6 space-y-6 flex flex-col gap-2 sm:gap-16">
+          <div className="w-full px-6 space-y-6 flex flex-col gap-2">
             <div className=" flex flex-col justify-center gap-4">
               <h1 className="text-4xl font-semibold text-gray-800">Sign Up</h1>
               <h4 className="text-base font-semibold text-gray-500">

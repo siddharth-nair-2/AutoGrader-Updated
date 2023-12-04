@@ -17,10 +17,15 @@ root.render(
             // Your custom theme tokens
             colorPrimary: "#000000", // Primary color
             borderRadiusBase: "2px", // Border radius
-            colorBgContainer: "#f4f3f6", // Background color for containers
+            colorBgContainer: "#ffffff", // Background color for containers
             colorTextBase: "#000000", // Base text color
             colorHeading: "#ffffff", // Text color for headings
             // Add more customizations as needed 6ab28a
+          },
+          components: {
+            Card: {
+              actionsBg: "#ffffff",
+            },
           },
         }}
       >
