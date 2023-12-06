@@ -33,3 +33,7 @@ input.checkBoxSignup {
   accent-color: black;
   margin-top: 1.5px;
 }
+
+.ant-table {
+  @apply shadow-md;
+}

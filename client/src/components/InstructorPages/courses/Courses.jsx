@@ -2,8 +2,16 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useTracker } from "../../../context/TrackerProvider";
-import Heading from "../../misc/Heading";
+import { Card, Button, Typography, Space } from "antd";
+import {
+  ArrowLeftOutlined,
+  ReadOutlined,
+  ProfileOutlined,
+  AppstoreOutlined,
+} from "@ant-design/icons";
 import Navbar from "../../misc/Navbar";
+
+const { Title } = Typography;
 
 const Container = styled.div`
   font-family: "Poppins", sans-serif;
@@ -105,40 +113,58 @@ const Courses = () => {
     localStorage.removeItem("submissionInfo");
   }, []);
 
-  return (
-    <Container>
-      <Navbar />
-      {selectedCourse && selectedCourse.name && (
-        <>
-          <Heading>
-            <Link to={"/"}>
-              <CourseButtons
-                style={{
-                  position: "absolute",
-                  left: "1%",
-                  fontSize: "14px",
-                  padding: "5px 10px 5px 10px",
-                  cursor: "pointer",
-                }}
-              >{`< Back`}</CourseButtons>
-            </Link>
-            {selectedCourse?.name.toUpperCase()}
-          </Heading>
+  const CourseActionCard = ({ title, icon, navigateTo }) => (
+    <Card
+      hoverable
+      onClick={() => navigate(navigateTo)}
+      className="text-center"
+    >
+      {icon}
+      <Title level={4}>{title}</Title>
+    </Card>
+  );
 
-          <ViewCreateDiv>
-            <CourseButtons onClick={(e) => navigate("/viewallassignments")} style={{width: "250px"}}>
-              View All Assignments
-            </CourseButtons>
-            <CourseButtons onClick={(e) => navigate("/viewalltests")} style={{width: "250px"}}>
-              View All Tests
-            </CourseButtons>
-            <CourseButtons onClick={(e) => navigate("/viewallmodules")} style={{width: "250px"}}>
-              View All Modules
-            </CourseButtons>
-          </ViewCreateDiv>
-        </>
-      )}
-    </Container>
+  return (
+    <>
+      <Navbar />
+      <div className="h-full overflow-auto bg-gray-100 p-6">
+        <Link to="/" className=" flex-1">
+          <Button
+            icon={<ArrowLeftOutlined />}
+            className=" mb-6 sm:mb-0 bg-black border-black text-white rounded-lg text-sm font-medium flex 
+              items-center justify-center hover:bg-white hover:text-black hover:border-black"
+          >
+            Back
+          </Button>
+        </Link>
+        <Space
+          direction="vertical"
+          size="large"
+          className="w-full h-full flex flex-col items-center justify-center"
+        >
+          <Title className="text-center">
+            {selectedCourse.name.toUpperCase()}
+          </Title>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+            <CourseActionCard
+              title="View All Assignments"
+              icon={<ReadOutlined style={{ fontSize: "24px" }} />}
+              navigateTo="/viewallassignments"
+            />
+            <CourseActionCard
+              title="View All Tests"
+              icon={<ProfileOutlined style={{ fontSize: "24px" }} />}
+              navigateTo="/viewalltests"
+            />
+            <CourseActionCard
+              title="View All Modules"
+              icon={<AppstoreOutlined style={{ fontSize: "24px" }} />}
+              navigateTo="/viewallmodules"
+            />
+          </div>
+        </Space>
+      </div>
+    </>
   );
 };
 

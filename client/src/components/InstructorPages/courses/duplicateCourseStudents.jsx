@@ -125,7 +125,7 @@ const Input = styled.input`
   font-size: 12px;
 `;
 
-const CourseStudents = () => {
+const CourseStudents2 = () => {
   const fetchCourseStudents = async () => {
     try {
       const data = await axios.get(
@@ -393,4 +393,4 @@ const CourseStudents = () => {
   );
 };
 
-export default CourseStudents;
+export default CourseStudents2;

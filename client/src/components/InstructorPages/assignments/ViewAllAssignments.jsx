@@ -1,80 +1,13 @@
 import axios from "axios";
-import { notification } from "antd";
+import { notification, Button, Row, Typography, Card } from "antd";
+import { ArrowLeftOutlined, PlusOutlined } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import styled from "styled-components";
 import { useTracker } from "../../../context/TrackerProvider";
 import AssignmentCard from "../../misc/AssignmentCard";
-import Heading from "../../misc/Heading";
 import Navbar from "../../misc/Navbar";
 
-const Container = styled.div`
-  font-family: "Poppins", sans-serif;
-  height: 100vh;
-  padding-bottom: 20px;
-  background-color: #f4f3f6;
-`;
-
-const CourseCard = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 20px;
-  color: black;
-  background-color: white;
-  border-radius: 24px;
-  width: 600px;
-  height: 100px;
-  margin: auto;
-  margin-top: 50px;
-  margin-bottom: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 24px;
-  font-weight: 500;
-  box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-
-  &:hover {
-    transform: scale(1.002);
-  }
-`;
-
-const CourseButtons = styled.button`
-  border: none;
-  outline: none;
-  padding: 16px;
-  background-color: black;
-  border-radius: 24px;
-  font-weight: bold;
-  font-size: 14px;
-  color: white;
-  cursor: pointer;
-  margin-right: 20px;
-  box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  &:hover {
-    transform: scale(1.01);
-  }
-`;
-
-const ViewCreateDiv = styled.div`
-  display: flex;
-  font-size: 24px;
-  justify-content: space-evenly;
-`;
-
-const CourseBox = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 50px;
-  margin: 25px;
-`;
+const { Title } = Typography;
 
 const ViewAllAssignments = () => {
   const { selectedCourse, setSelectedCourse } = useTracker();
@@ -91,6 +24,7 @@ const ViewAllAssignments = () => {
     localStorage.removeItem("moduleInfo");
     localStorage.removeItem("submissionInfo");
     fetchAssignments();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchAssignments = async () => {
@@ -111,50 +45,51 @@ const ViewAllAssignments = () => {
     }
   };
   return (
-    <Container>
+    <>
       <Navbar />
-      {selectedCourse && selectedCourse.name && (
-        <>
-          <Heading>
-            <Link to={"/course"}>
-              <CourseButtons
-                style={{
-                  position: "absolute",
-                  left: "1%",
-                  fontSize: "14px",
-                  padding: "5px 10px 5px 10px",
-                  cursor: "pointer",
-                }}
-              >{`< Back`}</CourseButtons>
-            </Link>
-            {selectedCourse?.name.toUpperCase()}
-          </Heading>
-          {assignments?.length > 0 ? (
-            <CourseBox>
-              {assignments.length > 0 &&
-                assignments.map((assignment) => {
-                  return (
-                    <AssignmentCard
-                      key={assignment._id}
-                      assignment={assignment}
-                    />
-                  );
-                })}
-            </CourseBox>
+      <div className="h-full overflow-auto bg-gray-100 p-6">
+        <Link to="/course" className="mb-4">
+          <Button
+            icon={<ArrowLeftOutlined />}
+            className="bg-[#000000] text-white font-semibold flex justify-center items-center hover:bg-slate-100"
+          >
+            Back
+          </Button>
+        </Link>
+        <Title level={2} className="text-center mb-8">
+          {selectedCourse?.name.toUpperCase()}
+        </Title>
+        <Row gutter={[16, 16]} justify="center" className=" gap-4">
+          {assignments.length > 0 ? (
+            assignments.map((assignment) => (
+              <AssignmentCard key={assignment._id} assignment={assignment} />
+            ))
           ) : (
-            <CourseCard>You have no assignments for this course!</CourseCard>
+            <Card className="text-center p-6">
+              <Title level={4}>You have no assignments for this course!</Title>
+            </Card>
           )}
-          <ViewCreateDiv>
-            <CourseButtons onClick={(e) => navigate("/createAssignment")}>
-              + New coding Assignment
-            </CourseButtons>
-            <CourseButtons onClick={(e) => navigate("/createTheoryAssignment")}>
-              + New Assignment
-            </CourseButtons>
-          </ViewCreateDiv>
-        </>
-      )}
-    </Container>
+        </Row>
+        <div className="text-center mt-8">
+          <Button
+            size="large"
+            icon={<PlusOutlined />}
+            onClick={() => navigate("/createAssignment")}
+            className="bg-[#000000] text-white font-semibold  hover:bg-slate-100 mx-2"
+          >
+            New Coding Assignment
+          </Button>
+          <Button
+            size="large"
+            icon={<PlusOutlined />}
+            onClick={() => navigate("/createTheoryAssignment")}
+            className="bg-[#000000] text-white font-semibold  hover:bg-slate-100 mx-2"
+          >
+            New Theory Assignment
+          </Button>
+        </div>
+      </div>
+    </>
   );
 };
 
