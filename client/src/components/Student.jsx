@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect } from "react";
 import { useAuth } from "../context/AuthProvider";
-import { notification, Button, Row, Typography, Card } from "antd";
+import { Button, Row, Typography, Card, App } from "antd";
 import CourseCardMain from "./misc/CourseCard";
 import Navbar from "./misc/Navbar";
 import { useTracker } from "../context/TrackerProvider";
@@ -9,6 +9,7 @@ import { useTracker } from "../context/TrackerProvider";
 const { Title } = Typography;
 
 const Student = () => {
+  const { notification } = App.useApp();
   const { user } = useAuth();
   const { courses, setCourses } = useTracker();
 

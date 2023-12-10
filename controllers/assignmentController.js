@@ -13,11 +13,11 @@ const AssignmentCreate = asyncHandler(async (req, res) => {
   const {
     name,
     description,
-    notes,
     due_date,
     courseID,
     questions,
     visibleToStudents,
+    instructorFiles,
   } = req.body;
 
   if (
@@ -48,10 +48,10 @@ const AssignmentCreate = asyncHandler(async (req, res) => {
     courseID,
     name,
     description,
-    notes,
     due_date: finalDue,
     visibleToStudents,
     questions,
+    instructorFiles,
   });
 
   if (assignment) {
@@ -60,7 +60,6 @@ const AssignmentCreate = asyncHandler(async (req, res) => {
       courseID: assignment.courseID,
       name: assignment.name,
       description: assignment.description,
-      notes: assignment.notes,
       due_date: finalDue,
       questions: assignment.questions,
     });

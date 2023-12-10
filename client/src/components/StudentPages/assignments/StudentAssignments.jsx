@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { useTracker } from "../../../context/TrackerProvider";
 import Editor from "@monaco-editor/react";
 import Navbar from "../../misc/Navbar";
-import { notification } from "antd";
+import { App } from "antd";
 import axios from "axios";
 
 const Container = styled.div`
@@ -257,6 +257,7 @@ const StudentAssignments = () => {
   const options = {
     fontSize: fontSize,
   };
+  const { notification } = App.useApp();
 
   const languagesList = [
     { value: "50", label: "C" },

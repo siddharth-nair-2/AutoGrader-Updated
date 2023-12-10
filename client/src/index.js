@@ -2,10 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
-import { ConfigProvider } from "antd";
+import { ConfigProvider, theme } from "antd";
 import { BrowserRouter } from "react-router-dom";
 import TrackerProvider from "./context/TrackerProvider";
 import AuthProvider from "./context/AuthProvider";
+import { App as AppAntd } from "antd";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -13,25 +14,36 @@ root.render(
     <BrowserRouter>
       <ConfigProvider
         theme={{
+          algorithm: theme.defaultAlgorithm,
           token: {
             // Your custom theme tokens
             colorPrimary: "#000000", // Primary color
-            borderRadiusBase: "2px", // Border radius
-            colorBgContainer: "#ffffff", // Background color for containers
-            colorTextBase: "#000000", // Base text color
-            colorHeading: "#ffffff", // Text color for headings
             // Add more customizations as needed 6ab28a
           },
           components: {
             Card: {
               actionsBg: "#ffffff",
             },
+            Select: {
+              optionActiveBg: "#d4d4d4",
+              optionSelectedBg: "#a3a3a3",
+            },
+            Button: {
+              colorPrimaryBorderHover: "#000000",
+              colorPrimaryBgHover: "#ffffff",
+              colorPrimaryTextHover: "#000000",
+              colorPrimary: "#ffffff",
+              colorPrimaryBorder: "#000000",
+              colorPrimaryBg: "#000000",
+            },
           },
         }}
       >
         <AuthProvider>
           <TrackerProvider>
-            <App />
+            <AppAntd>
+              <App />
+            </AppAntd>
           </TrackerProvider>
         </AuthProvider>
       </ConfigProvider>

@@ -8,7 +8,7 @@ import {
   Col,
   Select,
   Checkbox,
-  notification,
+  App,
 } from "antd";
 
 import { useAuth } from "../../context/AuthProvider";
@@ -18,7 +18,7 @@ const { Option } = Select;
 const Signup = () => {
   const [terms, setTerms] = useState(false);
   const { registerUser } = useAuth();
-
+  const { notification } = App.useApp();
 
   const [form] = Form.useForm();
 
@@ -242,9 +242,9 @@ const Signup = () => {
                 </Button>
               </Form.Item>
               <div className="text-left mt-3 font-normal">
-              Already have an account?
+                Already have an account?
                 <Link to="/login" className="font-semibold text-gray-800 ml-1">
-                Sign in
+                  Sign in
                 </Link>
               </div>
             </Form>

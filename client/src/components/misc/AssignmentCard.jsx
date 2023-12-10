@@ -13,6 +13,14 @@ const AssignmentCard = ({ assignment }) => {
     navigate("/viewassignment");
   };
 
+  const getItemCount = () => {
+    if (assignment.questions) {
+      return assignment.questions.length + assignment.instructorFiles.length;
+    } else {
+      return assignment.instructorFiles.length;
+    }
+  };
+
   return (
     <Card
       hoverable
@@ -45,10 +53,7 @@ const AssignmentCard = ({ assignment }) => {
         description={
           <>
             <Typography.Title level={5} className="font-semibold">
-              {`${
-                assignment.questions?.length ||
-                assignment.instructorFiles?.length
-              } Item(s)`}
+              {getItemCount()} Item(s)
             </Typography.Title>
             <Typography.Text className="block">
               {assignment.description.length > 120

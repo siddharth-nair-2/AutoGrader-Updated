@@ -2,9 +2,8 @@ import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTracker } from "../../../context/TrackerProvider";
-import { notification, Table, Button, Input, Typography, Space } from "antd";
+import { Table, Button, Input, Typography, App } from "antd";
 
-import Heading from "../../misc/Heading";
 import Navbar from "../../misc/Navbar";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 
@@ -17,6 +16,7 @@ const CourseStudents = () => {
   const [allStudents, setAllStudents] = useState([]);
   const [showAddStudents, setShowAddStudents] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const { notification } = App.useApp();
 
   useEffect(() => {
     // Check if courseInfo is available; if not, redirect to home
@@ -30,15 +30,6 @@ const CourseStudents = () => {
     fetchAllStudents(courseInfo._id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Add sorting functionality to your column definitions
-  const getColumns = (columns) =>
-    columns.map((col) => ({
-      ...col,
-      sorter: col.sorter !== false,
-      sortDirections: ["descend", "ascend"],
-      // If you want to enable filtering add filter here
-    }));
 
   // Enhanced student data with filter functionality
   const getFilteredData = (data) => {
@@ -149,6 +140,7 @@ const CourseStudents = () => {
     }
     fetchCourseStudents();
     fetchAllStudents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Column definitions for the enrolled students table
@@ -234,10 +226,12 @@ const CourseStudents = () => {
   // Use memoization to avoid unnecessary re-renders
   const filteredEnrolledStudents = useMemo(
     () => getFilteredData(students),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [students, searchText]
   );
   const filteredAllStudents = useMemo(
     () => getFilteredData(allStudents),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [allStudents, searchText]
   );
 
@@ -255,7 +249,7 @@ const CourseStudents = () => {
               Back
             </Button>
           </Link>
-          <Title className="text-center my-4 flex-1">
+          <Title className="text-center my-4 flex-1" level={2}>
             {selectedCourse?.name.toUpperCase()}
           </Title>
           <div className=" flex-1">
@@ -268,6 +262,7 @@ const CourseStudents = () => {
             </Button>
           </div>
         </div>
+
         <div className=" max-w-7xl m-auto">
           {!showAddStudents && (
             <>

@@ -1,9 +1,9 @@
-import { Row, Col, Form, Input, Button } from "antd";
+import { Row, Col, Form, Input, Button, App } from "antd";
 import { Link } from "react-router-dom";
-import { notification } from "antd";
 import { useAuth } from "../../context/AuthProvider";
 
 const Login = () => {
+  const { notification } = App.useApp();
   const [form] = Form.useForm();
   const { login } = useAuth();
 

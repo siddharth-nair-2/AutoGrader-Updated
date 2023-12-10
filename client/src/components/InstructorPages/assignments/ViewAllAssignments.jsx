@@ -1,5 +1,5 @@
 import axios from "axios";
-import { notification, Button, Row, Typography, Card } from "antd";
+import { Button, Row, Typography, Card, App } from "antd";
 import { ArrowLeftOutlined, PlusOutlined } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -12,6 +12,7 @@ const { Title } = Typography;
 const ViewAllAssignments = () => {
   const { selectedCourse, setSelectedCourse } = useTracker();
   const [assignments, setAssignments] = useState([]);
+  const { notification } = App.useApp();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,7 +25,7 @@ const ViewAllAssignments = () => {
     localStorage.removeItem("moduleInfo");
     localStorage.removeItem("submissionInfo");
     fetchAssignments();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchAssignments = async () => {

@@ -1,162 +1,43 @@
 import axios from "axios";
-import styled from "styled-components";
-import DateTimePicker from "react-datetime-picker";
-
 import { useEffect, useState } from "react";
-import { notification } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-import { AiOutlinePlus, AiOutlineDelete } from "react-icons/ai";
-
 import Navbar from "../../misc/Navbar";
-import Heading from "../../misc/Heading";
 import { useAuth } from "../../../context/AuthProvider";
 import { useTracker } from "../../../context/TrackerProvider";
+import {
+  Form,
+  Input,
+  Button,
+  Typography,
+  Space,
+  Select,
+  DatePicker,
+  App,
+  Switch,
+  Progress,
+} from "antd";
+import {
+  InboxOutlined,
+  MinusCircleOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
+import { ArrowLeftOutlined } from "@ant-design/icons";
+import Dragger from "antd/es/upload/Dragger";
 
-const Container = styled.div`
-  font-family: "Poppins", sans-serif;
-  min-height: 100vh;
-  padding-bottom: 20px;
-  background-color: #f4f3f6;
-`;
-
-const FormBox = styled.div`
-  width: 40%;
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-`;
-
-const FormContainer = styled.form`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  font-family: "Poppins", sans-serif;
-`;
-
-const Label = styled.label`
-  font-size: 12px;
-  font-weight: 600;
-  width: 100%;
-  margin-top: 12px;
-`;
-
-const Input = styled.input`
-  border: #e1dfec 2px solid;
-  width: 100%;
-  padding: 15px;
-  border-radius: 46px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
-
-const QNInput = styled.input`
-  border: #e1dfec 2px solid;
-  width: 9%;
-  padding: 15px;
-  border-radius: 46px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
-
-const QuestionInput = styled.input`
-  border: #e1dfec 2px solid;
-  width: 77%;
-  padding: 15px;
-  border-radius: 46px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
-
-const AddLogo = styled.div`
-  border: #e1dfec 2px solid;
-  width: 7%;
-  padding: 15px;
-  padding-left: 17px;
-  padding-bottom: 17px;
-  font-weight: 800;
-  border-radius: 46px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
-
-const TextArea = styled.textarea`
-  border: #e1dfec 2px solid;
-  width: 100%;
-  padding: 15px;
-  border-radius: 23px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
-
-const BlackBtn = styled.button`
-  border: none;
-  outline: none;
-  cursor: pointer;
-  background-color: #0a071b;
-  color: white;
-  width: 100%;
-  padding: 17px;
-  margin: 5px 0;
-  font-size: 14px;
-  border-radius: 46px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  margin-top: 40px;
-`;
-
-const CourseButtons = styled.button`
-  border: none;
-  outline: none;
-  padding: 16px;
-  background-color: black;
-  border-radius: 24px;
-  font-weight: bold;
-  font-size: 14px;
-  color: white;
-  cursor: pointer;
-  margin-right: 20px;
-  box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  &:hover {
-    transform: scale(1.01);
-  }
-`;
-
-const Select = styled.select`
-  border: #e1dfec 2px solid;
-  width: 100%;
-  padding: 15px;
-  border-radius: 46px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
+const { TextArea } = Input;
+const { Title, Text } = Typography;
 
 const CreateAssignments = () => {
+  const { notification, modal } = App.useApp();
+
   const navigate = useNavigate();
   const { selectedCourse, setSelectedCourse } = useTracker();
   const { user } = useAuth();
-
-  const [visibility, setVisiblity] = useState();
-  const [description, setDesc] = useState();
-  const [notes, setNotes] = useState("");
-  const [name, setName] = useState();
-  const [value, setValue] = useState(new Date());
-  const [questionList, setQuestionList] = useState([
-    {
-      questionNum: "",
-      questionInfo: "",
-      testCases: [{ inputCase: "", expectedOutput: "" }],
-    },
-  ]);
+  const [instructorFiles, setInstructorFiles] = useState([]);
+  const [fileList, setFileList] = useState([]);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [publicIds, setPublicIds] = useState([]);
+  const [uploadedStatus, setUploadedStatus] = useState(true);
 
   useEffect(() => {
     if (!user) {
@@ -170,62 +51,17 @@ const CreateAssignments = () => {
       setSelectedCourse(JSON.parse(localStorage.getItem("courseInfo")));
     }
   }, []);
+  const [form] = Form.useForm();
 
-  const handleQuestionChange = (e, index) => {
-    const { name, value } = e.target;
-    const questions = [...questionList];
-    questions[index][name] = value;
-    setQuestionList(questions);
-  };
-
-  const handleCaseInfoChange = (e, outerIndex, innerIndex) => {
-    const { name, value } = e.target;
-    let questionsListCopy = JSON.parse(JSON.stringify(questionList));
-    questionsListCopy[outerIndex].testCases[innerIndex][name] = value;
-    setQuestionList(questionsListCopy);
-  };
-
-  const handleCaseAddClick = (outerIndex, innerIndex) => {
-    let questionsListCopy = JSON.parse(JSON.stringify(questionList));
-    questionsListCopy[outerIndex].testCases.push({
-      inputCase: "",
-      expectedOutput: "",
-    });
-    setQuestionList(questionsListCopy);
-  };
-
-  const handleAddClick = () => {
-    setQuestionList([
-      ...questionList,
-      {
-        questionNum: "",
-        questionInfo: "",
-        testCases: [{ inputCase: "", expectedOutput: "" }],
-      },
-    ]);
-  };
-
-  const handleCaseRemoveClick = (outerIndex, innerIndex) => {
-    const list = [...questionList[outerIndex].testCases];
-    list.splice(innerIndex, 1);
-    let questionsListCopy = JSON.parse(JSON.stringify(questionList));
-    questionsListCopy[outerIndex].testCases = list;
-    setQuestionList(questionsListCopy);
-  };
-
-  const handleRemoveClick = (index) => {
-    const list = [...questionList];
-    list.splice(index, 1);
-    setQuestionList(list);
-  };
-
-  const handleDueDate = (newValue) => {
-    setValue(newValue);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!name || !description || !value || !visibility) {
+  const onFinish = async (e) => {
+    const { name, description, dueDate, visibleToStudents, questions } = e;
+    if (
+      !name ||
+      !description ||
+      !dueDate ||
+      visibleToStudents === undefined ||
+      !questions
+    ) {
       notification.error({
         message: "Missing Information",
         description: "Pleast enter all information!",
@@ -234,10 +70,7 @@ const CreateAssignments = () => {
       });
       return;
     }
-    if (
-      questionList.length < 2 &&
-      (questionList[0].questionNum === "" || questionList[0].questionNum === "")
-    ) {
+    if (questions.length < 1) {
       notification.error({
         message: "No Question!",
         description: "Each assignment should have at least one question!",
@@ -264,12 +97,14 @@ const CreateAssignments = () => {
       });
       return;
     }
-    if (notes.length > 256) {
+
+    if (uploadedStatus === false) {
       notification.error({
-        message: "Notes are too lengthy!",
-        description: "Notes should be less than 256 characters.",
+        message: "Please upload the files!",
+        description:
+          "Please press the Start Upload button before creating the assignment.",
+        duration: 8,
         placement: "bottomLeft",
-        duration: 4,
       });
       return;
     }
@@ -279,16 +114,16 @@ const CreateAssignments = () => {
           "Content-type": "application/json",
         },
       };
-      const { data } = await axios.post(
+      await axios.post(
         "http://localhost:5000/api/tracker/assignments",
         {
           courseID: selectedCourse._id,
           name,
           description,
-          notes,
-          due_date: value.toISOString(),
-          visibleToStudents: visibility,
-          questions: questionList,
+          due_date: dueDate.toDate(),
+          visibleToStudents,
+          questions,
+          instructorFiles,
         },
         config
       );
@@ -316,197 +151,440 @@ const CreateAssignments = () => {
     }
   };
 
-  return (
-    <Container>
-      <Navbar />
-      <Heading>
-        <Link to={"/viewallassignments"}>
-          <CourseButtons
-            style={{
-              position: "absolute",
-              left: "1%",
-              fontSize: "14px",
-              padding: "5px 10px 5px 10px",
-              cursor: "pointer",
-            }}
-          >{`< Back`}</CourseButtons>
-        </Link>
-        {`CREATE AN ASSIGNMENT - ${selectedCourse?.name}`}
-      </Heading>
-      <FormBox>
-        <FormContainer onSubmit={handleSubmit}>
-          <Label htmlFor="assignment-name">Assignment Name</Label>
-          <Input
-            type="text"
-            id="assignment-name"
-            placeholder="Assignment X"
-            name="assignmentName"
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <Label htmlFor="assignment-desc">Assignment Description</Label>
-          <TextArea
-            type="textarea"
-            id="assignment-desc"
-            placeholder="Please enter a description for your Assignment!"
-            name="assignmentDesc"
-            rows={2}
-            onChange={(e) => setDesc(e.target.value)}
-            required
-          />
-          <Label htmlFor="assignment-notes">Assignment Notes</Label>
-          <TextArea
-            type="textarea"
-            id="assignment-notes"
-            placeholder="Any notes? Write 'em here!"
-            name="assignmentNotes"
-            rows={2}
-            onChange={(e) => setNotes(e.target.value)}
-          />
-          <Label htmlFor="assignment-due">Due Date</Label>
-          <DateTimePicker
-            onChange={(e) => handleDueDate(e)}
-            value={value}
-            minDate={new Date()}
-          />
-          <Label htmlFor="assignment-visible">Visibility</Label>
-          <Select
-            required
-            name="assignmentVisible"
-            id="assignment-visible"
-            onChange={(e) => setVisiblity(e.target.value)}
-          >
-            <option value="" selected disabled hidden>
-              Choose visiblity
-            </option>
-            <option value={false}>Not visible to students</option>
-            <option value={true}>Visible to students</option>
-          </Select>
-          <Label htmlFor="assignment-due">Questions</Label>
-          {questionList.map((q, index) => {
-            return (
-              <>
-                <div
-                  style={{
-                    display: "flex",
-                    width: "100%",
-                    justifyContent: "space-between",
-                  }}
-                  key={index}
-                >
-                  <QNInput
-                    type="number"
-                    id="question-num"
-                    placeholder="QNo."
-                    min={1}
-                    value={q.questionNum}
-                    onChange={(e) => handleQuestionChange(e, index)}
-                    name="questionNum"
-                    required
-                  />
-                  <QuestionInput
-                    type="text"
-                    id="question-info"
-                    placeholder="Write the question here..."
-                    name="questionInfo"
-                    value={q.questionInfo}
-                    onChange={(e) => handleQuestionChange(e, index)}
-                    required
-                  />
-                  {questionList.length !== 1 && (
-                    <AddLogo>
-                      <AiOutlineDelete
-                        boxSize={4}
-                        onClick={() => handleRemoveClick(index)}
-                        color="red"
-                        _hover={{ transform: "scale(1.1)", cursor: "pointer" }}
-                      />
-                    </AddLogo>
-                  )}
-                  {questionList.length - 1 === index && (
-                    <AddLogo>
-                      <AiOutlinePlus
-                        boxSize={4}
-                        onClick={handleAddClick}
-                        color="green"
-                        _hover={{ transform: "scale(1.1)", cursor: "pointer" }}
-                      />
-                    </AddLogo>
-                  )}
-                </div>
+  const props = {
+    multiple: true,
+    onChange: (info) => {
+      if (info.fileList.length > 0) {
+        setUploadedStatus(false);
+      }
+      if (info.fileList.length === 0 && instructorFiles.length === 0) {
+        setUploadedStatus(true);
+      }
+    },
+    onRemove: (file) => {
+      const newFileList = fileList.filter((item) => item.uid !== file.uid);
+      setFileList(newFileList);
+    },
+    beforeUpload: (file) => {
+      setFileList((prevFileList) => [...prevFileList, file]);
+      return false; // Prevent automatic upload
+    },
+    fileList,
+  };
 
-                {q.testCases.map((indCase, innerIndex) => {
+  const handleUpload = async () => {
+    // Reset progress to 0
+    setUploadProgress(0);
+    setInstructorFiles([]);
+    setPublicIds([]);
+
+    const uploadPromises = fileList.map((file) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "kgen9eiq");
+
+      return axios.post(
+        `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUD_NAME}/upload`,
+        formData,
+        {
+          onUploadProgress: (progressEvent) => {
+            const progress = (progressEvent.loaded / progressEvent.total) * 100;
+            setUploadProgress((oldProgress) => Math.max(oldProgress, progress));
+          },
+        }
+      );
+    });
+
+    try {
+      const responses = await Promise.all(uploadPromises);
+
+      const newInstructorFiles = [];
+      const newPublicIds = [];
+
+      responses.map((response) => {
+        const url = response.data.url; // URL of the uploaded file
+        const fileName = response.data.original_filename; // Original file name
+        const publicId = response.data.public_id; // Public ID of the uploaded file
+
+        newInstructorFiles.push({ publicId, fileName, filePath: url });
+        newPublicIds.push(publicId);
+
+        notification.success({
+          message: "File uploaded!",
+          description: `${fileName} uploaded successfully`,
+          duration: 4,
+          placement: "bottomLeft",
+        });
+      });
+
+      // Update the state with new instructor files
+      setInstructorFiles((currentFiles) => [
+        ...currentFiles,
+        ...newInstructorFiles,
+      ]);
+      setPublicIds((currentIds) => [...currentIds, ...newPublicIds]);
+      setUploadedStatus(true);
+    } catch (error) {
+      notification.error({
+        message: "File upload failed",
+        description: error.message,
+        duration: 4,
+        placement: "bottomLeft",
+      });
+    }
+  };
+
+  const showUploadConfirmation = () => {
+    modal.confirm({
+      title: `Are you sure you want to upload ${fileList.length} files? ${
+        instructorFiles.length > 0
+          ? "This will overwrite the existing files."
+          : ""
+      }`,
+      content: (
+        <div className="my-2">
+          <p className="mb-2 font-semibold">Files to be uploaded:</p>
+          <ol className=" list-decimal list-inside">
+            {fileList.map((file) => (
+              <li
+                style={{}}
+                key={file.uid}
+                className=" bg-white p-1 rounded-lg text-black"
+              >
+                <Text ellipsis>{file.name}</Text>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ),
+      onOk() {
+        if (instructorFiles.length > 0) {
+          deleteFiles(publicIds); // Delete old files first
+        }
+        handleUpload();
+      },
+      onCancel() {},
+      okButtonProps: {
+        className: " main-black-btn",
+      },
+      cancelButtonProps: {
+        className: " hover:!border-black hover:!text-black",
+      },
+      width: 800,
+    });
+  };
+
+  const deleteFiles = async (publicIds) => {
+    try {
+      await axios.post("http://localhost:5000/api/tracker/delete-file", {
+        publicIds,
+      });
+
+      setInstructorFiles([]);
+      setPublicIds([]);
+      notification.success({
+        message: "Files Overwritten",
+        description: "The existing files have been successfully overwritten.",
+        duration: 4,
+        placement: "bottomLeft",
+      });
+    } catch (error) {
+      console.error("Error deleting files:", error);
+      notification.error({
+        message: "Overwriting Failed",
+        description: "Failed to overwrite files. Please try again.",
+        duration: 4,
+        placement: "bottomLeft",
+      });
+    }
+  };
+
+  return (
+    <>
+      <Navbar />
+      <div className="h-full overflow-auto bg-gray-100 px-6 py-2">
+        <div className="flex justify-between items-center">
+          <Link to="/viewallassignments" className=" flex-1">
+            <Button
+              icon={<ArrowLeftOutlined />}
+              className="bg-black border-black text-white rounded-lg text-sm font-medium flex 
+              items-center justify-center hover:bg-white hover:text-black hover:border-black"
+            >
+              Back
+            </Button>
+          </Link>
+          <Title level={3} className="text-center font-bold my-4 flex-1">
+            {`CREATE A CODING ASSIGNMENT - ${selectedCourse?.name}`}
+          </Title>
+          <div className=" flex-1"></div>
+        </div>
+        <Form
+          form={form}
+          onFinish={onFinish}
+          autoComplete="off"
+          layout="vertical"
+          className="max-w-3xl mx-auto mt-6"
+          initialValues={{
+            questions: [
+              {
+                questionInfo: "",
+                testCases: [{ inputCase: "", expectedOutput: "" }],
+              },
+            ],
+          }}
+        >
+          {/* Assignment Name */}
+          <Form.Item
+            name="name"
+            label={<span className=" font-bold">Assignment Name</span>}
+            rules={[
+              { required: true, message: "Please input the assignment name!" },
+            ]}
+          >
+            <Input placeholder="Assignment X" />
+          </Form.Item>
+
+          {/* Assignment Description */}
+          <Form.Item
+            name="description"
+            label={<span className=" font-bold">Assignment Description</span>}
+            rules={[
+              {
+                required: true,
+                message: "Please input the assignment description!",
+              },
+            ]}
+          >
+            <TextArea
+              placeholder="Describe the assignment"
+              autoSize={{ minRows: 3 }}
+            />
+          </Form.Item>
+
+          <div className="flex justify-between items-center space-x-4">
+            {/* Visible to Students */}
+            <Form.Item
+              name="visibleToStudents"
+              label={<span className=" font-bold">Visible to Students</span>}
+              valuePropName="checked"
+              initialValue={true}
+            >
+              <Switch
+                checkedChildren="Visible"
+                unCheckedChildren="Hidden"
+                className=" bg-[#858687] hover:shadow-xl hover:!bg-[#4b4c4d]"
+              />
+            </Form.Item>
+
+            {/* Due Date */}
+            <Form.Item
+              name="dueDate"
+              label={<span className=" font-bold">Due Date</span>}
+              rules={[
+                { required: true, message: "Please select the due date!" },
+              ]}
+            >
+              <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" />
+            </Form.Item>
+          </div>
+
+          {/* Instructor Files */}
+          <Form.Item
+            label={<span className=" font-bold">Instructor Files</span>}
+          >
+            <Dragger {...props}>
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="ant-upload-text">
+                Click or drag file to this area to upload
+              </p>
+              <p className="ant-upload-hint">
+                Support for a single or bulk upload. Strictly prohibited from
+                uploading company data or other banned files.
+              </p>
+            </Dragger>
+          </Form.Item>
+          <Button
+            type="primary"
+            htmlType="button"
+            onClick={showUploadConfirmation}
+            disabled={
+              (fileList.length === 0 && instructorFiles.length === 0) ||
+              uploadedStatus
+            }
+            className=" mb-4 main-black-btn"
+          >
+            {uploadedStatus ? "Files Up to date" : "Start Upload"}
+          </Button>
+          {uploadProgress > 0 && (
+            <Progress percent={Math.round(uploadProgress)} />
+          )}
+
+          {/* Questions List */}
+          <Form.List
+            name="questions"
+            rules={[
+              {
+                validator: async (_, questions) => {
+                  if (!questions || questions.length < 1) {
+                    return Promise.reject(
+                      new Error("At least one question is required.")
+                    );
+                  }
+                },
+              },
+            ]}
+          >
+            {(questions, { add, remove }) => (
+              <>
+                {questions.map(({ key, name, ...restField }) => {
                   return (
-                    <div
-                      style={{
-                        display: "flex",
-                        width: "100%",
-                        justifyContent: "space-between",
-                      }}
-                      key={`${innerIndex} - ${index}`}
+                    <Space
+                      key={key}
+                      style={{ display: "flex", marginBottom: 8 }}
+                      align="baseline"
                     >
-                      {q.testCases.length !== 1 && (
-                        <AddLogo>
-                          <AiOutlineDelete
-                            boxSize={4}
-                            onClick={() =>
-                              handleCaseRemoveClick(index, innerIndex)
-                            }
-                            color="red"
-                            _hover={{
-                              transform: "scale(1.1)",
-                              cursor: "pointer",
-                            }}
-                          />
-                        </AddLogo>
-                      )}
-                      {q.testCases.length - 1 === innerIndex && (
-                        <AddLogo>
-                          <AiOutlinePlus
-                            boxSize={4}
-                            onClick={(e) =>
-                              handleCaseAddClick(index, innerIndex)
-                            }
-                            color="green"
-                            _hover={{
-                              transform: "scale(1.1)",
-                              cursor: "pointer",
-                            }}
-                          />
-                        </AddLogo>
-                      )}
-                      <QuestionInput
-                        type="text"
-                        id="input-case"
-                        placeholder="Input Case"
-                        name="inputCase"
-                        value={indCase.inputCase}
-                        onChange={(e) =>
-                          handleCaseInfoChange(e, index, innerIndex)
+                      <Form.Item
+                        {...restField}
+                        name={[name, "questionNum"]}
+                        label={<span className=" font-bold">#</span>}
+                        initialValue={key + 1}
+                      >
+                        <Input
+                          type="number"
+                          min={1}
+                          placeholder="1"
+                          disabled={true}
+                          className=" w-[50px]"
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        {...restField}
+                        name={[name, "questionInfo"]}
+                        label={
+                          <span className=" font-bold">Question info</span>
                         }
-                        required
-                      />
-                      <QuestionInput
-                        type="text"
-                        id="expected-output"
-                        placeholder="Output case"
-                        name="expectedOutput"
-                        value={indCase.expectedOutput}
-                        onChange={(e) =>
-                          handleCaseInfoChange(e, index, innerIndex)
-                        }
-                        required
-                      />
-                    </div>
+                        rules={[
+                          { required: true, message: "Missing question" },
+                        ]}
+                      >
+                        <Input
+                          placeholder="Question info"
+                          className=" w-[200px]"
+                        />
+                      </Form.Item>
+                      <Form.List
+                        name={[name, "testCases"]}
+                        rules={[
+                          {
+                            validator: async (_, testCases) => {
+                              if (!testCases || testCases.length < 1) {
+                                return Promise.reject(
+                                  new Error(
+                                    "At least one test case is required."
+                                  )
+                                );
+                              }
+                            },
+                          },
+                        ]}
+                      >
+                        {(cases, { add: addCase, remove: removeCase }) => (
+                          <>
+                            {cases.map((caseField) => {
+                              return (
+                                <Space key={caseField.key} align="baseline">
+                                  <Form.Item
+                                    {...caseField}
+                                    name={[caseField.name, "inputCase"]}
+                                    label={<span>Input test case</span>}
+                                    key={caseField.key + "input"}
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "Input case required",
+                                      },
+                                    ]}
+                                  >
+                                    <Input
+                                      placeholder="Input case"
+                                      className=" w-[150px]"
+                                    />
+                                  </Form.Item>
+                                  <Form.Item
+                                    {...caseField}
+                                    name={[caseField.name, "expectedOutput"]}
+                                    label={<span>Expected output</span>}
+                                    key={caseField.key + "output"}
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "Expected output required",
+                                      },
+                                    ]}
+                                  >
+                                    <Input
+                                      placeholder="Expected output"
+                                      className=" w-[150px]"
+                                    />
+                                  </Form.Item>
+                                  {cases.length > 1 ? (
+                                    <MinusCircleOutlined
+                                      onClick={() => removeCase(caseField.name)}
+                                    />
+                                  ) : null}
+                                </Space>
+                              );
+                            })}
+                            <Button
+                              type="dashed"
+                              onClick={() => addCase()}
+                              block
+                              icon={<PlusOutlined />}
+                            >
+                              Add test case
+                            </Button>
+                          </>
+                        )}
+                      </Form.List>
+                      {questions.length > 1 ? (
+                        <MinusCircleOutlined onClick={() => remove(name)} />
+                      ) : null}
+                    </Space>
                   );
                 })}
+                <Form.Item>
+                  <Button
+                    type="dashed"
+                    onClick={() =>
+                      add({
+                        questionInfo: "",
+                        testCases: [{ inputCase: "", expectedOutput: "" }],
+                      })
+                    }
+                    block
+                    icon={<PlusOutlined />}
+                  >
+                    Add question
+                  </Button>
+                </Form.Item>
               </>
-            );
-          })}
-          <BlackBtn>Create Assignment</BlackBtn>
-        </FormContainer>
-      </FormBox>
-    </Container>
+            )}
+          </Form.List>
+
+          <Form.Item>
+            <Button
+              size="large"
+              htmlType="submit"
+              className="w-full font-medium flex items-center justify-center main-black-btn"
+            >
+              Create Assignment
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+    </>
   );
 };
 

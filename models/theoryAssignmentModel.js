@@ -20,7 +20,7 @@ const TheoryAssignmentSchema = new mongoose.Schema(
     courseID: {
       type: mongoose.Schema.Types.ObjectId,
       require: [true, "Course ID required"],
-      ref: "Course"
+      ref: "Course",
     },
     due_date: {
       type: Date,
@@ -33,15 +33,15 @@ const TheoryAssignmentSchema = new mongoose.Schema(
     },
     instructorFiles: [
       {
+        publicId: {
+          type: String,
+          required: true,
+        },
         fileName: {
           type: String,
           required: true,
         },
         filePath: {
-          type: String,
-          required: true,
-        },
-        extension: {
           type: String,
           required: true,
         },

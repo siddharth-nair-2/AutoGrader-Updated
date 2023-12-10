@@ -1,5 +1,5 @@
 import axios from "axios";
-import { notification } from "antd";
+import { App } from "antd";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -80,6 +80,7 @@ const ViewAllTests = () => {
   const { selectedCourse, setSelectedCourse } = useTracker();
   const [tests, settests] = useState([]);
   const navigate = useNavigate();
+  const { notification } = App.useApp();
 
   useEffect(() => {
     if (!JSON.parse(localStorage.getItem("courseInfo"))) {

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { notification, Form, Input, Button, Select, Typography } from "antd";
+import { Form, Input, Button, Select, Typography, App } from "antd";
 import Navbar from "../../misc/Navbar";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useAuth } from "../../../context/AuthProvider";
@@ -12,6 +12,7 @@ const { Title } = Typography;
 const CreateCourses = () => {
   const { user } = useAuth();
   const [form] = Form.useForm();
+  const { notification } = App.useApp();
 
   const onFinish = async (values) => {
     const { courseID, description, name, semester, section } = values;

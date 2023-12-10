@@ -3,14 +3,15 @@ import styled from "styled-components";
 import DateTimePicker from "react-datetime-picker";
 
 import { useEffect, useState } from "react";
-import { notification, Upload, Button } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { Upload, Button, App, Progress, Modal, Typography } from "antd";
+import { UploadOutlined, InboxOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
-import { useDropzone } from "react-dropzone";
 import Navbar from "../../misc/Navbar";
 import Heading from "../../misc/Heading";
 import { useAuth } from "../../../context/AuthProvider";
 import { useTracker } from "../../../context/TrackerProvider";
+
+const { Text } = Typography;
 
 const Container = styled.div`
   font-family: "Poppins", sans-serif;
@@ -140,9 +141,12 @@ const Select = styled.select`
   font-size: 12px;
 `;
 
+const { Dragger } = Upload;
+
 const CreateTheoryAssignment = () => {
   const navigate = useNavigate();
   const { selectedCourse, setSelectedCourse } = useTracker();
+  const { notification } = App.useApp();
   const { user } = useAuth();
 
   const [name, setName] = useState("");
@@ -150,20 +154,8 @@ const CreateTheoryAssignment = () => {
   const [dueDate, setDueDate] = useState(new Date());
   const [visibility, setVisibility] = useState(false);
   const [instructorFiles, setInstructorFiles] = useState([]);
-
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: ".pdf, .doc, .docx, .ppt, .pptx, .txt, .java, .c, .cpp, .py",
-    onDrop: (acceptedFiles) => {
-      // Update your state here with the new files
-      setInstructorFiles(
-        acceptedFiles.map((file) =>
-          Object.assign(file, {
-            preview: URL.createObjectURL(file),
-          })
-        )
-      );
-    },
-  });
+  const [fileList, setFileList] = useState([]);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     if (!user) {
@@ -182,14 +174,10 @@ const CreateTheoryAssignment = () => {
     setDueDate(newValue);
   };
 
-  const handleFileChange = (e) => {
-    setInstructorFiles([...e.target.files]);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name || !description || !visibility || !instructorFiles) {
+    if (!name || !description) {
       notification.error({
         message: "Missing Information",
         description: "Pleast enter all information!",
@@ -208,6 +196,7 @@ const CreateTheoryAssignment = () => {
       });
       return;
     }
+
     if (description.length > 2000) {
       notification.error({
         message: "Description is too lengthy!",
@@ -218,36 +207,27 @@ const CreateTheoryAssignment = () => {
       return;
     }
 
-    const fileFormData = new FormData();
-    instructorFiles.forEach((file) => {
-      fileFormData.append("instructorFiles", file);
-    });
+    if (instructorFiles.length === 0) {
+      notification.error({
+        message: "No files uploaded!",
+        description: "Please upload at least one file.",
+        duration: 4,
+        placement: "bottomLeft",
+      });
+      return;
+    }
 
     try {
-      const fileUploadResponse = await axios.post(
-        "http://localhost:5000/api/tracker/upload-files",
-        fileFormData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-
-      const instructorFilesData = fileUploadResponse.data.urls.map(
-        (url, index) => ({
-          fileName: instructorFiles[index].name,
-          filePath: url,
-          extension: instructorFiles[index].name.split(".").pop(),
-        })
-      );
-
       const assignmentData = {
         name,
         description,
         due_date: dueDate,
         visibleToStudents: visibility,
-        instructorFiles: instructorFilesData,
+        instructorFiles,
         courseID: selectedCourse._id,
       };
 
-      const res = await axios.post(
+      await axios.post(
         "http://localhost:5000/api/tracker/theoryAssignments",
         assignmentData
       );
@@ -268,13 +248,105 @@ const CreateTheoryAssignment = () => {
     }
   };
 
-  const antdFileProps = {
+  const handleUpload = async () => {
+    // Reset progress to 0
+    setUploadProgress(0);
+
+    const uploadPromises = fileList.map((file) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "kgen9eiq");
+
+      return axios.post(
+        `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUD_NAME}/upload`,
+        formData,
+        {
+          onUploadProgress: (progressEvent) => {
+            const progress = (progressEvent.loaded / progressEvent.total) * 100;
+            setUploadProgress((oldProgress) => Math.max(oldProgress, progress));
+          },
+        }
+      );
+    });
+
+    try {
+      const responses = await Promise.all(uploadPromises);
+
+      const newInstructorFiles = responses.map((response) => {
+        const url = response.data.url; // URL of the uploaded file
+        const fileName = response.data.original_filename; // Original file name
+
+        return {
+          fileName,
+          filePath: url,
+        };
+      });
+
+      // Update the state with new instructor files
+      setInstructorFiles((currentFiles) => [
+        ...currentFiles,
+        ...newInstructorFiles,
+      ]);
+
+      responses.forEach((response) => {
+        notification.success({
+          message: "File uploaded!",
+          description: `${response.data.original_filename} uploaded successfully`,
+          duration: 4,
+          placement: "bottomLeft",
+        });
+      });
+      console.log("All files uploaded", responses);
+    } catch (error) {
+      notification.error("File upload failed");
+      console.error(error);
+    }
+  };
+
+  const props = {
+    multiple: true,
+    onRemove: (file) => {
+      const newFileList = fileList.filter((item) => item.uid !== file.uid);
+      setFileList(newFileList);
+    },
     beforeUpload: (file) => {
-      setInstructorFiles([...instructorFiles, file]);
+      setFileList((prevFileList) => [...prevFileList, file]);
       return false; // Prevent automatic upload
     },
-    multiple: true,
-    accept: ".pdf,.doc,.docx,.ppt,.pptx,.txt,.java,.c,.cpp,.py",
+    fileList,
+  };
+
+  const showUploadConfirmation = () => {
+    Modal.confirm({
+      title: `Are you sure you want to upload ${fileList.length} files?`,
+      content: (
+        <div className="my-2">
+          <p className="mb-2 font-semibold">Files to be uploaded:</p>
+          <ol className=" list-decimal list-inside">
+            {fileList.map((file) => (
+              <li
+                style={{}}
+                key={file.uid}
+                className=" bg-white p-1 rounded-lg text-black"
+              >
+                <Text ellipsis>{file.name}</Text>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ),
+      onOk() {
+        handleUpload();
+      },
+      onCancel() {},
+      okButtonProps: {
+        className: " main-black-btn",
+      },
+      cancelButtonProps: {
+        className: " hover:!border-black hover:!text-black",
+      },
+      width: 800,
+    });
   };
 
   return (
@@ -326,9 +398,31 @@ const CreateTheoryAssignment = () => {
             <option value={true}>Visible to students</option>
           </Select>
           <Label htmlFor="instructor-files">Instructor Files</Label>
-          <Upload {...antdFileProps}>
-            <Button icon={<UploadOutlined />}>Select Files</Button>
-          </Upload>
+
+          <Dragger {...props}>
+            <p className="ant-upload-drag-icon">
+              <InboxOutlined />
+            </p>
+            <p className="ant-upload-text">
+              Click or drag file to this area to upload
+            </p>
+            <p className="ant-upload-hint">
+              Support for a single or bulk upload. Strictly prohibited from
+              uploading company data or other banned files.
+            </p>
+          </Dragger>
+          <Button
+            type="primary"
+            htmlType="button"
+            onClick={showUploadConfirmation}
+            disabled={fileList.length === 0}
+            style={{ marginTop: 16 }}
+          >
+            Start Upload
+          </Button>
+          {uploadProgress > 0 && (
+            <Progress percent={Math.round(uploadProgress)} />
+          )}
           <BlackBtn type="submit">Create Assignment</BlackBtn>
         </FormContainer>
       </FormBox>

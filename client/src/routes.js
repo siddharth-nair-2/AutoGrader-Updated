@@ -13,12 +13,13 @@ import PlagiarismPage from "./components/InstructorPages/assignments/PlagiarismP
 import ViewAllAssignments from "./components/InstructorPages/assignments/ViewAllAssignments";
 import ViewAllModules from "./components/InstructorPages/modules/ViewAllModules";
 import ViewAllTests from "./components/InstructorPages/tests/ViewAllTests";
-import CourseStudents2 from "./components/InstructorPages/courses/duplicateCourseStudents";
+import CreateAssignments2 from "./components/InstructorPages/assignments/duplicateCreateAssignments";
 
 export const instructorRoutes = [
   { path: "/", element: <Instructor /> },
   { path: "/createcourses", element: <CreateCourses /> },
   { path: "/createassignment", element: <CreateAssignments /> },
+  { path: "/createassignment2", element: <CreateAssignments2 /> },
   { path: "/createTheoryAssignment", element: <CreateTheoryAssignment /> },
   { path: "/course", element: <Courses /> },
   {
@@ -29,7 +30,6 @@ export const instructorRoutes = [
   { path: "/viewallmodules", element: <ViewAllModules /> },
   { path: "/viewalltests", element: <ViewAllTests /> },
   { path: "/courseStudents", element: <CourseStudents /> },
-  { path: "/courseStudents2", element: <CourseStudents2 /> },
   { path: "/viewSubmission", element: <SingleSubmission /> },
   { path: "/plagiarism", element: <PlagiarismPage /> },
 ];

@@ -37,3 +37,20 @@ input.checkBoxSignup {
 .ant-table {
   @apply shadow-md;
 }
+
+.main-black-btn {
+  @apply bg-black  text-white rounded-lg text-sm enabled:hover:!bg-white enabled:hover:!text-black 
+  enabled:hover:!border-black shadow-none ;
+}
+
+.ant-picker-time-panel-cell-selected .ant-picker-time-panel-cell-inner {
+  @apply !text-white hover:!text-black !bg-black;
+}
+
+.ant-picker-now-btn {
+  @apply hover:!text-[#75b18a];
+}
+
+.ant-picker-ok button {
+  @apply main-black-btn shadow-none;
+}

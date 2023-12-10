@@ -36,15 +36,15 @@ const ModuleSchema = new mongoose.Schema(
     ],
     files: [
       {
+        publicId: {
+          type: String,
+          required: true,
+        },
         fileName: {
           type: String,
           required: true,
         },
         filePath: {
-          type: String,
-          required: true,
-        },
-        extension: {
           type: String,
           required: true,
         },

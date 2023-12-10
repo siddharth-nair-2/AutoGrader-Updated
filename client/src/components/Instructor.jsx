@@ -3,7 +3,7 @@ import axios from "axios";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PlusOutlined } from "@ant-design/icons";
-import { notification, Button, Row, Typography } from "antd";
+import { Button, Row, Typography, App } from "antd";
 
 import Navbar from "./misc/Navbar";
 import CourseCardMain from "./misc/CourseCard";
@@ -13,6 +13,7 @@ import { useTracker } from "../context/TrackerProvider";
 const { Title } = Typography;
 
 const Instructor = () => {
+  const { notification } = App.useApp();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { courses, setCourses } = useTracker();
@@ -21,7 +22,7 @@ const Instructor = () => {
     fetchCourses();
     localStorage.removeItem("courseInfo");
     localStorage.removeItem("assignmentInfo");
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchCourses = async () => {

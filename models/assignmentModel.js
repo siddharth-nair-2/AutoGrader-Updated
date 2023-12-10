@@ -15,15 +15,10 @@ const AssignmentSchema = new mongoose.Schema({
       "Assignment description must be less than 2001 characters long",
     ],
   },
-  notes: {
-    type: String,
-    default: "No Notes",
-    maxLength: [256, "Assignment notes must be less than 257 characters long"],
-  },
   courseID: {
     type: mongoose.Schema.Types.ObjectId,
     require: [true, "Course ID required"],
-    ref: "Course"
+    ref: "Course",
   },
   due_date: {
     type: mongoose.Schema.Types.Date,
@@ -35,15 +30,15 @@ const AssignmentSchema = new mongoose.Schema({
   },
   instructorFiles: [
     {
+      publicId: {
+        type: String,
+        required: true,
+      },
       fileName: {
         type: String,
         required: true,
       },
       filePath: {
-        type: String,
-        required: true,
-      },
-      extension: {
         type: String,
         required: true,
       },
