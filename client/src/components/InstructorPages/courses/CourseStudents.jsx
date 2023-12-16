@@ -6,6 +6,7 @@ import { Table, Button, Input, Typography, App } from "antd";
 
 import Navbar from "../../misc/Navbar";
 import { ArrowLeftOutlined } from "@ant-design/icons";
+import Heading from "../../misc/Heading";
 
 const { Title } = Typography;
 
@@ -239,30 +240,28 @@ const CourseStudents = () => {
     <>
       <Navbar />
       <div className="h-full overflow-auto bg-gray-100 p-6">
-        <div className="flex justify-between items-center">
-          <Link to="/" className=" flex-1">
+        <div className="flex justify-around items-center">
+          <Link to="/">
             <Button
               icon={<ArrowLeftOutlined />}
-              className=" mb-6 sm:mb-0 bg-black border-black text-white rounded-lg text-sm font-medium flex 
-              items-center justify-center hover:bg-white hover:text-black hover:border-black"
+              className="bg-black border-black text-white rounded-lg text-sm font-medium flex items-center justify-center hover:bg-white hover:text-black hover:border-black"
             >
               Back
             </Button>
           </Link>
-          <Title className="text-center my-4 flex-1" level={2}>
+          <Title level={2} className="text-center font-bold my-4 mx-auto">
             {selectedCourse?.name.toUpperCase()}
           </Title>
-          <div className=" flex-1">
+          <div className=" max-w-[100px]">
             <Button
               className="bg-black border-black text-white rounded-lg text-sm font-medium flex 
             items-center justify-center hover:bg-white hover:text-black hover:border-black ml-auto"
               onClick={() => setShowAddStudents(!showAddStudents)}
             >
-              {showAddStudents ? "Remove Students" : "Add Students"}
+              {showAddStudents ? "- Students" : "+ Students"}
             </Button>
           </div>
         </div>
-
         <div className=" max-w-7xl m-auto">
           {!showAddStudents && (
             <>

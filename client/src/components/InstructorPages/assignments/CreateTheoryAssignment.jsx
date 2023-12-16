@@ -1,161 +1,40 @@
 import axios from "axios";
-import styled from "styled-components";
-import DateTimePicker from "react-datetime-picker";
-
 import { useEffect, useState } from "react";
-import { Upload, Button, App, Progress, Modal, Typography } from "antd";
-import { UploadOutlined, InboxOutlined } from "@ant-design/icons";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  Upload,
+  Button,
+  App,
+  Progress,
+  Typography,
+  Form,
+  Switch,
+  DatePicker,
+  Input,
+} from "antd";
+import { InboxOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../misc/Navbar";
 import Heading from "../../misc/Heading";
 import { useAuth } from "../../../context/AuthProvider";
 import { useTracker } from "../../../context/TrackerProvider";
+import TextArea from "antd/es/input/TextArea";
 
 const { Text } = Typography;
-
-const Container = styled.div`
-  font-family: "Poppins", sans-serif;
-  min-height: 100vh;
-  padding-bottom: 20px;
-  background-color: #f4f3f6;
-`;
-
-const FormBox = styled.div`
-  width: 40%;
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-`;
-
-const FormContainer = styled.form`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  font-family: "Poppins", sans-serif;
-`;
-
-const Label = styled.label`
-  font-size: 12px;
-  font-weight: 600;
-  width: 100%;
-  margin-top: 12px;
-`;
-
-const Input = styled.input`
-  border: #e1dfec 2px solid;
-  width: 100%;
-  padding: 15px;
-  border-radius: 46px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
-
-const QNInput = styled.input`
-  border: #e1dfec 2px solid;
-  width: 9%;
-  padding: 15px;
-  border-radius: 46px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
-
-const QuestionInput = styled.input`
-  border: #e1dfec 2px solid;
-  width: 77%;
-  padding: 15px;
-  border-radius: 46px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
-
-const AddLogo = styled.div`
-  border: #e1dfec 2px solid;
-  width: 7%;
-  padding: 15px;
-  padding-left: 17px;
-  padding-bottom: 17px;
-  font-weight: 800;
-  border-radius: 46px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
-
-const TextArea = styled.textarea`
-  border: #e1dfec 2px solid;
-  width: 100%;
-  padding: 15px;
-  border-radius: 23px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
-
-const BlackBtn = styled.button`
-  border: none;
-  outline: none;
-  cursor: pointer;
-  background-color: #0a071b;
-  color: white;
-  width: 100%;
-  padding: 17px;
-  margin: 5px 0;
-  font-size: 14px;
-  border-radius: 46px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  margin-top: 40px;
-`;
-
-const CourseButtons = styled.button`
-  border: none;
-  outline: none;
-  padding: 16px;
-  background-color: black;
-  border-radius: 24px;
-  font-weight: bold;
-  font-size: 14px;
-  color: white;
-  cursor: pointer;
-  margin-right: 20px;
-  box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  &:hover {
-    transform: scale(1.01);
-  }
-`;
-
-const Select = styled.select`
-  border: #e1dfec 2px solid;
-  width: 100%;
-  padding: 15px;
-  border-radius: 46px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
 
 const { Dragger } = Upload;
 
 const CreateTheoryAssignment = () => {
   const navigate = useNavigate();
   const { selectedCourse, setSelectedCourse } = useTracker();
-  const { notification } = App.useApp();
   const { user } = useAuth();
 
-  const [name, setName] = useState("");
-  const [description, setDesc] = useState("");
-  const [dueDate, setDueDate] = useState(new Date());
-  const [visibility, setVisibility] = useState(false);
-  const [instructorFiles, setInstructorFiles] = useState([]);
   const [fileList, setFileList] = useState([]);
+  const [uploadedStatus, setUploadedStatus] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [instructorFiles, setInstructorFiles] = useState([]);
+  const [publicIds, setPublicIds] = useState([]);
+  const [form] = Form.useForm();
+  const { notification, modal } = App.useApp();
 
   useEffect(() => {
     if (!user) {
@@ -170,14 +49,22 @@ const CreateTheoryAssignment = () => {
     }
   }, []);
 
-  const handleDueDate = (newValue) => {
-    setDueDate(newValue);
+  const props = {
+    multiple: true,
+    onRemove: (file) => {
+      const newFileList = fileList.filter((item) => item.uid !== file.uid);
+      setFileList(newFileList);
+    },
+    beforeUpload: (file) => {
+      setFileList((prevFileList) => [...prevFileList, file]);
+      return false; // Prevent automatic upload
+    },
+    fileList,
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!name || !description) {
+  const onFinish = async (e) => {
+    const { name, description, dueDate, visibleToStudents } = e;
+    if (!name || !description || !dueDate || visibleToStudents === undefined) {
       notification.error({
         message: "Missing Information",
         description: "Pleast enter all information!",
@@ -186,7 +73,6 @@ const CreateTheoryAssignment = () => {
       });
       return;
     }
-
     if (name.length > 64) {
       notification.error({
         message: "Name is too lengthy!",
@@ -196,7 +82,6 @@ const CreateTheoryAssignment = () => {
       });
       return;
     }
-
     if (description.length > 2000) {
       notification.error({
         message: "Description is too lengthy!",
@@ -207,50 +92,116 @@ const CreateTheoryAssignment = () => {
       return;
     }
 
-    if (instructorFiles.length === 0) {
+    if (fileList.length < 1) {
       notification.error({
         message: "No files uploaded!",
-        description: "Please upload at least one file.",
+        description: "You have to upload at least 1 file.",
         duration: 4,
         placement: "bottomLeft",
       });
       return;
-    }
-
-    try {
-      const assignmentData = {
-        name,
-        description,
-        due_date: dueDate,
-        visibleToStudents: visibility,
-        instructorFiles,
-        courseID: selectedCourse._id,
-      };
-
-      await axios.post(
-        "http://localhost:5000/api/tracker/theoryAssignments",
-        assignmentData
-      );
-      notification.success({
-        message: "Assignment created successfully!",
-        description: "The assignment has been created!",
-        duration: 3,
-        placement: "bottomLeft",
-      });
-      window.location = "/viewallassignments";
-    } catch (err) {
-      notification.error({
-        message: "Error creating assignment",
-        description: "Failed to create the assignment",
-        duration: 5,
-        placement: "bottomLeft",
+    } else {
+      modal.confirm({
+        title: `Are you sure you want to upload ${fileList.length} files?`,
+        content: (
+          <div className="my-2">
+            <p className="mb-2 font-semibold">Files to be uploaded:</p>
+            <ol className=" list-decimal list-inside">
+              {fileList.map((file) => (
+                <li
+                  style={{}}
+                  key={file.uid}
+                  className=" bg-white p-1 rounded-lg text-black"
+                >
+                  <Text ellipsis>{file.name}</Text>
+                </li>
+              ))}
+            </ol>
+          </div>
+        ),
+        onOk: async () => {
+          await handleUpload();
+          setUploadedStatus(true);
+        },
+        onCancel() {},
+        okButtonProps: {
+          className: " main-black-btn",
+        },
+        cancelButtonProps: {
+          className: " hover:!border-black hover:!text-black",
+        },
+        width: 800,
       });
     }
   };
 
+  const createAssignment = async (formData, uploadedFiles) => {
+    try {
+      const config = {
+        Headers: {
+          "Content-type": "application/json",
+        },
+      };
+      await axios.post(
+        "http://localhost:5000/api/tracker/theoryAssignments",
+        {
+          courseID: selectedCourse._id,
+          name: formData.name,
+          description: formData.description,
+          due_date: formData.dueDate.toDate(),
+          visibleToStudents: formData.visibleToStudents,
+          instructorFiles: uploadedFiles,
+        },
+        config
+      );
+
+      notification.success({
+        message: "Assignment Created!",
+        description: `${formData.name} created successfully`,
+        duration: 4,
+        placement: "bottomLeft",
+      });
+      navigate("/viewallassignments");
+    } catch (error) {
+      if (error.response.status === 409) {
+        notification.error({
+          message: "Error",
+          description: "An assignment with the same name already exists!",
+          duration: 4,
+          placement: "bottomLeft",
+        });
+      } else if (
+        error.response &&
+        error.response.status >= 400 &&
+        error.response.status <= 500
+      ) {
+        notification.error({
+          message: "Error",
+          description: error.response.statusText,
+          duration: 4,
+          placement: "bottomLeft",
+        });
+      }
+    }
+  };
+
+  useEffect(() => {
+    // Check if upload is complete and trigger assignment creation
+    if (uploadedStatus) {
+      (async () => {
+        const formData = form.getFieldsValue();
+        await createAssignment(formData, instructorFiles);
+        setUploadedStatus(false); // Reset upload complete state after assignment creation
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uploadedStatus, instructorFiles, form]);
+
   const handleUpload = async () => {
     // Reset progress to 0
     setUploadProgress(0);
+    setInstructorFiles([]);
+    setPublicIds([]);
 
     const uploadPromises = fileList.map((file) => {
       const formData = new FormData();
@@ -272,14 +223,20 @@ const CreateTheoryAssignment = () => {
     try {
       const responses = await Promise.all(uploadPromises);
 
-      const newInstructorFiles = responses.map((response) => {
-        const url = response.data.url; // URL of the uploaded file
-        const fileName = response.data.original_filename; // Original file name
+      const newInstructorFiles = [];
+      const newPublicIds = [];
 
-        return {
-          fileName,
-          filePath: url,
-        };
+      responses.map((response) => {
+        let url = response.data.url; // URL of the uploaded file
+        const fileName = response.data.original_filename; // Original file name
+        const publicId = response.data.public_id; // Public ID of the uploaded file
+
+        if (!publicId.includes(".")) {
+          url = `https://res.cloudinary.com/${process.env.REACT_APP_CLOUD_NAME}/image/upload/fl_attachment/${publicId}`;
+        }
+
+        newInstructorFiles.push({ publicId, fileName, filePath: url });
+        newPublicIds.push(publicId);
       });
 
       // Update the state with new instructor files
@@ -287,146 +244,122 @@ const CreateTheoryAssignment = () => {
         ...currentFiles,
         ...newInstructorFiles,
       ]);
+      setPublicIds((currentIds) => [...currentIds, ...newPublicIds]);
+      setUploadedStatus(true);
 
-      responses.forEach((response) => {
-        notification.success({
-          message: "File uploaded!",
-          description: `${response.data.original_filename} uploaded successfully`,
-          duration: 4,
-          placement: "bottomLeft",
-        });
+      notification.success({
+        message: "File uploaded!",
+        description: `All files uploaded successfully`,
+        duration: 4,
+        placement: "bottomLeft",
       });
-      console.log("All files uploaded", responses);
+
+      return instructorFiles;
     } catch (error) {
-      notification.error("File upload failed");
-      console.error(error);
+      notification.error({
+        message: "File upload failed",
+        description: error.message,
+        duration: 4,
+        placement: "bottomLeft",
+      });
     }
   };
 
-  const props = {
-    multiple: true,
-    onRemove: (file) => {
-      const newFileList = fileList.filter((item) => item.uid !== file.uid);
-      setFileList(newFileList);
-    },
-    beforeUpload: (file) => {
-      setFileList((prevFileList) => [...prevFileList, file]);
-      return false; // Prevent automatic upload
-    },
-    fileList,
-  };
-
-  const showUploadConfirmation = () => {
-    Modal.confirm({
-      title: `Are you sure you want to upload ${fileList.length} files?`,
-      content: (
-        <div className="my-2">
-          <p className="mb-2 font-semibold">Files to be uploaded:</p>
-          <ol className=" list-decimal list-inside">
-            {fileList.map((file) => (
-              <li
-                style={{}}
-                key={file.uid}
-                className=" bg-white p-1 rounded-lg text-black"
-              >
-                <Text ellipsis>{file.name}</Text>
-              </li>
-            ))}
-          </ol>
-        </div>
-      ),
-      onOk() {
-        handleUpload();
-      },
-      onCancel() {},
-      okButtonProps: {
-        className: " main-black-btn",
-      },
-      cancelButtonProps: {
-        className: " hover:!border-black hover:!text-black",
-      },
-      width: 800,
-    });
-  };
-
   return (
-    <Container>
+    <>
       <Navbar />
-      <Heading>
-        <Link to={"/viewallassignments"}>
-          <CourseButtons
-            style={{
-              position: "absolute",
-              left: "1%",
-              fontSize: "14px",
-              padding: "5px 10px 5px 10px",
-              cursor: "pointer",
-            }}
-          >{`< Back`}</CourseButtons>
-        </Link>
-        {`CREATE AN ASSIGNMENT - ${selectedCourse?.name}`}
-      </Heading>
-      <FormBox>
-        <FormContainer onSubmit={handleSubmit}>
-          <Label htmlFor="assignment-name">Assignment Name</Label>
-          <Input
-            type="text"
-            id="assignment-name"
-            placeholder="Assignment X"
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <Label htmlFor="assignment-desc">Assignment Description</Label>
-          <TextArea
-            id="assignment-desc"
-            placeholder="Please enter a description for your Assignment!"
-            onChange={(e) => setDesc(e.target.value)}
-            required
-          />
-          <Label htmlFor="assignment-due">Due Date</Label>
-          <DateTimePicker
-            onChange={(e) => handleDueDate(e)}
-            value={dueDate}
-            minDate={new Date()}
-          />
-          <Label htmlFor="assignment-visible">Visibility</Label>
-          <Select
-            id="assignment-visible"
-            onChange={(e) => setVisibility(e.target.value === "true")}
+      <div className="h-full overflow-auto bg-gray-100 px-6 py-2">
+        <Heading
+          link={"/viewallassignments"}
+          title={`CREATE A THEORY ASSIGNMENT - ${selectedCourse?.name}`}
+        />
+        <Form
+          form={form}
+          onFinish={onFinish}
+          layout="vertical"
+          className="max-w-3xl mx-auto mt-6"
+        >
+          <Form.Item
+            name="name"
+            label={<span className=" font-bold">Assignment Name</span>}
+            rules={[
+              { required: true, message: "Please input the assignment name!" },
+            ]}
           >
-            <option value={false}>Not visible to students</option>
-            <option value={true}>Visible to students</option>
-          </Select>
-          <Label htmlFor="instructor-files">Instructor Files</Label>
-
-          <Dragger {...props}>
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined />
-            </p>
-            <p className="ant-upload-text">
-              Click or drag file to this area to upload
-            </p>
-            <p className="ant-upload-hint">
-              Support for a single or bulk upload. Strictly prohibited from
-              uploading company data or other banned files.
-            </p>
-          </Dragger>
-          <Button
-            type="primary"
-            htmlType="button"
-            onClick={showUploadConfirmation}
-            disabled={fileList.length === 0}
-            style={{ marginTop: 16 }}
+            <Input placeholder="Assignment X" />
+          </Form.Item>
+          <Form.Item
+            name="description"
+            label={<span className=" font-bold">Assignment Description</span>}
+            rules={[
+              {
+                required: true,
+                message: "Please input the assignment description!",
+              },
+            ]}
           >
-            Start Upload
-          </Button>
+            <TextArea
+              placeholder="Describe the assignment"
+              autoSize={{ minRows: 3 }}
+            />
+          </Form.Item>
+          <div className="flex justify-between items-center space-x-4">
+            <Form.Item
+              name="visibleToStudents"
+              label={<span className=" font-bold">Visible to Students</span>}
+              valuePropName="checked"
+              initialValue={true}
+            >
+              <Switch
+                checkedChildren="Visible"
+                unCheckedChildren="Hidden"
+                className=" bg-[#858687] hover:shadow-xl hover:!bg-[#4b4c4d]"
+              />
+            </Form.Item>
+            <Form.Item
+              name="dueDate"
+              label={<span className=" font-bold">Due Date</span>}
+              rules={[
+                { required: true, message: "Please select the due date!" },
+              ]}
+            >
+              <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" />
+            </Form.Item>
+          </div>
+          <Form.Item
+            label={<span className=" font-bold">Instructor Files</span>}
+            required={true}
+            rules={[
+              { required: true, message: "Please upload at least one file!" },
+            ]}
+          >
+            <Dragger {...props}>
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="ant-upload-text">
+                Click or drag file to this area to upload
+              </p>
+              <p className="ant-upload-hint">
+                Support for a single or bulk upload.
+              </p>
+            </Dragger>
+          </Form.Item>
           {uploadProgress > 0 && (
             <Progress percent={Math.round(uploadProgress)} />
           )}
-          <BlackBtn type="submit">Create Assignment</BlackBtn>
-        </FormContainer>
-      </FormBox>
-    </Container>
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="w-full main-black-btn"
+            >
+              Create Assignment
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+    </>
   );
 };
 

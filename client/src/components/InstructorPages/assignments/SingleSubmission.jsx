@@ -5,6 +5,7 @@ import { useTracker } from "../../../context/TrackerProvider";
 import Navbar from "../../misc/Navbar";
 import { Button, Card, Typography, Select, Slider } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
+import Heading from "../../misc/Heading";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -47,23 +48,14 @@ const SingleSubmission = () => {
       <div className="min-h-full bg-gray-100">
         {selectedCourse && selectedAssignment && activeSubmission && (
           <>
-            <div className="flex justify-between items-center px-6 py-2 bg-[#5bb38a]">
-              <Link to="/viewassignment" className=" flex-1">
-                <Button
-                  icon={<ArrowLeftOutlined />}
-                  className="mb-6 sm:mb-0 bg-black border-black text-white rounded-lg text-sm font-medium flex items-center justify-center hover:bg-white hover:text-black hover:border-black"
-                >
-                  Back
-                </Button>
-              </Link>
-              <Title level={4} className="text-center flex-1">
-                {`${selectedCourse?.name.toUpperCase()} - ${
+            <div className="px-6 bg-[#5bb38a]">
+              <Heading
+                link={"/viewassignment"}
+                title={`${selectedCourse?.name.toUpperCase()} - ${
                   selectedAssignment?.name
                 }`}
-              </Title>
-              <div className="flex-1"></div>
+              />
             </div>
-
             <div className="flex gap-6 mt-6 p-6 pt-0">
               <div className="flex flex-col gap-6 w-1/4">
                 <Card

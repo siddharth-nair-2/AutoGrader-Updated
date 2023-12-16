@@ -10,22 +10,20 @@ import {
   Button,
   Typography,
   Space,
-  Select,
   DatePicker,
   App,
   Switch,
-  Progress,
 } from "antd";
 import {
   InboxOutlined,
   MinusCircleOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import { ArrowLeftOutlined } from "@ant-design/icons";
 import Dragger from "antd/es/upload/Dragger";
+import Heading from "../../misc/Heading";
 
 const { TextArea } = Input;
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const CreateAssignments = () => {
   const { notification, modal } = App.useApp();
@@ -37,7 +35,7 @@ const CreateAssignments = () => {
   const [fileList, setFileList] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [publicIds, setPublicIds] = useState([]);
-  const [uploadedStatus, setUploadedStatus] = useState(true);
+  const [uploadedStatus, setUploadedStatus] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -98,16 +96,46 @@ const CreateAssignments = () => {
       return;
     }
 
-    if (uploadedStatus === false) {
-      notification.error({
-        message: "Please upload the files!",
-        description:
-          "Please press the Start Upload button before creating the assignment.",
-        duration: 8,
-        placement: "bottomLeft",
-      });
+    if (fileList.length < 1) {
+      // No files, proceed to create assignment directly
+      await createAssignment(e, []);
       return;
+    } else {
+      modal.confirm({
+        title: `Are you sure you want to upload ${fileList.length} files?`,
+        content: (
+          <div className="my-2">
+            <p className="mb-2 font-semibold">Files to be uploaded:</p>
+            <ol className=" list-decimal list-inside">
+              {fileList.map((file) => (
+                <li
+                  style={{}}
+                  key={file.uid}
+                  className=" bg-white p-1 rounded-lg text-black"
+                >
+                  <Text ellipsis>{file.name}</Text>
+                </li>
+              ))}
+            </ol>
+          </div>
+        ),
+        onOk: async () => {
+          await handleUpload();
+          setUploadedStatus(true);
+        },
+        onCancel() {},
+        okButtonProps: {
+          className: " main-black-btn",
+        },
+        cancelButtonProps: {
+          className: " hover:!border-black hover:!text-black",
+        },
+        width: 800,
+      });
     }
+  };
+
+  const createAssignment = async (formData, uploadedFiles) => {
     try {
       const config = {
         Headers: {
@@ -118,16 +146,23 @@ const CreateAssignments = () => {
         "http://localhost:5000/api/tracker/assignments",
         {
           courseID: selectedCourse._id,
-          name,
-          description,
-          due_date: dueDate.toDate(),
-          visibleToStudents,
-          questions,
-          instructorFiles,
+          name: formData.name,
+          description: formData.description,
+          due_date: formData.dueDate.toDate(),
+          visibleToStudents: formData.visibleToStudents,
+          questions: formData.questions,
+          instructorFiles: uploadedFiles, // Set instructorFiles to an empty array
         },
         config
       );
-      window.location = "/viewallassignments";
+
+      notification.success({
+        message: "Assignment Created!",
+        description: `${formData.name} created successfully`,
+        duration: 4,
+        placement: "bottomLeft",
+      });
+      navigate("/viewallassignments");
     } catch (error) {
       if (error.response.status === 409) {
         notification.error({
@@ -151,16 +186,20 @@ const CreateAssignments = () => {
     }
   };
 
+  useEffect(() => {
+    // Check if upload is complete and trigger assignment creation
+    if (uploadedStatus) {
+      (async () => {
+        const formData = form.getFieldsValue();
+        await createAssignment(formData, instructorFiles);
+        setUploadedStatus(false); // Reset upload complete state after assignment creation
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uploadedStatus, instructorFiles, form]);
+
   const props = {
     multiple: true,
-    onChange: (info) => {
-      if (info.fileList.length > 0) {
-        setUploadedStatus(false);
-      }
-      if (info.fileList.length === 0 && instructorFiles.length === 0) {
-        setUploadedStatus(true);
-      }
-    },
     onRemove: (file) => {
       const newFileList = fileList.filter((item) => item.uid !== file.uid);
       setFileList(newFileList);
@@ -202,19 +241,16 @@ const CreateAssignments = () => {
       const newPublicIds = [];
 
       responses.map((response) => {
-        const url = response.data.url; // URL of the uploaded file
+        let url = response.data.url; // URL of the uploaded file
         const fileName = response.data.original_filename; // Original file name
         const publicId = response.data.public_id; // Public ID of the uploaded file
 
+        if (!publicId.includes(".")) {
+          url = `https://res.cloudinary.com/${process.env.REACT_APP_CLOUD_NAME}/image/upload/fl_attachment/${publicId}`;
+        }
+
         newInstructorFiles.push({ publicId, fileName, filePath: url });
         newPublicIds.push(publicId);
-
-        notification.success({
-          message: "File uploaded!",
-          description: `${fileName} uploaded successfully`,
-          duration: 4,
-          placement: "bottomLeft",
-        });
       });
 
       // Update the state with new instructor files
@@ -224,6 +260,15 @@ const CreateAssignments = () => {
       ]);
       setPublicIds((currentIds) => [...currentIds, ...newPublicIds]);
       setUploadedStatus(true);
+
+      notification.success({
+        message: "File uploaded!",
+        description: `All files uploaded successfully`,
+        duration: 4,
+        placement: "bottomLeft",
+      });
+
+      return instructorFiles;
     } catch (error) {
       notification.error({
         message: "File upload failed",
@@ -234,90 +279,14 @@ const CreateAssignments = () => {
     }
   };
 
-  const showUploadConfirmation = () => {
-    modal.confirm({
-      title: `Are you sure you want to upload ${fileList.length} files? ${
-        instructorFiles.length > 0
-          ? "This will overwrite the existing files."
-          : ""
-      }`,
-      content: (
-        <div className="my-2">
-          <p className="mb-2 font-semibold">Files to be uploaded:</p>
-          <ol className=" list-decimal list-inside">
-            {fileList.map((file) => (
-              <li
-                style={{}}
-                key={file.uid}
-                className=" bg-white p-1 rounded-lg text-black"
-              >
-                <Text ellipsis>{file.name}</Text>
-              </li>
-            ))}
-          </ol>
-        </div>
-      ),
-      onOk() {
-        if (instructorFiles.length > 0) {
-          deleteFiles(publicIds); // Delete old files first
-        }
-        handleUpload();
-      },
-      onCancel() {},
-      okButtonProps: {
-        className: " main-black-btn",
-      },
-      cancelButtonProps: {
-        className: " hover:!border-black hover:!text-black",
-      },
-      width: 800,
-    });
-  };
-
-  const deleteFiles = async (publicIds) => {
-    try {
-      await axios.post("http://localhost:5000/api/tracker/delete-file", {
-        publicIds,
-      });
-
-      setInstructorFiles([]);
-      setPublicIds([]);
-      notification.success({
-        message: "Files Overwritten",
-        description: "The existing files have been successfully overwritten.",
-        duration: 4,
-        placement: "bottomLeft",
-      });
-    } catch (error) {
-      console.error("Error deleting files:", error);
-      notification.error({
-        message: "Overwriting Failed",
-        description: "Failed to overwrite files. Please try again.",
-        duration: 4,
-        placement: "bottomLeft",
-      });
-    }
-  };
-
   return (
     <>
       <Navbar />
       <div className="h-full overflow-auto bg-gray-100 px-6 py-2">
-        <div className="flex justify-between items-center">
-          <Link to="/viewallassignments" className=" flex-1">
-            <Button
-              icon={<ArrowLeftOutlined />}
-              className="bg-black border-black text-white rounded-lg text-sm font-medium flex 
-              items-center justify-center hover:bg-white hover:text-black hover:border-black"
-            >
-              Back
-            </Button>
-          </Link>
-          <Title level={3} className="text-center font-bold my-4 flex-1">
-            {`CREATE A CODING ASSIGNMENT - ${selectedCourse?.name}`}
-          </Title>
-          <div className=" flex-1"></div>
-        </div>
+        <Heading
+          link={"/viewallassignments"}
+          title={`CREATE A CODING ASSIGNMENT - ${selectedCourse?.name}`}
+        />
         <Form
           form={form}
           onFinish={onFinish}
@@ -405,21 +374,6 @@ const CreateAssignments = () => {
               </p>
             </Dragger>
           </Form.Item>
-          <Button
-            type="primary"
-            htmlType="button"
-            onClick={showUploadConfirmation}
-            disabled={
-              (fileList.length === 0 && instructorFiles.length === 0) ||
-              uploadedStatus
-            }
-            className=" mb-4 main-black-btn"
-          >
-            {uploadedStatus ? "Files Up to date" : "Start Upload"}
-          </Button>
-          {uploadProgress > 0 && (
-            <Progress percent={Math.round(uploadProgress)} />
-          )}
 
           {/* Questions List */}
           <Form.List

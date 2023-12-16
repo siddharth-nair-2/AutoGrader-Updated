@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTracker } from "../../../context/TrackerProvider";
 import AssignmentCard from "../../misc/AssignmentCard";
 import Navbar from "../../misc/Navbar";
+import Heading from "../../misc/Heading";
 
 const { Title } = Typography;
 
@@ -48,18 +49,12 @@ const ViewAllAssignments = () => {
   return (
     <>
       <Navbar />
-      <div className="h-full overflow-auto bg-gray-100 p-6">
-        <Link to="/course" className="mb-4">
-          <Button
-            icon={<ArrowLeftOutlined />}
-            className="bg-[#000000] text-white font-semibold flex justify-center items-center hover:bg-slate-100"
-          >
-            Back
-          </Button>
-        </Link>
-        <Title level={2} className="text-center mb-8">
-          {selectedCourse?.name.toUpperCase()}
-        </Title>
+      <div className="h-full overflow-auto bg-gray-100 p-6 py-2">
+        <Heading
+          link={"/course"}
+          title={`${selectedCourse?.name.toUpperCase()}`}
+          size={2}
+        />
         <Row gutter={[16, 16]} justify="center" className=" gap-4">
           {assignments.length > 0 ? (
             assignments.map((assignment) => (

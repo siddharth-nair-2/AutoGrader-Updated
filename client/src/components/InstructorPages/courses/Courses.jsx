@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTracker } from "../../../context/TrackerProvider";
-import { Card, Button, Typography, Space } from "antd";
+import { Card, Typography, Space } from "antd";
 import {
-  ArrowLeftOutlined,
   ReadOutlined,
   ProfileOutlined,
   AppstoreOutlined,
 } from "@ant-design/icons";
 import Navbar from "../../misc/Navbar";
+import Heading from "../../misc/Heading";
 
 const { Title } = Typography;
 
@@ -42,24 +42,17 @@ const Courses = () => {
   return (
     <>
       <Navbar />
-      <div className="h-full overflow-auto bg-gray-100 p-6">
-        <Link to="/" className=" flex-1">
-          <Button
-            icon={<ArrowLeftOutlined />}
-            className=" mb-6 sm:mb-0 bg-black border-black text-white rounded-lg text-sm font-medium flex 
-              items-center justify-center hover:bg-white hover:text-black hover:border-black"
-          >
-            Back
-          </Button>
-        </Link>
+      <div className="h-full overflow-auto bg-gray-100 px-6 py-2">
+        <Heading
+          link={"/"}
+          title={`${selectedCourse?.name.toUpperCase()}`}
+          size={1}
+        />
         <Space
           direction="vertical"
           size="large"
           className="w-full h-full flex flex-col items-center justify-center"
         >
-          <Title className="text-center">
-            {selectedCourse?.name.toUpperCase()}
-          </Title>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
             <CourseActionCard
               title="View All Assignments"

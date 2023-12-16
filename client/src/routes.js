@@ -14,6 +14,10 @@ import ViewAllAssignments from "./components/InstructorPages/assignments/ViewAll
 import ViewAllModules from "./components/InstructorPages/modules/ViewAllModules";
 import ViewAllTests from "./components/InstructorPages/tests/ViewAllTests";
 import CreateAssignments2 from "./components/InstructorPages/assignments/duplicateCreateAssignments";
+import StudentAssignments2 from "./components/StudentPages/assignments/duplicateStudentAssignments";
+import StudentTheoryAssignments from "./components/StudentPages/assignments/StudentTheoryAssignments";
+import ViewTheoryAssignmentSubmission from "./components/InstructorPages/assignments/ViewTheoryAssignmentSubmission";
+import SingleTheorySubmission from "./components/InstructorPages/assignments/SingleTheorySubmission";
 
 export const instructorRoutes = [
   { path: "/", element: <Instructor /> },
@@ -26,11 +30,16 @@ export const instructorRoutes = [
     path: "/viewassignment",
     element: <ViewAssignmentSubmission />,
   },
+  {
+    path: "/viewtheoryassignment",
+    element: <ViewTheoryAssignmentSubmission />,
+  },
   { path: "/viewallassignments", element: <ViewAllAssignments /> },
   { path: "/viewallmodules", element: <ViewAllModules /> },
   { path: "/viewalltests", element: <ViewAllTests /> },
   { path: "/courseStudents", element: <CourseStudents /> },
   { path: "/viewSubmission", element: <SingleSubmission /> },
+  { path: "/viewTheorySubmission", element: <SingleTheorySubmission /> },
   { path: "/plagiarism", element: <PlagiarismPage /> },
 ];
 
@@ -38,4 +47,6 @@ export const studentRoutes = [
   { path: "/", element: <Student /> },
   { path: "/course", element: <StudentCourses /> },
   { path: "/viewassignment", element: <StudentAssignments /> },
+  { path: "/viewtheoryassignment", element: <StudentTheoryAssignments /> },
+  { path: "/viewassignment2", element: <StudentAssignments2 /> },
 ];

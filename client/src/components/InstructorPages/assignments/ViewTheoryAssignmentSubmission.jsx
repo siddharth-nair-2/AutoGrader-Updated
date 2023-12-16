@@ -6,15 +6,14 @@ import { useTracker } from "../../../context/TrackerProvider";
 import Navbar from "../../misc/Navbar";
 import { Table, Button, Input, Typography, App } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import Heading from "../../misc/Heading";
 
 const { Title } = Typography;
 
-const ViewAssignmentSubmission = () => {
+const ViewTheoryAssignmentSubmission = () => {
   const fetchAllSubmissions = async () => {
     try {
       const data = await axios.get(
-        `http://localhost:5000/api/tracker/submissions?courseID=${
+        `http://localhost:5000/api/tracker//theory-submissions?courseID=${
           JSON.parse(localStorage.getItem("assignmentInfo")).courseID
         }&assignmentID=${
           JSON.parse(localStorage.getItem("assignmentInfo"))._id
@@ -62,18 +61,10 @@ const ViewAssignmentSubmission = () => {
       },
       onOk: async () => {
         try {
-          // Update assignment visibility
-          if (assignmentData.hasOwnProperty("questions")) {
-            await axios.patch(
-              `http://localhost:5000/api/tracker/assignments/${assignmentData._id}`,
-              { visibleToStudents: !assignmentData.visibleToStudents }
-            );
-          } else {
-            await axios.patch(
-              `http://localhost:5000/api/tracker/theoryAssignments/${assignmentData._id}`,
-              { visibleToStudents: !assignmentData.visibleToStudents }
-            );
-          }
+          await axios.patch(
+            `http://localhost:5000/api/tracker/theoryAssignments/${assignmentData._id}`,
+            { visibleToStudents: !assignmentData.visibleToStudents }
+          );
 
           notification.success({
             message: "Visibility Changed!",
@@ -123,16 +114,9 @@ const ViewAssignmentSubmission = () => {
             await deleteFiles(publicIds);
           }
 
-          // Delete assignment
-          if (assignmentData.hasOwnProperty("questions")) {
-            await axios.delete(
-              `http://localhost:5000/api/tracker/assignments/${assignmentData._id}`
-            );
-          } else {
-            await axios.delete(
-              `http://localhost:5000/api/tracker/theoryAssignments/${assignmentData._id}`
-            );
-          }
+          await axios.delete(
+            `http://localhost:5000/api/tracker/theoryAssignments/${assignmentData._id}`
+          );
 
           notification.success({
             message: "Assignment Deleted!",
@@ -199,32 +183,6 @@ const ViewAssignmentSubmission = () => {
       sorter: (a, b) => a.studentName.localeCompare(b.studentName),
     },
     {
-      title: "Question No.",
-      dataIndex: "questionNum",
-      key: "questionNum",
-      sorter: (a, b) => a.questionNum - b.questionNum,
-    },
-    {
-      title: "Language",
-      dataIndex: "languageName",
-      key: "languageName",
-      sorter: (a, b) => a.languageName.localeCompare(b.languageName),
-      render: (languageName) =>
-        languageName === "62"
-          ? "Java"
-          : languageName === "50"
-          ? "C"
-          : languageName === "54"
-          ? "C++"
-          : "Python",
-    },
-    {
-      title: "Passed Cases",
-      dataIndex: "testCases",
-      key: "testCases",
-      sorter: (a, b) => a.testCases - b.testCases,
-    },
-    {
       title: "Upload Date",
       dataIndex: "updatedAt",
       key: "updatedAt",
@@ -246,7 +204,7 @@ const ViewAssignmentSubmission = () => {
         <Button
           onClick={() => {
             localStorage.setItem("submissionInfo", JSON.stringify(record));
-            navigate("/viewSubmission");
+            navigate("/viewTheorySubmission");
           }}
           className="bg-[#b8defe] border-[#45a1fe] text-[#45a1fe] rounded-lg text-sm font-semibold flex 
                     hover:bg-[#85b5e6] hover:text-[#b8defe] hover:border-[#b8defe]"
@@ -289,15 +247,7 @@ const ViewAssignmentSubmission = () => {
           <Title level={4} className="text-center my-4">
             All submissions for {selectedAssignment?.name}
           </Title>
-          <div className=" flex items-center justify-between w-full">
-            <Link to={"/plagiarism"}>
-              <Button
-                className="bg-[#46282F] border-[#46282F] text-white rounded-lg text-sm font-medium flex 
-              items-center justify-center hover:bg-white hover:text-[#ff5a5a] hover:border-[#46282F] ml-auto"
-              >
-                Plagiarism List
-              </Button>
-            </Link>
+          <div className=" flex items-center justify-end w-full">
             <Button
               className=" mb-6 sm:mb-0 bg-black border-black text-white rounded-lg text-sm font-medium flex 
               items-center justify-center hover:bg-white hover:text-black hover:border-black"
@@ -325,4 +275,4 @@ const ViewAssignmentSubmission = () => {
   );
 };
 
-export default ViewAssignmentSubmission;
+export default ViewTheoryAssignmentSubmission;

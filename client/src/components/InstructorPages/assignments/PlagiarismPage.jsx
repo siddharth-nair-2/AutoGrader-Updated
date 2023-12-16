@@ -5,6 +5,7 @@ import { useTracker } from "../../../context/TrackerProvider";
 import Navbar from "../../misc/Navbar";
 import { Table, Button, Input, Typography, App } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
+import Heading from "../../misc/Heading";
 
 const { Title } = Typography;
 
@@ -100,22 +101,11 @@ const PlagiarismPage = () => {
   return (
     <>
       <Navbar />
-      <div className="h-full overflow-auto bg-gray-100 p-6">
-        <div className="flex justify-between items-center">
-          <Link to="/viewAssignment" className="flex-1">
-            <Button
-              icon={<ArrowLeftOutlined />}
-              className="mb-6 sm:mb-0 bg-black border-black text-white rounded-lg text-sm font-medium flex items-center justify-center hover:bg-white hover:text-black hover:border-black"
-            >
-              Back
-            </Button>
-          </Link>
-          <Title className="text-center my-4 flex-1" level={2}>
-            {selectedCourse?.name.toUpperCase()}
-          </Title>
-          <div className="flex-1"></div>
-        </div>
-
+      <div className="h-full overflow-auto bg-gray-100 px-6 py-2">
+        <Heading
+          link={"/viewAssignment"}
+          title={`${selectedCourse?.name.toUpperCase()}`}
+        />
         <div className="max-w-7xl m-auto">
           <Title level={4} className="text-center my-4">
             Plagiarism Comparisons - {selectedAssignment?.name}

@@ -60,6 +60,14 @@ const {
   getModulesForCourse,
   getAllModules,
 } = require("../controllers/moduleController");
+
+const {
+  createTheoryAssignmentSubmission,
+  getAllTheoryAssignmentSubmissions,
+  getTheoryAssignmentSubmission,
+  updateTheoryAssignmentSubmission,
+} = require("../controllers/theoryAssignmentSubmissionController");
+
 const { protect } = require("../middleware/authMiddleware");
 const router = express.Router();
 const cloudinary = require("cloudinary").v2;
@@ -82,6 +90,12 @@ router.get("/submission/compare", compareSubmission);
 router.get("/submission/custom", getCustomSubmissions);
 router.get("/submissions", getAllSubmissions);
 router.patch("/submission/update", updateSubmission);
+
+// Theory Assignment Submission Routes
+router.post('/theory-submission', createTheoryAssignmentSubmission);
+router.get('/theory-submissions', getAllTheoryAssignmentSubmissions);
+router.get('/theory-submission', getTheoryAssignmentSubmission);
+router.patch('/theory-submission/update', updateTheoryAssignmentSubmission);
 
 /* FIX ON FRONTEND */
 // router.route("/submission").post(createSubmission); - DONE

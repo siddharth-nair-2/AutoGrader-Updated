@@ -10,7 +10,9 @@ const AssignmentCard = ({ assignment }) => {
 
   const handleAssignmentOpen = () => {
     localStorage.setItem("assignmentInfo", JSON.stringify(assignment));
-    navigate("/viewassignment");
+    assignment.hasOwnProperty("questions")
+      ? navigate("/viewassignment")
+      : navigate("/viewtheoryassignment");
   };
 
   const getItemCount = () => {

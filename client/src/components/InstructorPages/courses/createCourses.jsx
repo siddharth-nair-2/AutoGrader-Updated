@@ -4,6 +4,7 @@ import { Form, Input, Button, Select, Typography, App } from "antd";
 import Navbar from "../../misc/Navbar";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useAuth } from "../../../context/AuthProvider";
+import Heading from "../../misc/Heading";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -101,21 +102,12 @@ const CreateCourses = () => {
   return (
     <>
       <Navbar />
-      <div className="h-full overflow-auto bg-gray-100 p-6">
-        <div className="flex justify-start">
-          <Link to="/">
-            <Button
-              icon={<ArrowLeftOutlined />}
-              className=" mb-6 sm:mb-0 bg-black border-black text-white rounded-lg text-sm font-medium flex 
-              items-center justify-center hover:bg-white hover:text-black hover:border-black"
-            >
-              Back
-            </Button>
-          </Link>
-        </div>
-        <Title className="text-center mb-6 text-3xl font-extrabold">
-          CREATE A COURSE
-        </Title>
+      <div className="h-full overflow-auto bg-gray-100 px-6 py-2">
+        <Heading
+          link={"/"}
+          title={`CREATE A COURSE`}
+          size={1}
+        />
         <Form
           form={form}
           onFinish={onFinish}
