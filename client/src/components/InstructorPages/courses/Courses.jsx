@@ -1,11 +1,13 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTracker } from "../../../context/TrackerProvider";
-import { Card, Typography, Space } from "antd";
+import { Card, Typography, Space, Button } from "antd";
 import {
   ReadOutlined,
   ProfileOutlined,
   AppstoreOutlined,
+  ArrowLeftOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 import Navbar from "../../misc/Navbar";
 import Heading from "../../misc/Heading";
@@ -43,17 +45,36 @@ const Courses = () => {
     <>
       <Navbar />
       <div className="h-full overflow-auto bg-gray-100 px-6 py-2">
-        <Heading
-          link={"/"}
-          title={`${selectedCourse?.name.toUpperCase()}`}
-          size={1}
-        />
+        <div className="flex justify-between items-center">
+          <Link to="/viewalltests">
+            <Button
+              icon={<ArrowLeftOutlined />}
+              className=" sm:mb-0 bg-black border-black text-white rounded-lg text-sm font-medium flex 
+            items-center justify-center hover:bg-white hover:text-black hover:border-black"
+            >
+              Back
+            </Button>
+          </Link>
+          <Title className="text-center my-4" level={3}>
+            {selectedCourse?.name.toUpperCase()}
+          </Title>
+          <Link to="/createmodule" className=" w-[85px]">
+            <Button
+            icon={<PlusOutlined />}
+              className="bg-[#46282F] border-[#46282F] text-white rounded-lg text-sm font-medium flex 
+          items-center justify-center hover:bg-white hover:text-[#ff5a5a] hover:border-[#46282F] -ml-4"
+              onClick={() => console.log("first")}
+            >
+              Module
+            </Button>
+          </Link>
+        </div>
         <Space
           direction="vertical"
           size="large"
           className="w-full h-full flex flex-col items-center justify-center"
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
             <CourseActionCard
               title="View All Assignments"
               icon={<ReadOutlined style={{ fontSize: "24px" }} />}
@@ -63,11 +84,6 @@ const Courses = () => {
               title="View All Tests"
               icon={<ProfileOutlined style={{ fontSize: "24px" }} />}
               navigateTo="/viewalltests"
-            />
-            <CourseActionCard
-              title="View All Modules"
-              icon={<AppstoreOutlined style={{ fontSize: "24px" }} />}
-              navigateTo="/viewallmodules"
             />
           </div>
         </Space>

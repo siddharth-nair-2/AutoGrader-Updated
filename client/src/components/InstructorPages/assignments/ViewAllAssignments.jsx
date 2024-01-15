@@ -1,8 +1,8 @@
 import axios from "axios";
 import { Button, Row, Typography, Card, App } from "antd";
-import { ArrowLeftOutlined, PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTracker } from "../../../context/TrackerProvider";
 import AssignmentCard from "../../misc/AssignmentCard";
 import Navbar from "../../misc/Navbar";

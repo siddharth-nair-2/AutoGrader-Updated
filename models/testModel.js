@@ -9,17 +9,17 @@ const TestSchema = new mongoose.Schema(
       minLength: [1, "Test name must be atleast 1 character long"],
       maxLength: [64, "Test name must be less than 65 characters long"],
     },
+    testType: {
+      type: String,
+      enum: ["test", "quiz"],
+      required: true,
+    },
     description: {
       type: String,
       maxLength: [
         2000,
         "Test description must be less than 2001 characters long",
       ],
-    },
-    notes: {
-      type: String,
-      default: "No Notes",
-      maxLength: [256, "Test notes must be less than 257 characters long"],
     },
     courseID: {
       type: mongoose.Schema.Types.ObjectId,
@@ -67,6 +67,15 @@ const TestSchema = new mongoose.Schema(
             2000,
             "Question information must be less than 2000 characters.",
           ],
+        },
+        marks: {
+          type: Number,
+          required: true,
+        },
+        responseType: {
+          type: String,
+          enum: ["single", "multiple", "subjective"],
+          required: true,
         },
         options: [
           {

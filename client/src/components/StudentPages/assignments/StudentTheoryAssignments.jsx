@@ -46,7 +46,17 @@ const StudentTheoryAssignments = () => {
   const onFinish = async (values) => {
     const { comment } = values;
 
-    if (!comment || comment.trim().length === 0) {
+    if (fileList.length < 1 && !comment) {
+      notification.error({
+        message: "No information or files!!",
+        description: "You have to upload at least 1 file or enter a comment.",
+        duration: 4,
+        placement: "bottomLeft",
+      });
+      return;
+    }
+
+    if (comment && comment.trim().length === 0) {
       notification.error({
         message: "Missing Information",
         description: "Please enter a comment!",
@@ -56,64 +66,53 @@ const StudentTheoryAssignments = () => {
       return;
     }
 
-    if (fileList.length < 1) {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/tracker/theory-submission?studentID=${user._id}&assignmentID=${selectedAssignment._id}`
+      );
+      if (response.data) {
+        // Existing submission found
+        confirmOverwrite(response.data.submittedFiles, values);
+      } else {
+        modal.confirm({
+          title: `Are you sure you want to upload ${fileList.length} files?`,
+          content: (
+            <div className="my-2">
+              <p className="mb-2 font-semibold">Files to be uploaded:</p>
+              <ol className=" list-decimal list-inside">
+                {fileList.map((file) => (
+                  <li
+                    style={{}}
+                    key={file.uid}
+                    className=" bg-white p-1 rounded-lg text-black"
+                  >
+                    <Text ellipsis>{file.name}</Text>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ),
+          onOk: async () => {
+            await handleUpload();
+          },
+          onCancel() {},
+          okButtonProps: {
+            className: " main-black-btn",
+          },
+          cancelButtonProps: {
+            className: " hover:!border-black hover:!text-black",
+          },
+          width: 800,
+        });
+      }
+    } catch (error) {
       notification.error({
-        message: "No files uploaded!",
-        description: "You have to upload at least 1 file.",
+        message: "Error Occured!",
+        description: error.message,
         duration: 4,
         placement: "bottomLeft",
       });
       return;
-    } else {
-      try {
-        const response = await axios.get(
-          `http://localhost:5000/api/tracker/theory-submission?studentID=${user._id}&assignmentID=${selectedAssignment._id}`
-        );
-        console.log(response.data);
-        if (response.data) {
-          // Existing submission found
-          confirmOverwrite(response.data.submittedFiles, values);
-        } else {
-          modal.confirm({
-            title: `Are you sure you want to upload ${fileList.length} files?`,
-            content: (
-              <div className="my-2">
-                <p className="mb-2 font-semibold">Files to be uploaded:</p>
-                <ol className=" list-decimal list-inside">
-                  {fileList.map((file) => (
-                    <li
-                      style={{}}
-                      key={file.uid}
-                      className=" bg-white p-1 rounded-lg text-black"
-                    >
-                      <Text ellipsis>{file.name}</Text>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            ),
-            onOk: async () => {
-              await handleUpload();
-            },
-            onCancel() {},
-            okButtonProps: {
-              className: " main-black-btn",
-            },
-            cancelButtonProps: {
-              className: " hover:!border-black hover:!text-black",
-            },
-            width: 800,
-          });
-        }
-      } catch (error) {
-        notification.error({
-          message: "Error Occured!",
-          description: error.message,
-          duration: 4,
-          placement: "bottomLeft",
-        });
-        return;
-      }
     }
   };
 
@@ -156,7 +155,9 @@ const StudentTheoryAssignments = () => {
   const deleteOldFiles = async (files) => {
     const publicIds = files.map((file) => file.publicId);
     try {
-      await axios.post("http://localhost:5000/api/tracker/delete-file", { publicIds });
+      await axios.post("http://localhost:5000/api/tracker/delete-file", {
+        publicIds,
+      });
     } catch (error) {
       notification.error({
         message: "Error Occured!",
@@ -218,7 +219,9 @@ const StudentTheoryAssignments = () => {
       await axios.patch(
         `http://localhost:5000/api/tracker/theory-submission/update?studentID=${user._id}&assignmentID=${selectedAssignment._id}`,
         {
-          comment: form.getFieldValue("comment"),
+          comment: form.getFieldValue("comment")
+            ? form.getFieldValue("comment")
+            : "N/A",
           submittedFiles: uploadedFiles,
         }
       );
@@ -246,7 +249,9 @@ const StudentTheoryAssignments = () => {
         studentID: user._id,
         assignmentID: selectedAssignment._id,
         courseID: selectedCourse._id,
-        comment: form.getFieldValue("comment"),
+        comment: form.getFieldValue("comment")
+          ? form.getFieldValue("comment")
+          : "N/A",
         submittedFiles: uploadedFiles,
       });
 
@@ -325,22 +330,12 @@ const StudentTheoryAssignments = () => {
                   <Form.Item
                     name="comment"
                     label={<span className=" font-bold">Your Comment</span>}
-                    rules={[
-                      { required: true, message: "Please input your comment!" },
-                    ]}
                   >
                     <TextArea rows={4} placeholder="Type your comment here" />
                   </Form.Item>
 
                   <Form.Item
                     label={<span className=" font-bold">Your Files</span>}
-                    required={true}
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please upload at least one file!",
-                      },
-                    ]}
                   >
                     <Dragger {...draggerProps}>
                       <p className="ant-upload-drag-icon">

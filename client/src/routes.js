@@ -13,40 +13,55 @@ import PlagiarismPage from "./components/InstructorPages/assignments/PlagiarismP
 import ViewAllAssignments from "./components/InstructorPages/assignments/ViewAllAssignments";
 import ViewAllModules from "./components/InstructorPages/modules/ViewAllModules";
 import ViewAllTests from "./components/InstructorPages/tests/ViewAllTests";
-import CreateAssignments2 from "./components/InstructorPages/assignments/duplicateCreateAssignments";
-import StudentAssignments2 from "./components/StudentPages/assignments/duplicateStudentAssignments";
 import StudentTheoryAssignments from "./components/StudentPages/assignments/StudentTheoryAssignments";
 import ViewTheoryAssignmentSubmission from "./components/InstructorPages/assignments/ViewTheoryAssignmentSubmission";
 import SingleTheorySubmission from "./components/InstructorPages/assignments/SingleTheorySubmission";
+import CreateTest from "./components/InstructorPages/tests/CreateTests";
+import StudentTests from "./components/StudentPages/tests/StudentTests";
+import ViewTestSubmissions from "./components/InstructorPages/tests/ViewTestSubmissions";
+import SingleTestSubmission from "./components/InstructorPages/tests/SingleTestSubmission";
+import CreateModules from "./components/InstructorPages/modules/CreateModules";
 
 export const instructorRoutes = [
   { path: "/", element: <Instructor /> },
+
+  // Courses
   { path: "/createcourses", element: <CreateCourses /> },
-  { path: "/createassignment", element: <CreateAssignments /> },
-  { path: "/createassignment2", element: <CreateAssignments2 /> },
-  { path: "/createTheoryAssignment", element: <CreateTheoryAssignment /> },
   { path: "/course", element: <Courses /> },
-  {
-    path: "/viewassignment",
-    element: <ViewAssignmentSubmission />,
-  },
+  { path: "/courseStudents", element: <CourseStudents /> },
+
+  // Assignments
+  { path: "/createassignment", element: <CreateAssignments /> },
+  { path: "/createTheoryAssignment", element: <CreateTheoryAssignment /> },
+  { path: "/viewassignment", element: <ViewAssignmentSubmission /> },
   {
     path: "/viewtheoryassignment",
     element: <ViewTheoryAssignmentSubmission />,
   },
   { path: "/viewallassignments", element: <ViewAllAssignments /> },
-  { path: "/viewallmodules", element: <ViewAllModules /> },
-  { path: "/viewalltests", element: <ViewAllTests /> },
-  { path: "/courseStudents", element: <CourseStudents /> },
+  { path: "/plagiarism", element: <PlagiarismPage /> },
+
+  // Assignment Submissions
   { path: "/viewSubmission", element: <SingleSubmission /> },
   { path: "/viewTheorySubmission", element: <SingleTheorySubmission /> },
-  { path: "/plagiarism", element: <PlagiarismPage /> },
+
+  // Tests
+  { path: "/createtest", element: <CreateTest /> },
+  { path: "/viewalltests", element: <ViewAllTests /> },
+
+  // Test Submissions
+  { path: "/viewtest", element: <ViewTestSubmissions /> },
+  { path: "/viewtestsubmission/:id", element: <SingleTestSubmission /> },
+
+  // Modules
+  { path: "/createmodule", element: <CreateModules /> },
+  { path: "/viewallmodules", element: <ViewAllModules /> },
 ];
 
 export const studentRoutes = [
   { path: "/", element: <Student /> },
   { path: "/course", element: <StudentCourses /> },
   { path: "/viewassignment", element: <StudentAssignments /> },
+  { path: "/viewtest", element: <StudentTests /> },
   { path: "/viewtheoryassignment", element: <StudentTheoryAssignments /> },
-  { path: "/viewassignment2", element: <StudentAssignments2 /> },
 ];

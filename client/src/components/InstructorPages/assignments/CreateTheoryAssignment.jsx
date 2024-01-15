@@ -64,7 +64,7 @@ const CreateTheoryAssignment = () => {
 
   const onFinish = async (e) => {
     const { name, description, dueDate, visibleToStudents } = e;
-    if (!name || !description || !dueDate || visibleToStudents === undefined) {
+    if (!name || !dueDate || visibleToStudents === undefined) {
       notification.error({
         message: "Missing Information",
         description: "Pleast enter all information!",
@@ -82,7 +82,19 @@ const CreateTheoryAssignment = () => {
       });
       return;
     }
-    if (description.length > 2000) {
+
+    if (fileList.length < 1 && !description) {
+      notification.error({
+        message: "No information or files!!",
+        description:
+          "You have to upload at least 1 file or enter a description!.",
+        duration: 4,
+        placement: "bottomLeft",
+      });
+      return;
+    }
+
+    if (description && description.length > 2000) {
       notification.error({
         message: "Description is too lengthy!",
         description: "Description should be less than 2000 characters.",
@@ -92,47 +104,37 @@ const CreateTheoryAssignment = () => {
       return;
     }
 
-    if (fileList.length < 1) {
-      notification.error({
-        message: "No files uploaded!",
-        description: "You have to upload at least 1 file.",
-        duration: 4,
-        placement: "bottomLeft",
-      });
-      return;
-    } else {
-      modal.confirm({
-        title: `Are you sure you want to upload ${fileList.length} files?`,
-        content: (
-          <div className="my-2">
-            <p className="mb-2 font-semibold">Files to be uploaded:</p>
-            <ol className=" list-decimal list-inside">
-              {fileList.map((file) => (
-                <li
-                  style={{}}
-                  key={file.uid}
-                  className=" bg-white p-1 rounded-lg text-black"
-                >
-                  <Text ellipsis>{file.name}</Text>
-                </li>
-              ))}
-            </ol>
-          </div>
-        ),
-        onOk: async () => {
-          await handleUpload();
-          setUploadedStatus(true);
-        },
-        onCancel() {},
-        okButtonProps: {
-          className: " main-black-btn",
-        },
-        cancelButtonProps: {
-          className: " hover:!border-black hover:!text-black",
-        },
-        width: 800,
-      });
-    }
+    modal.confirm({
+      title: `Are you sure you want to upload ${fileList.length} files?`,
+      content: (
+        <div className="my-2">
+          <p className="mb-2 font-semibold">Files to be uploaded:</p>
+          <ol className=" list-decimal list-inside">
+            {fileList.map((file) => (
+              <li
+                style={{}}
+                key={file.uid}
+                className=" bg-white p-1 rounded-lg text-black"
+              >
+                <Text ellipsis>{file.name}</Text>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ),
+      onOk: async () => {
+        await handleUpload();
+        setUploadedStatus(true);
+      },
+      onCancel() {},
+      okButtonProps: {
+        className: " main-black-btn",
+      },
+      cancelButtonProps: {
+        className: " hover:!border-black hover:!text-black",
+      },
+      width: 800,
+    });
   };
 
   const createAssignment = async (formData, uploadedFiles) => {
@@ -147,7 +149,7 @@ const CreateTheoryAssignment = () => {
         {
           courseID: selectedCourse._id,
           name: formData.name,
-          description: formData.description,
+          description: formData.description ? formData.description : "N/A",
           due_date: formData.dueDate.toDate(),
           visibleToStudents: formData.visibleToStudents,
           instructorFiles: uploadedFiles,
@@ -176,7 +178,7 @@ const CreateTheoryAssignment = () => {
         error.response.status <= 500
       ) {
         notification.error({
-          message: "Error",
+          message: "Error with assignment upload",
           description: error.response.statusText,
           duration: 4,
           placement: "bottomLeft",
@@ -291,12 +293,6 @@ const CreateTheoryAssignment = () => {
           <Form.Item
             name="description"
             label={<span className=" font-bold">Assignment Description</span>}
-            rules={[
-              {
-                required: true,
-                message: "Please input the assignment description!",
-              },
-            ]}
           >
             <TextArea
               placeholder="Describe the assignment"
@@ -328,10 +324,6 @@ const CreateTheoryAssignment = () => {
           </div>
           <Form.Item
             label={<span className=" font-bold">Instructor Files</span>}
-            required={true}
-            rules={[
-              { required: true, message: "Please upload at least one file!" },
-            ]}
           >
             <Dragger {...props}>
               <p className="ant-upload-drag-icon">

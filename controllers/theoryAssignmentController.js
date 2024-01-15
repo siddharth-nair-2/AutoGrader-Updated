@@ -25,6 +25,7 @@ const createTheoryAssignment = asyncHandler(async (req, res) => {
     courseID,
     name,
   });
+
   const existingAssignment = await Assignment.findOne({ courseID, name });
 
   if (theoryAssignmentExists || existingAssignment) {
@@ -41,6 +42,7 @@ const createTheoryAssignment = asyncHandler(async (req, res) => {
     visibleToStudents,
     instructorFiles,
   });
+  console.log(theoryAssignment)
 
   if (theoryAssignment) {
     res.status(201).json(theoryAssignment);

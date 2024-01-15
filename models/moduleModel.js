@@ -24,10 +24,6 @@ const ModuleSchema = new mongoose.Schema(
         ref: "Assignment",
       },
     ],
-    isLocked: {
-      type: Boolean,
-      required: true,
-    },
     tests: [
       {
         type: mongoose.Schema.Types.ObjectId,

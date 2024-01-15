@@ -7,14 +7,13 @@ const { Module } = require("../models/moduleModel");
 
 // Create a new module
 const createModule = asyncHandler(async (req, res) => {
-  const { title, courseID, content, isLocked, assignments, tests, files } =
+  const { title, courseID, content, assignments, tests, files } =
     req.body;
 
   if (
     !title ||
     !courseID ||
     !content ||
-    isLocked === null ||
     !assignments ||
     !tests ||
     !files
@@ -28,7 +27,6 @@ const createModule = asyncHandler(async (req, res) => {
     title,
     courseID,
     content,
-    isLocked,
     assignments,
     tests,
     files,
@@ -40,7 +38,6 @@ const createModule = asyncHandler(async (req, res) => {
       title: module.title,
       courseID: module.courseID,
       content: module.content,
-      isLocked: module.isLocked,
       assignments: module.assignments,
       tests: module.tests,
       files: module.files,
@@ -52,8 +49,7 @@ const createModule = asyncHandler(async (req, res) => {
 const updateModule = asyncHandler(async (req, res) => {
   try {
     const moduleID = req.params.moduleID;
-    const { title, content, isLocked, newAssignments, newTests, newFiles } =
-      req.body;
+    const { title, content, newAssignments, newTests, newFiles } = req.body;
 
     const module = await Module.findById(moduleID);
 
@@ -67,9 +63,6 @@ const updateModule = asyncHandler(async (req, res) => {
     }
     if (content) {
       module.content = content;
-    }
-    if (isLocked !== undefined) {
-      module.isLocked = isLocked;
     }
     if (newAssignments && newAssignments.length > 0) {
       module.assignments.push(...newAssignments);

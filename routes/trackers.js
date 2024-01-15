@@ -68,6 +68,17 @@ const {
   updateTheoryAssignmentSubmission,
 } = require("../controllers/theoryAssignmentSubmissionController");
 
+const {
+  submitTest,
+  updateTestSubmission,
+  deleteTestSubmission,
+  getTestSubmission,
+  listSubmissionsForTest,
+  listSubmissionsByStudent,
+  listSubmissionsForCourse,
+  getAllTestSubmissions,
+} = require("../controllers/testSubmissionController"); // Adjust the path as necessary
+
 const { protect } = require("../middleware/authMiddleware");
 const router = express.Router();
 const cloudinary = require("cloudinary").v2;
@@ -92,10 +103,10 @@ router.get("/submissions", getAllSubmissions);
 router.patch("/submission/update", updateSubmission);
 
 // Theory Assignment Submission Routes
-router.post('/theory-submission', createTheoryAssignmentSubmission);
-router.get('/theory-submissions', getAllTheoryAssignmentSubmissions);
-router.get('/theory-submission', getTheoryAssignmentSubmission);
-router.patch('/theory-submission/update', updateTheoryAssignmentSubmission);
+router.post("/theory-submission", createTheoryAssignmentSubmission);
+router.get("/theory-submissions", getAllTheoryAssignmentSubmissions);
+router.get("/theory-submission", getTheoryAssignmentSubmission);
+router.patch("/theory-submission/update", updateTheoryAssignmentSubmission);
 
 /* FIX ON FRONTEND */
 // router.route("/submission").post(createSubmission); - DONE
@@ -155,6 +166,16 @@ router.delete("/module/:moduleID", deleteModule);
 router.get("/modules/course/:courseID", getModulesForCourse);
 router.get("/module/:moduleID", getSingleModule);
 router.get("/modules", getAllModules);
+
+// Test Submission Routes
+router.post("/test-submission", submitTest);
+router.patch("/test-submission/:submissionId", updateTestSubmission);
+router.delete("/test-submission/:submissionId", deleteTestSubmission);
+router.get("/test-submission/:submissionId", getTestSubmission);
+router.get("/test-submissions/test/:testId", listSubmissionsForTest);
+router.get("/test-submissions/student/:studentId", listSubmissionsByStudent);
+router.get("/test-submissions/course/:courseId", listSubmissionsForCourse);
+router.get("/test-submissions", getAllTestSubmissions);
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

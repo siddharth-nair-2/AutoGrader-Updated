@@ -10,9 +10,9 @@ const createTest = asyncHandler(async (req, res) => {
   const {
     name,
     description,
-    notes,
     courseID,
     scheduledAt,
+    testType,
     duration,
     visibleToStudents,
     questions,
@@ -21,11 +21,10 @@ const createTest = asyncHandler(async (req, res) => {
 
   if (
     !name ||
-    !description ||
-    !notes ||
     !courseID ||
     !scheduledAt ||
     !duration ||
+    !testType ||
     visibleToStudents === null ||
     !questions ||
     !files
@@ -37,9 +36,9 @@ const createTest = asyncHandler(async (req, res) => {
   // Create and save the test
   const test = await Test.create({
     name,
-    description,
-    notes,
+    description: description || "",
     courseID,
+    testType,
     scheduledAt,
     duration,
     visibleToStudents,
@@ -51,8 +50,8 @@ const createTest = asyncHandler(async (req, res) => {
     res.status(201).json({
       _id: test._id,
       name: test.name,
+      testType: test.type,
       description: test.description,
-      notes: test.notes,
       courseID: test.courseID,
       scheduledAt: test.scheduledAt,
       duration: test.duration,

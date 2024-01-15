@@ -1,80 +1,13 @@
 import axios from "axios";
-import { App } from "antd";
+import { App, Button, Card, Row } from "antd";
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 import { useTracker } from "../../../context/TrackerProvider";
-import AssignmentCard from "../../misc/AssignmentCard";
 import Heading from "../../misc/Heading";
 import Navbar from "../../misc/Navbar";
-
-const Container = styled.div`
-  font-family: "Poppins", sans-serif;
-  height: 100vh;
-  padding-bottom: 20px;
-  background-color: #f4f3f6;
-`;
-
-const CourseCard = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 20px;
-  color: black;
-  background-color: white;
-  border-radius: 24px;
-  width: 600px;
-  height: 100px;
-  margin: auto;
-  margin-top: 50px;
-  margin-bottom: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 24px;
-  font-weight: 500;
-  box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-
-  &:hover {
-    transform: scale(1.002);
-  }
-`;
-
-const CourseButtons = styled.button`
-  border: none;
-  outline: none;
-  padding: 16px;
-  background-color: black;
-  border-radius: 24px;
-  font-weight: bold;
-  font-size: 14px;
-  color: white;
-  cursor: pointer;
-  margin-right: 20px;
-  box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  &:hover {
-    transform: scale(1.01);
-  }
-`;
-
-const ViewCreateDiv = styled.div`
-  display: flex;
-  font-size: 24px;
-  justify-content: space-evenly;
-`;
-
-const CourseBox = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 50px;
-  margin: 25px;
-`;
+import { PlusOutlined } from "@ant-design/icons";
+import Title from "antd/es/typography/Title";
+import TestCard from "../../misc/TestCard";
 
 const ViewAllTests = () => {
   const { selectedCourse, setSelectedCourse } = useTracker();
@@ -92,17 +25,17 @@ const ViewAllTests = () => {
     localStorage.removeItem("moduleInfo");
     localStorage.removeItem("submissionInfo");
     fetchTests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchTests = async () => {
     try {
-      const data = await axios.post(
-        "http://localhost:5000/api/tracker/assignmentGet",
-        {
-          _id: JSON.parse(localStorage.getItem("courseInfo"))._id,
-        }
+      const res = await axios.get(
+        `http://localhost:5000/api/tracker/tests/course/${
+          JSON.parse(localStorage.getItem("courseInfo"))._id
+        }`
       );
-      settests(data.data);
+      settests(res.data);
     } catch (error) {
       notification.error({
         message: "Error Occured!",
@@ -113,47 +46,35 @@ const ViewAllTests = () => {
     }
   };
   return (
-    <Container>
+    <>
       <Navbar />
-      {selectedCourse && selectedCourse.name && (
-        <>
-          <Heading>
-            <Link to={"/course"}>
-              <CourseButtons
-                style={{
-                  position: "absolute",
-                  left: "1%",
-                  fontSize: "14px",
-                  padding: "5px 10px 5px 10px",
-                  cursor: "pointer",
-                }}
-              >{`< Back`}</CourseButtons>
-            </Link>
-            {selectedCourse?.name.toUpperCase()}
-          </Heading>
-          {tests?.length > 0 ? (
-            <CourseBox>
-              {tests.length > 0 &&
-                tests.map((assignment) => {
-                  return (
-                    <AssignmentCard
-                      key={assignment._id}
-                      assignment={assignment}
-                    />
-                  );
-                })}
-            </CourseBox>
+      <div className="h-full overflow-auto bg-gray-100 p-6 py-2">
+        <Heading
+          link={"/course"}
+          title={`${selectedCourse?.name.toUpperCase()}`}
+          size={2}
+        />
+        <Row gutter={[16, 16]} justify="center" className=" gap-4">
+          {tests.length > 0 ? (
+            tests.map((test) => <TestCard key={test._id} test={test} />)
           ) : (
-            <CourseCard>You have no tests for this course!</CourseCard>
+            <Card className="text-center p-6">
+              <Title level={4}>You have no tests for this course!</Title>
+            </Card>
           )}
-          <ViewCreateDiv>
-            <CourseButtons onClick={(e) => navigate("/createAssignment")}>
-              + New Tests
-            </CourseButtons>
-          </ViewCreateDiv>
-        </>
-      )}
-    </Container>
+        </Row>
+        <div className="text-center mt-8">
+          <Button
+            size="large"
+            icon={<PlusOutlined />}
+            onClick={() => navigate("/createtest")}
+            className="bg-[#000000] text-white font-semibold  hover:bg-slate-100 mx-2"
+          >
+            New Test
+          </Button>
+        </div>
+      </div>
+    </>
   );
 };
 
