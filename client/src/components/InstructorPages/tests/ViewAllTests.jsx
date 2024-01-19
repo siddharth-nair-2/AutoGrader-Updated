@@ -39,7 +39,7 @@ const ViewAllTests = () => {
     } catch (error) {
       notification.error({
         message: "Error Occured!",
-        description: "Failed to load the tests",
+        description: "Failed to load the tests!",
         duration: 5,
         placement: "bottomLeft",
       });
