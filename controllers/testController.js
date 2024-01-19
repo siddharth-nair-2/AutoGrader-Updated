@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { Test } = require("../models/trackerModel");
+const { Test } = require("../models/testModel");
 
 // -----------------------------
 // Test Management Controllers
@@ -10,9 +10,9 @@ const createTest = asyncHandler(async (req, res) => {
   const {
     name,
     description,
-    notes,
     courseID,
     scheduledAt,
+    testType,
     duration,
     visibleToStudents,
     questions,
@@ -21,11 +21,10 @@ const createTest = asyncHandler(async (req, res) => {
 
   if (
     !name ||
-    !description ||
-    !notes ||
     !courseID ||
     !scheduledAt ||
     !duration ||
+    !testType ||
     visibleToStudents === null ||
     !questions ||
     !files
@@ -37,9 +36,9 @@ const createTest = asyncHandler(async (req, res) => {
   // Create and save the test
   const test = await Test.create({
     name,
-    description,
-    notes,
+    description: description || "",
     courseID,
+    testType,
     scheduledAt,
     duration,
     visibleToStudents,
@@ -51,8 +50,8 @@ const createTest = asyncHandler(async (req, res) => {
     res.status(201).json({
       _id: test._id,
       name: test.name,
+      testType: test.type,
       description: test.description,
-      notes: test.notes,
       courseID: test.courseID,
       scheduledAt: test.scheduledAt,
       duration: test.duration,
@@ -65,103 +64,98 @@ const createTest = asyncHandler(async (req, res) => {
 
 // Update an existing test
 const updateTest = asyncHandler(async (req, res) => {
+  const testID = req.params.testID;
+  const { visibleToStudents } = req.body;
+
   try {
-    const { testID, courseID, visibleToStudents } = req.body;
-    const test = await Test.updateOne(
-      {
-        courseID: courseID,
-        _id: testID,
-      },
-      {
-        visibleToStudents,
-      }
+    const updatedTest = await Test.findOneAndUpdate(
+      { _id: testID },
+      { visibleToStudents },
+      { new: true }
     );
-    res.status(200).send(test);
+
+    if (!updatedTest) {
+      return res.status(404).json({ message: "Test not found" });
+    }
+
+    res.status(200).json(updatedTest);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
 
 // Delete a test
 const deleteTest = asyncHandler(async (req, res) => {
-  const { testID } = req.body;
-
-  if (!testID) {
-    res.status(400);
-    throw new Error("Please enter all the fields!");
-  }
+  const testID = req.params.testID; // Get testID from URL parameters
 
   try {
-    await Test.deleteOne({ _id: testID });
-    // Include any additional cleanup if necessary
-    res.status(200).send("Test successfully deleted");
+    const deletedTest = await Test.deleteOne({ _id: testID });
+
+    if (!deletedTest.deletedCount) {
+      return res.status(404).json({ message: "Test not found" });
+    }
+
+    res.status(200).json({ message: "Test successfully deleted" });
   } catch (error) {
-    res.status(400);
-    throw new Error("Test deletion failed");
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
 
 // Get tests for a course
 const getTestsForCourse = asyncHandler(async (req, res) => {
+  const courseID = req.params.courseID; // Get courseID from URL parameters
+
   try {
-    const { courseID } = req.body;
-
-    if (!courseID) {
-      res.status(400);
-      throw new Error("Course ID is required!");
-    }
-
     const tests = await Test.find({ courseID: courseID });
 
     if (!tests || tests.length === 0) {
-      res.status(404);
-      throw new Error("No tests found for this course!");
+      return res
+        .status(404)
+        .json({ message: "No tests found for this course" });
     }
 
-    res.status(200).send(tests);
+    res.status(200).json(tests);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
 
 // Get tests visible to students
 const getStudentTests = asyncHandler(async (req, res) => {
+  const courseID = req.params.courseID; // Get courseID from URL parameters
   try {
-    const { courseID } = req.body;
     const tests = await Test.find({
       courseID: courseID,
       visibleToStudents: true,
     });
-    res.status(200).send(tests);
+
+    if (!tests.length) {
+      return res.status(404).json({
+        message:
+          "No tests found for this course which are avaiable for students.",
+      });
+    }
+
+    res.status(200).json(tests);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
 
 // Get a single test by ID
 const getSingleTest = asyncHandler(async (req, res) => {
+  const testID = req.params.testID;
+
   try {
-    const { testID } = req.body;
+    const test = await Test.findById(testID);
 
-    if (!testID) {
-      res.status(400);
-      throw new Error("Test ID is required!");
+    if (!test) {
+      return res.status(404).json({ message: "Test not found" });
     }
 
-    const tests = await Test.findById(testID);
-
-    if (!tests) {
-      res.status(404);
-      throw new Error("Test not found!");
-    }
-
-    res.status(200).send(tests);
+    res.status(200).json(test);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
 
@@ -169,10 +163,13 @@ const getSingleTest = asyncHandler(async (req, res) => {
 const getAllTests = asyncHandler(async (req, res) => {
   try {
     const tests = await Test.find({});
+
+    if (!tests || tests.length === 0) {
+      return res.status(404).json({ message: "Tests not found" });
+    }
     res.status(200).send(tests);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
 

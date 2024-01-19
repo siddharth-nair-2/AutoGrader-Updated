@@ -1,164 +1,80 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { useToast } from "@chakra-ui/react";
-import styled from "styled-components";
-import { TrackerState } from "../Context/TrackerProvider";
+
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { PlusOutlined } from "@ant-design/icons";
+import { Button, Row, Typography, App } from "antd";
+
 import Navbar from "./misc/Navbar";
 import CourseCardMain from "./misc/CourseCard";
-import Heading from "./misc/Heading";
+import { useAuth } from "../context/AuthProvider";
+import { useTracker } from "../context/TrackerProvider";
 
-const Container = styled.div`
-  font-family: "Poppins", sans-serif;
-  height: 100vh;
-  padding-bottom: 20px;
-  background-color: #f4f3f6;
-`;
-
-const ViewCreateDiv = styled.div`
-  display: flex;
-  font-size: 24px;
-  justify-content: space-evenly;
-`;
-
-const CourseBox = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 50px;
-  margin: 25px;
-`;
-
-const CourseCard = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 20px;
-  padding-bottom: 10px;
-  color: black;
-  background-color: white;
-  border-radius: 24px;
-  width: 400px;
-  height: 250px;
-  box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-
-  &:hover {
-    transform: scale(1.002);
-  }
-`;
-
-const CourseButtons = styled.button`
-  border: none;
-  outline: none;
-  padding: 16px;
-  background-color: black;
-  border-radius: 24px;
-  font-weight: bold;
-  font-size: 14px;
-  color: white;
-  cursor: pointer;
-  margin-right: 20px;
-  box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  &:hover {
-    transform: scale(1.01);
-  }
-`;
+const { Title } = Typography;
 
 const Instructor = () => {
-  const toast = useToast();
+  const { notification } = App.useApp();
   const navigate = useNavigate();
-  const { courses, setCourses } = TrackerState();
+  const { user } = useAuth();
+  const { courses, setCourses } = useTracker();
 
   useEffect(() => {
     fetchCourses();
     localStorage.removeItem("courseInfo");
     localStorage.removeItem("assignmentInfo");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchCourses = async () => {
     try {
-      const data = await axios.post(
-        "http://localhost:5000/api/tracker/courseGet",
-        {
-          _id: JSON.parse(localStorage.getItem("userInfo"))._id,
-        }
+      const data = await axios.get(
+        `http://localhost:5000/api/tracker/courses?instructor=${user._id}`
       );
       setCourses(data.data);
     } catch (error) {
-      toast({
-        title: "Error Occured!",
+      notification.error({
+        message: "Error Occured!",
         description: "Failed to Load the courses",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
+        duration: 5,
+        placement: "bottomLeft",
       });
     }
   };
 
   return (
-    <Container>
+    <>
       <Navbar />
-      {courses && courses.length > 0 && (
-        <>
-          <Heading>COURSES</Heading>
-          <CourseBox>
-            {courses &&
-              courses.slice(0, 8).map((course) => {
-                let desc = course.description;
-                if (desc.length > 120) {
-                  desc = desc.substring(0, 114);
-                  desc += "...";
-                }
-                return (
-                  <CourseCardMain
-                    key={course._id}
-                    course={course}
-                    description={desc}
-                    isStudent={false}
-                  />
-                );
-              })}
-          </CourseBox>
-          <ViewCreateDiv>
-            {courses.length > 8 && (
-              <CourseButtons>View All Courses</CourseButtons>
-            )}
-            <CourseButtons onClick={(e) => navigate("/createcourses")}>
-              + New Course
-            </CourseButtons>
-          </ViewCreateDiv>
-        </>
-      )}
-      {courses && courses.length < 1 && (
-        <>
-          <CourseCard
-            style={{
-              margin: "auto",
-              marginTop: "50px",
-              marginBottom: "50px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              fontSize: "24px",
-              fontWeight: "500",
-            }}
+      <div className="h-[100%] overflow-auto bg-gray-100 p-6">
+        <Title level={2} className="text-center mb-6 text-3xl font-extrabold">
+          COURSES
+        </Title>
+        <Row gutter={[16, 16]} className="justify-center gap-4">
+          {courses?.slice(0, 8).map((course) => (
+            <div key={course._id}>
+              <CourseCardMain
+                course={course}
+                description={course.description}
+                isStudent={false}
+              />
+            </div>
+          ))}
+        </Row>
+        <div className="text-center my-6 flex justify-center gap-4">
+          {courses?.length > 8 && (
+            <Button size="large" className=" font-semibold text-black">
+              View All Courses
+            </Button>
+          )}
+          <Button
+            onClick={() => navigate("/createcourses")}
+            className="bg-[#000000] text-white font-semibold flex justify-center items-center hover:bg-slate-100"
+            size="large"
           >
-            You have no courses!
-          </CourseCard>
-          <ViewCreateDiv>
-            <CourseButtons onClick={(e) => navigate("/createcourses")}>
-              + New Course
-            </CourseButtons>
-          </ViewCreateDiv>
-        </>
-      )}
-    </Container>
+            <PlusOutlined /> New Course
+          </Button>
+        </div>
+      </div>
+    </>
   );
 };
 

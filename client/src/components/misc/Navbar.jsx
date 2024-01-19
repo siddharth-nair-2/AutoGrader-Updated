@@ -1,94 +1,64 @@
-import React, { useEffect } from "react";
-import { TrackerState } from "../../Context/TrackerProvider";
-import styled from "styled-components";
+import React from "react";
+import { Layout, Button, Avatar, Typography } from "antd";
+import { UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthProvider";
+const { Header } = Layout;
+const { Text } = Typography;
 
-const NavBar = styled.nav`
-  width: 100%;
-  height: 70px;
-  background-color: black;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-family: "Poppins", sans-serif;
-`;
-
-const H1Nav = styled.h1`
-  color: white;
-  font-size: 25px;
-  margin-left: 20px;
-`;
-
-const H2Nav = styled.h1`
-  color: white;
-  font-size: 14px;
-  margin-left: 20px;
-  font-weight: 600;
-  margin-top: -5px;
-`;
-
-const NavLeftDiv = styled.div`
-  flex: 1;
-  display: flex;
-  align-items: start;
-  flex-direction: column;
-`;
-
-const LogoutBtn = styled.button`
-  border: none;
-  outline: none;
-  padding: 12px 0;
-  background-color: white;
-  border-radius: 20px;
-  width: 120px;
-  font-weight: bold;
-  font-size: 14px;
-  cursor: pointer;
-  margin-right: 20px;
-`;
-
-const LogoImg = styled.img`
-  max-width: 50px;
-  flex: 1;
-  cursor: pointer;
-`;
 const Navbar = () => {
-  const { user, setUser } = TrackerState();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setUser(JSON.parse(localStorage.getItem("userInfo")));
-  }, []);
 
   const handleLogoClick = () => {
     localStorage.removeItem("courseInfo");
     localStorage.removeItem("assignmentInfo");
     localStorage.removeItem("submissionInfo");
-    navigate("/")
-  }
+    localStorage.removeItem("testCases");
+    navigate("/");
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem("userInfo");
-    localStorage.removeItem("courseInfo");
-    localStorage.removeItem("assignmentInfo");
-    localStorage.removeItem("submissionInfo");
-    window.location = ("/");
+    logout();
+    window.location = "/";
   };
+
   return (
-    <NavBar>
-      {user && (
-        <NavLeftDiv>
-          <H1Nav>
-            {user.firstName} {user.lastName}
-          </H1Nav>
-          <H2Nav>{user.userType}</H2Nav>
-        </NavLeftDiv>
-      )}
-      <LogoImg src="userLogo.jpg" alt="Autograder logo" onClick={handleLogoClick} />
-      <div style={{ flex: "1", textAlign: "right" }}>
-        <LogoutBtn onClick={handleLogout}>Logout</LogoutBtn>
+    <Header className=" bg-black flex justify-between items-center p-0">
+      {/* Left Section: User Information or placeholder to keep logo centered */}
+      <div className="flex flex-col justify-start flex-1 px-6">
+        {user && (
+          <>
+            <Text strong className="text-lg text-white mb-1">
+              {user.firstName}
+            </Text>
+            <Text className="text-white">{user.userType}</Text>
+          </>
+        )}
       </div>
-    </NavBar>
+
+      {/* Center Section: Logo */}
+      <div className=" flex-1 flex justify-center">
+        <Avatar
+          src="userLogo.jpg"
+          onClick={handleLogoClick}
+          className=" cursor-pointer"
+        />
+      </div>
+
+      {/* Right Section: Logout Button or placeholder to keep logo centered */}
+      <div className=" flex-1 flex justify-end px-6">
+        <Button
+          type="primary"
+          shape="round"
+          icon={<UserOutlined />}
+          onClick={handleLogout}
+          className=" bg-white text-black hover:border-white"
+        >
+          Logout
+        </Button>
+      </div>
+    </Header>
   );
 };
 

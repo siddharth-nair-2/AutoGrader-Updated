@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { Plagiarism } = require("../models/trackerModel");
+const { Plagiarism } = require("../models/plagiarismModel");
 
 // -----------------------------
 // Plagiarism Management Controllers
@@ -108,7 +108,7 @@ const plagiarismCreate = asyncHandler(async (req, res) => {
 // Get all plagiarism records for an assignment
 const getAllPlagiarisms = asyncHandler(async (req, res) => {
   try {
-    const { courseID, assignmentID } = req.body;
+    const { courseID, assignmentID } = req.query;
     const plagiarism = await Plagiarism.find({
       courseID: courseID,
       assignmentID: assignmentID,

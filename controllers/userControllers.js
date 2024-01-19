@@ -11,155 +11,134 @@ const registerUser = asyncHandler(async (req, res) => {
   const { firstName, lastName, email, password, userType } = req.body;
 
   if (!firstName || !lastName || !email || !password || !userType) {
-    res.status(400);
-    throw new Error("Please enter all the fields!");
+    return res.status(400).json({ message: "Please enter all the fields!" });
   }
 
-  const userExists = await User.findOne({ email });
-  if (userExists) {
-    res.status(400).send("InUse");
-    throw new Error("This email is already in use!");
-  }
+  try {
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ message: "This email is already in use!" });
+    }
 
-  const user = await User.create({
-    firstName,
-    lastName,
-    email,
-    password,
-    userType,
-  });
-
-  if (user) {
-    res.status(201).json({
-      _id: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      userType: user.userType,
-      token: generateToken(user._id),
+    const user = await User.create({
+      firstName,
+      lastName,
+      email,
+      password,
+      userType,
     });
-  } else {
-    res.status(400);
-    throw new error("Unable to create user!");
+
+    if (user) {
+      res.status(201).json({
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        userType: user.userType,
+        token: generateToken(user._id),
+      });
+    } else {
+      res.status(400).json({ message: "Unable to create user!" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
 
 // Authenticate a user and return token
-const authUser = asyncHandler(async (req, res) => {
+const authenticateUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email }).select("+password");
+  try {
+    const user = await User.findOne({ email }).select("+password");
 
-  if (
-    user &&
-    (await user.matchPassword(password)) &&
-    user.userType === "Student"
-  ) {
-    res.json({
-      _id: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      courses: user.courses,
-      userType: user.userType,
-      token: generateToken(user._id),
-    });
-  } else if (
-    user &&
-    (await user.matchPassword(password)) &&
-    user.userType === "Instructor"
-  ) {
-    res.json({
-      _id: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      userType: user.userType,
-      token: generateToken(user._id),
-    });
-  } else {
-    res.status(401).send("Invalid Credentials");
-    throw new Error("Invalid Credentials");
+    if (
+      user &&
+      (await user.matchPassword(password)) &&
+      user.userType === "Student"
+    ) {
+      res.json({
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        courses: user.courses,
+        userType: user.userType,
+        token: generateToken(user._id),
+      });
+    } else if (
+      user &&
+      (await user.matchPassword(password)) &&
+      user.userType === "Instructor"
+    ) {
+      res.json({
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        userType: user.userType,
+        token: generateToken(user._id),
+      });
+    } else {
+      res.status(401).json({ message: "Invalid email or password" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
-
 
 // -----------------------------
 // Course Enrollment Controllers
 // -----------------------------
 
 // Add a course to a user's profile
-const addCourses = asyncHandler(async (req, res) => {
-  const { _id, courseID } = req.body;
+const addCourseToUser = asyncHandler(async (req, res) => {
+  const userID = req.params.userID;
+  const courseID = req.params.courseID;
 
-  const userExists = await User.findById(_id);
+  try {
+    const user = await User.findById(userID);
+    if (!user) {
+      return res.status(404).json({ message: "Student not found" });
+    }
 
-  if (!userExists) {
-    res.status(404);
-    throw new Error("User does not exist!");
-  }
+    if (user.courses.some((course) => course.courseID === courseID)) {
+      return res
+        .status(400)
+        .json({ message: "Student already enrolled in the course" });
+    }
 
-  if (
-    userExists.courses.findIndex((x) => {
-      return x.courseID == courseID;
-    }) != -1
-  ) {
-    res.status(404);
-    throw new Error("Student already enrolled in the course!");
-  }
+    user.courses.push({ courseID });
+    await user.save();
 
-  const updatedProfile = await User.findByIdAndUpdate(_id, {
-    $push: {
-      courses: {
-        courseID: courseID,
-      },
-    },
-  });
-
-  if (!updatedProfile) {
-    res.status(404);
-    throw new Error("User does not exist!");
-  } else {
-    res.json(updatedProfile);
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Save operation failed:", error);
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
 
 // Remove a course from a user's profile
-const removeCourses = asyncHandler(async (req, res) => {
-  const { _id, courseID } = req.body;
+const removeCourseFromUser = asyncHandler(async (req, res) => {
+  const { userID, courseID } = req.params;
 
-  const userExists = await User.findById(_id);
+  try {
+    const user = await User.findById(userID);
 
-  if (!userExists) {
-    res.status(404);
-    throw new Error("User does not exist!");
-  }
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-  if (
-    userExists.courses.findIndex((x) => {
-      return x.courseID == courseID;
-    }) == -1
-  ) {
-    res.status(404);
-    throw new Error("Student isn't enrolled in this course!");
-  }
+    user.courses = user.courses.filter(
+      (course) => course.courseID !== courseID
+    );
+    await user.save();
 
-  const updatedProfile = await User.findByIdAndUpdate(_id, {
-    $pull: {
-      courses: {
-        courseID: courseID,
-      },
-    },
-  });
-
-  if (!updatedProfile) {
-    res.status(404);
-    throw new Error("User does not exist!");
-  } else {
-    res.json(updatedProfile);
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
-
 
 // -----------------------------
 // User Information Retrieval Controllers
@@ -170,49 +149,66 @@ const getAllStudents = asyncHandler(async (req, res) => {
   try {
     const students = await User.find({ userType: "Student" });
 
-    res.status(200).send(students);
+    if (!students) {
+      return res.status(404).json({ message: "No students found" });
+    }
+
+    res.status(200).json(students);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
 
 // Get students for a specific course
 const getStudentsForCourse = asyncHandler(async (req, res) => {
+  const courseID = req.params.courseID;
   try {
-    const { _id } = req.body;
-    const students = await User.find({ "courses.courseID": _id });
+    const students = await User.find({ "courses.courseID": courseID });
 
-    res.status(200).send(students);
+    if (!students) {
+      return res
+        .status(404)
+        .json({ message: "No students found for this course" });
+    }
+
+    res.status(200).json(students);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
 
 // Retrieve all users based on a search query
-const allUsers = asyncHandler(async (req, res) => {
-  const keyword = req.query.search
-    ? {
-        $or: [
-          { name: { $regex: req.query.search, $options: "i" } },
-          { email: { $regex: req.query.search, $options: "i" } },
-        ],
-      }
-    : {};
+const searchUsers = asyncHandler(async (req, res) => {
+  try {
+    const keyword = req.query.search
+      ? {
+          $or: [
+            { firstName: { $regex: req.query.search, $options: "i" } },
+            { lastName: { $regex: req.query.search, $options: "i" } },
+            { email: { $regex: req.query.search, $options: "i" } },
+          ],
+        }
+      : {};
 
-  const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
-  res.send(users);
+    const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+
+    if (!users.length) {
+      return res.status(404).json({ message: "No users found" });
+    }
+
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Server Error" });
+  }
 });
-
 
 // Exporting all controllers
 module.exports = {
   registerUser,
-  authUser,
-  allUsers,
+  authenticateUser,
+  searchUsers,
   getStudentsForCourse,
-  addCourses,
+  addCourseToUser,
   getAllStudents,
-  removeCourses,
+  removeCourseFromUser,
 };

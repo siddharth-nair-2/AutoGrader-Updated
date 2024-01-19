@@ -1,180 +1,41 @@
-import { useToast } from "@chakra-ui/react";
+/* eslint-disable react-hooks/exhaustive-deps */
 import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import styled from "styled-components";
-import { TrackerState } from "../../../Context/TrackerProvider";
-import Heading from "../../misc/Heading";
+import { useTracker } from "../../../context/TrackerProvider";
 import Navbar from "../../misc/Navbar";
-import { AgGridReact } from "ag-grid-react";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-alpine.css";
+import { Table, Button, Input, Typography, App } from "antd";
+import { ArrowLeftOutlined } from "@ant-design/icons";
+import Heading from "../../misc/Heading";
 
-const Container = styled.div`
-  font-family: "Poppins", sans-serif;
-  min-height: 100vh;
-  padding-bottom: 20px;
-  background-color: #f4f3f6;
-`;
-
-const CourseButtons = styled.button`
-  border: none;
-  outline: none;
-  padding: 16px;
-  background-color: black;
-  border-radius: 24px;
-  font-weight: bold;
-  font-size: 14px;
-  color: white;
-  cursor: pointer;
-  margin-right: 20px;
-  box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  &:hover {
-    transform: scale(1.01);
-  }
-`;
-
-const CourseBox = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 50px;
-  margin: 25px;
-`;
-
-const Title = styled.div`
-  color: black;
-  font-size: 20px;
-  margin: 20px 80px 20px 80px;
-  font-weight: 600;
-  justify-content: center;
-  display: flex;
-`;
-
-const RemoveStudent = styled.button`
-  color: #0099ff;
-  background-color: #b0dfff;
-  border: 1px solid #0099ff;
-  font-weight: 600;
-  font-family: "Poppins", sans-serif;
-  font-size: 12;
-  border-radius: 14px;
-  margin-top: 3px;
-  margin-bottom: 3px;
-  padding-left: 15px;
-  padding-right: 15px;
-`;
-
-const Input = styled.input`
-  border: #e1dfec 2px solid;
-  width: 100%;
-  padding: 10px;
-  border-radius: 46px;
-  background-color: white;
-  margin: 5px 0;
-  font-size: 12px;
-`;
+const { Title } = Typography;
 
 const ViewAssignmentSubmission = () => {
-  const fetchAllAssignments = async () => {
+  const fetchAllSubmissions = async () => {
     try {
-      const data = await axios.post(
-        "http://localhost:5000/api/tracker/getAllSubmissions",
-        {
-          courseID: JSON.parse(localStorage.getItem("assignmentInfo")).courseID,
-          assignmentID: JSON.parse(localStorage.getItem("assignmentInfo"))._id,
-        }
+      const data = await axios.get(
+        `http://localhost:5000/api/tracker/submissions?courseID=${
+          JSON.parse(localStorage.getItem("assignmentInfo")).courseID
+        }&assignmentID=${
+          JSON.parse(localStorage.getItem("assignmentInfo"))._id
+        }`
       );
-      setAllStudents(data.data);
+      setSubmissions(data.data);
     } catch (error) {
-      toast({
-        title: "Error Occured!",
-        description: "Failed to Load the students",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
+      notification.error({
+        message: "Error Occured!",
+        description: "Failed to load the submissions",
+        duration: 5,
+        placement: "bottomLeft",
       });
     }
   };
-
-  const DateRenderer = (params) => {
-    return (
-      <div>
-        {new Date(params.data.updatedAt).toLocaleString("en-CA", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-          hour: "numeric",
-          minute: "numeric",
-          hour12: true,
-        })}
-      </div>
-    );
-  };
-
-  const LanguageRenderer = (params) => {
-    return params.data.languageName === "62"
-      ? "Java"
-      : params.data.languageName === "50"
-      ? "C"
-      : params.data.languageName === "54"
-      ? "C++"
-      : "Python";
-  };
   const navigate = useNavigate();
-
-  const ViewButton = (params) => {
-    const removeHandler = async () => {
-      localStorage.setItem("submissionInfo", JSON.stringify(params.data));
-      navigate("/viewSubmission");
-    };
-
-    return <RemoveStudent onClick={removeHandler}>View</RemoveStudent>;
-  };
-  const [columnDefsAdd] = useState([
-    {
-      headerName: "#",
-      valueGetter: "node.rowIndex + 1",
-      maxWidth: 75,
-    },
-    {
-      headerName: "Name",
-      field: "studentName",
-    },
-    {
-      headerName: "Q. No.",
-      maxWidth: 100,
-      field: "questionNum",
-    },
-    {
-      headerName: "Language",
-      maxWidth: 150,
-      cellRenderer: LanguageRenderer,
-    },
-    {
-      headerName: "Passed Cases",
-      maxWidth: 155,
-      field: "testCases",
-    },
-    { headerName: "Upload Date", cellRenderer: DateRenderer },
-    {
-      headerName: "View",
-      minWidth: 120,
-      maxWidth: 150,
-      cellRenderer: ViewButton,
-    },
-  ]);
-
-  const toast = useToast();
-
-  const [gridApi, setGridApi] = useState(null);
-  const [gridColumnApi, setGridColumnApi] = useState(null);
-  const { selectedCourse, setSelectedCourse } = TrackerState();
-  const [allStudents, setAllStudents] = useState([]);
+  const { notification, modal } = App.useApp();
+  const { selectedCourse, setSelectedCourse } = useTracker();
   const [selectedAssignment, setSelectedAssignment] = useState();
+  const [submissions, setSubmissions] = useState([]);
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
     localStorage.removeItem("submissionInfo");
@@ -183,220 +44,284 @@ const ViewAssignmentSubmission = () => {
     } else {
       setSelectedCourse(JSON.parse(localStorage.getItem("courseInfo")));
       setSelectedAssignment(JSON.parse(localStorage.getItem("assignmentInfo")));
-      fetchAllAssignments();
+      fetchAllSubmissions();
     }
   }, []);
-
-  const defaultColDef = useMemo(() => {
-    return {
-      editable: true,
-      sortable: true,
-      resizable: true,
-      filter: true,
-      flex: 1,
-      minWidth: 100,
-    };
-  }, []);
-
-  const onGridReady = (params) => {
-    setGridApi(params.api);
-    setGridColumnApi(params.columnApi);
-  };
 
   const handleVisibilityToggle = async () => {
-    if (
-      window.confirm(
-        `The assignment is currently ${
-          selectedAssignment.visibleToStudents ? "" : "not "
-        }visible to students! Are you sure you want to change this?`
-      )
-    ) {
-      try {
-        const data = await axios
-          .post("http://localhost:5000/api/tracker/updateAssignment", {
-            assignmentID: JSON.parse(localStorage.getItem("assignmentInfo"))
-              ._id,
-            courseID: JSON.parse(localStorage.getItem("assignmentInfo"))
-              .courseID,
-            visibleToStudents: !JSON.parse(
-              localStorage.getItem("assignmentInfo")
-            ).visibleToStudents,
-          })
-          .then(() =>
-            toast({
-              title: "Visibility Changed!",
-              description: `The assignment is ${
-                JSON.parse(localStorage.getItem("assignmentInfo"))
-                  .visibleToStudents
-                  ? "not "
-                  : ""
-              }visible to students!`,
-              status: "success",
-              duration: 3000,
-              isClosable: true,
-              position: "bottom-left",
-            })
-          )
-          .then(() => navigate("/course"));
-      } catch (error) {
-        toast({
-          title: "Error Occured!",
-          description: "Failed to Delete the assignment",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom-left",
-        });
-      }
-    }
+    var assignmentData = JSON.parse(localStorage.getItem("assignmentInfo"));
+    modal.confirm({
+      title: `Change Visibility?`,
+      content: `The assignment is currently ${
+        assignmentData.visibleToStudents ? "" : "not "
+      }visible to students! Are you sure you want to change this?`,
+      okText: "Yes",
+      cancelText: "No",
+      okButtonProps: {
+        className: " main-black-btn",
+      },
+      onOk: async () => {
+        try {
+          // Update assignment visibility
+          if (assignmentData.hasOwnProperty("questions")) {
+            await axios.patch(
+              `http://localhost:5000/api/tracker/assignments/${assignmentData._id}`,
+              { visibleToStudents: !assignmentData.visibleToStudents }
+            );
+          } else {
+            await axios.patch(
+              `http://localhost:5000/api/tracker/theoryAssignments/${assignmentData._id}`,
+              { visibleToStudents: !assignmentData.visibleToStudents }
+            );
+          }
+
+          notification.success({
+            message: "Visibility Changed!",
+            description: `The assignment is ${
+              assignmentData.visibleToStudents ? "not " : ""
+            }visible to students!`,
+            duration: 3,
+            position: "bottomLeft",
+          });
+
+          navigate("/viewallassignments");
+        } catch (error) {
+          notification.error({
+            message: "Error Occurred!",
+            description: "Failed to change the assignment visibility",
+            duration: 5,
+            placement: "bottomLeft",
+          });
+        }
+      },
+    });
   };
 
   const handleAssignmentDelete = async () => {
-    if (window.confirm("Are you sure you want to delete this assignment?")) {
-      try {
-        const data = await axios
-          .post("http://localhost:5000/api/tracker/assignmentDelete", {
-            assignmentID: JSON.parse(localStorage.getItem("assignmentInfo"))
-              ._id,
-          })
-          .then(() => navigate("/course"));
-      } catch (error) {
-        toast({
-          title: "Error Occured!",
-          description: "Failed to Delete the assignment",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom-left",
-        });
-      }
+    var assignmentData = JSON.parse(localStorage.getItem("assignmentInfo"));
+    modal.confirm({
+      title: "Delete Assignment?",
+      content:
+        "Are you sure you want to delete this assignment? This action cannot be undone.",
+      okText: "Yes",
+      okButtonProps: {
+        className: " main-black-btn",
+      },
+      cancelText: "No",
+      onOk: async () => {
+        try {
+          const publicIds = [];
+
+          if (assignmentData?.instructorFiles) {
+            for (const file of assignmentData.instructorFiles) {
+              publicIds.push(file.publicId);
+            }
+          }
+
+          // Delete files if any
+          if (publicIds.length > 0) {
+            await deleteFiles(publicIds);
+          }
+
+          // Delete assignment
+          if (assignmentData.hasOwnProperty("questions")) {
+            await axios.delete(
+              `http://localhost:5000/api/tracker/assignments/${assignmentData._id}`
+            );
+          } else {
+            await axios.delete(
+              `http://localhost:5000/api/tracker/theoryAssignments/${assignmentData._id}`
+            );
+          }
+
+          notification.success({
+            message: "Assignment Deleted!",
+            description: `Assignment: ${assignmentData.name} has been deleted successfully!`,
+            duration: 3,
+            position: "bottomLeft",
+          });
+
+          navigate("/viewallassignments");
+        } catch (error) {
+          notification.error({
+            message: "Error Occurred!",
+            description: "Failed to delete the assignment and/or files",
+            duration: 5,
+            placement: "bottomLeft",
+          });
+        }
+      },
+    });
+  };
+
+  const deleteFiles = async (publicIds) => {
+    try {
+      await axios.post("http://localhost:5000/api/tracker/delete-file", {
+        publicIds,
+      });
+
+      notification.success({
+        message: "Deleted Files",
+        description: "The files related to this assigmment have been deleted.",
+        duration: 4,
+        placement: "bottomLeft",
+      });
+    } catch (error) {
+      console.error("Error deleting files:", error);
+      notification.error({
+        message: "Failed",
+        description: "Failed to delete files related to this assigmment.",
+        duration: 4,
+        placement: "bottomLeft",
+      });
     }
   };
 
-  const onFilterTextChange = (e) => {
-    gridApi.setQuickFilter(e.target.value);
-  };
+  const filteredSubmissions = useMemo(() => {
+    return submissions.filter((submission) =>
+      Object.values(submission)
+        .join(" ")
+        .toLowerCase()
+        .includes(searchText.toLowerCase())
+    );
+  }, [submissions, searchText]);
+
+  const submissionColumns = [
+    {
+      title: "#",
+      key: "index",
+      render: (text, record, index) => index + 1, // Add this line to show the row number starting at 1
+    },
+    {
+      title: "Student Name",
+      dataIndex: "studentName",
+      key: "studentName",
+      sorter: (a, b) => a.studentName.localeCompare(b.studentName),
+    },
+    {
+      title: "Question No.",
+      dataIndex: "questionNum",
+      key: "questionNum",
+      sorter: (a, b) => a.questionNum - b.questionNum,
+    },
+    {
+      title: "Language",
+      dataIndex: "languageName",
+      key: "languageName",
+      sorter: (a, b) => a.languageName.localeCompare(b.languageName),
+      render: (languageName) =>
+        languageName === "62"
+          ? "Java"
+          : languageName === "50"
+          ? "C"
+          : languageName === "54"
+          ? "C++"
+          : "Python",
+    },
+    {
+      title: "Passed Cases",
+      dataIndex: "testCases",
+      key: "testCases",
+      sorter: (a, b) => a.testCases - b.testCases,
+    },
+    {
+      title: "Upload Date",
+      dataIndex: "updatedAt",
+      key: "updatedAt",
+      sorter: (a, b) => new Date(a.updatedAt) - new Date(b.updatedAt),
+      render: (updatedAt) =>
+        new Date(updatedAt).toLocaleString("en-CA", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        }),
+    },
+    {
+      title: "View",
+      key: "view",
+      render: (_, record) => (
+        <Button
+          onClick={() => {
+            localStorage.setItem("submissionInfo", JSON.stringify(record));
+            navigate("/viewSubmission");
+          }}
+          className="bg-[#b8defe] border-[#45a1fe] text-[#45a1fe] rounded-lg text-sm font-semibold flex 
+                    hover:bg-[#85b5e6] hover:text-[#b8defe] hover:border-[#b8defe]"
+        >
+          View
+        </Button>
+      ),
+    },
+  ];
 
   return (
-    <Container>
+    <>
       <Navbar />
-      {selectedCourse && selectedCourse?.name && (
-        <>
-          <Heading>
-            <Link to={"/course"}>
-              <CourseButtons
-                style={{
-                  position: "absolute",
-                  left: "1%",
-                  fontSize: "14px",
-                  padding: "5px 10px 5px 10px",
-                  cursor: "pointer",
-                }}
-              >{`< Back`}</CourseButtons>
-            </Link>
+      <div className="h-full overflow-auto bg-gray-100 px-6 py-2">
+        <div className="flex justify-between items-center">
+          <Link to="/viewallassignments">
+            <Button
+              icon={<ArrowLeftOutlined />}
+              className=" mb-6 sm:mb-0 bg-black border-black text-white rounded-lg text-sm font-medium flex 
+              items-center justify-center hover:bg-white hover:text-black hover:border-black"
+            >
+              Back
+            </Button>
+          </Link>
+          <Title className="text-center my-4" level={3}>
             {selectedCourse?.name.toUpperCase()}
-            <CourseButtons
-              style={{
-                position: "absolute",
-                right: "1%",
-                fontSize: "16px",
-                padding: "10px 15px 10px 15px",
-                backgroundColor: "#46282F",
-              }}
+          </Title>
+          <div className=" w-[85px]">
+            <Button
+              className="bg-[#46282F] border-[#46282F] text-white rounded-lg text-sm font-medium flex 
+            items-center justify-center hover:bg-white hover:text-[#ff5a5a] hover:border-[#46282F] ml-auto"
               onClick={handleAssignmentDelete}
             >
-              Delete Assignment
-            </CourseButtons>
-          </Heading>
-          {
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-              }}
-            >
-              <Title>All Submissions for {selectedAssignment?.name}</Title>
-              <CourseBox>
-                <div
-                  className="ag-theme-alpine"
-                  style={{
-                    height: 500,
-                    width: "60%",
-                    fontFamily: "Poppins, Sans-Serif",
-                    fontSize: 14,
-                  }}
-                >
-                  <Input
-                    type="search"
-                    id="search-students"
-                    placeholder="Search..."
-                    name="searchStudents"
-                    onChange={onFilterTextChange}
-                    required
-                  />
-                  <AgGridReact
-                    rowData={allStudents.sort((p1, p2) => {
-                      let firstComp =
-                        p1.studentName < p2.studentName
-                          ? 1
-                          : p1.studentName > p2.studentName
-                          ? -1
-                          : 0;
-                      if (firstComp === 0) {
-                        let aDate = new Date(p1.createdAt);
-                        let bDate = new Date(p2.createdAt);
-                        firstComp = bDate - aDate;
-                      }
-                      return firstComp;
-                    })}
-                    columnDefs={columnDefsAdd}
-                    onGridReady={onGridReady}
-                    defaultColDef={defaultColDef}
-                    pagination={true}
-                    rowHeight={50}
-                    paginationPageSize={10}
-                  ></AgGridReact>
-                </div>
-              </CourseBox>
-              <div
-                style={{
-                  marginLeft: "auto",
-                  marginRight: "auto",
-                  display: "flex",
-                }}
+              Delete
+            </Button>
+          </div>
+        </div>
+
+        <div className=" max-w-7xl m-auto">
+          <Title level={4} className="text-center my-4">
+            All submissions for {selectedAssignment?.name}
+          </Title>
+          <div className=" flex items-center justify-between w-full">
+            <Link to={"/plagiarism"}>
+              <Button
+                className="bg-[#46282F] border-[#46282F] text-white rounded-lg text-sm font-medium flex 
+              items-center justify-center hover:bg-white hover:text-[#ff5a5a] hover:border-[#46282F] ml-auto"
               >
-                <Link to={"/plagiarism"}>
-                  <CourseButtons
-                    style={{
-                      fontSize: "18px",
-                      marginTop: "50px",
-                      width: "200px",
-                      padding: "10px",
-                      backgroundColor: "#46282F",
-                    }}
-                  >
-                    Plagiarism List
-                  </CourseButtons>
-                </Link>
-                <CourseButtons
-                  style={{
-                    fontSize: "18px",
-                    marginTop: "50px",
-                    width: "200px",
-                    padding: "10px",
-                    backgroundColor: "Black",
-                  }}
-                  onClick={handleVisibilityToggle}
-                >
-                  Toggle Visibility
-                </CourseButtons>
-              </div>
-            </div>
-          }
-        </>
-      )}
-    </Container>
+                Plagiarism List
+              </Button>
+            </Link>
+            <Button
+              className=" mb-6 sm:mb-0 bg-black border-black text-white rounded-lg text-sm font-medium flex 
+              items-center justify-center hover:bg-white hover:text-black hover:border-black"
+              onClick={handleVisibilityToggle}
+            >
+              Toggle Visibility
+            </Button>
+          </div>
+          <Input
+            placeholder="Search submissions..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            className="my-4 shadow-sm"
+          />
+          <Table
+            dataSource={filteredSubmissions}
+            columns={submissionColumns}
+            rowKey="_id"
+            pagination={{ pageSize: 10 }}
+            className="my-4"
+          />
+        </div>
+      </div>
+    </>
   );
 };
 

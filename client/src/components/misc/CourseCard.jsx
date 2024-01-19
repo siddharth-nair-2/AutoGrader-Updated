@@ -1,96 +1,12 @@
 import React from "react";
-import styled from "styled-components";
-import { TrackerState } from "../../Context/TrackerProvider";
+import { useTracker } from "../../context/TrackerProvider";
 import { useNavigate } from "react-router-dom";
-import { HiUserGroup } from "react-icons/hi";
+import { HiUserGroup, HiArrowNarrowRight } from "react-icons/hi";
+import { Card, Typography, Button, Tooltip } from "antd";
+const { Meta } = Card;
 
-const CourseCard = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 20px;
-  padding-bottom: 10px;
-  color: black;
-  background-color: white;
-  border-radius: 24px;
-  width: 400px;
-  height: 250px;
-  box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 1px -1px 25px -1px rgba(0, 0, 0, 0.1);
-
-  &:hover {
-    transform: scale(1.002);
-  }
-`;
-
-const CardID = styled.div`
-  border-radius: 12px;
-  /* background-color: #e0f7ef; */
-  text-align: left;
-  font-weight: 600;
-  font-size: 20px;
-  color: #5bb38a;
-`;
-
-const CardSem = styled.div`
-  font-weight: 600;
-  font-size: 12px;
-  text-align: center;
-  color: #5bb38a;
-  margin-top: 5px;
-`;
-
-const CardName = styled.div`
-  font-weight: 600;
-  text-align: left;
-  font-size: 24px;
-  color: black;
-`;
-
-const CardDesc = styled.div`
-  display: flex;
-  height: 80px;
-`;
-
-const OpenCourse = styled.div`
-  position: absolute;
-  font-weight: 400;
-  top: 88%;
-  left: 92%;
-  height: 25px;
-  width: 25px;
-  padding-left: 9px;
-  padding-top: 1px;
-  cursor: pointer;
-  color: white;
-  background-color: black;
-  border-radius: 50%;
-  &:hover {
-    transform: scale(1.1);
-  }
-`;
-const ViewStudents = styled.div`
-  position: absolute;
-  font-weight: 400;
-  top: 88%;
-  right: 92%;
-  height: 25px;
-  width: 25px;
-  padding-left: 4px;
-  padding-top: 3px;
-  cursor: pointer;
-  color: white;
-  background-color: black;
-  border-radius: 50%;
-  &:hover {
-    transform: scale(1.1);
-  }
-`;
-
-const CourseCardMain = ({ course, description, isStudent}) => {
-  const { setSelectedCourse } = TrackerState();
+const CourseCardMain = ({ course, description, isStudent }) => {
+  const { setSelectedCourse } = useTracker();
   const navigate = useNavigate();
 
   const handleCourseClick = () => {
@@ -105,24 +21,64 @@ const CourseCardMain = ({ course, description, isStudent}) => {
     navigate("/courseStudents");
   };
   return (
-    <CourseCard>
-      {!isStudent && (
-        <ViewStudents onClick={handleStudentsClick}>
-          <HiUserGroup />
-        </ViewStudents>
-      )}
-      <OpenCourse onClick={handleCourseClick}>&gt;</OpenCourse>
-      <CardID>
-        {course.courseID}
-        {course.section}
-      </CardID>
-      <CardName>{course.name}</CardName>
-      <CardDesc>{description}</CardDesc>
-      <CardSem>
-        <hr style={{ marginBottom: "10px" }} />
-        {course.semester}
-      </CardSem>
-    </CourseCard>
+    <Card
+      hoverable
+      className="rounded-xl shadow-md bg-white h-[275px] w-[360px] flex flex-col justify-between md:w-[400px]"
+      actions={[
+        !isStudent && (
+          <Tooltip placement="top" title="Course Students">
+            <Button
+              type="text"
+              icon={<HiUserGroup size={18} />}
+              key="students"
+              onClick={handleStudentsClick}
+            />
+          </Tooltip>
+        ),
+        <Tooltip placement="top" title="View Course">
+          <Button
+            type="text"
+            key="open"
+            onClick={handleCourseClick}
+            icon={<HiArrowNarrowRight size={18} />}
+          />
+        </Tooltip>,
+      ]}
+    >
+      <Meta
+        title={
+          <Typography.Title
+            level={4}
+            style={{
+              color: "#6ab28a",
+              marginBottom: 0,
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <span>
+              {course.courseID}
+              {course.section}
+            </span>
+            <Typography.Text className="block text-gray-600">
+              {course.semester}
+            </Typography.Text>
+          </Typography.Title>
+        }
+        description={
+          <>
+            <Typography.Title level={3} className="font-bold">
+              {course.name}
+            </Typography.Title>
+            <Typography.Text className="block">
+              {course.description.length > 120
+                ? `${course.description.substring(0, 120)}...`
+                : course.description}
+            </Typography.Text>
+          </>
+        }
+      />
+    </Card>
   );
 };
 

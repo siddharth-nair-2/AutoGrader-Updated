@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { Submission } = require("../models/trackerModel");
+const { Submission } = require("../models/submissionModel");
 
 // -----------------------------
 // Submission Management Controllers
@@ -68,32 +68,22 @@ const createSubmission = asyncHandler(async (req, res) => {
 // Compare a student's submission
 const compareSubmission = asyncHandler(async (req, res) => {
   try {
-    const { studentID, questionID } = req.body;
-    const courses = await Submission.find({
-      studentID: studentID,
-      questionID: questionID,
-    });
-
-    res.status(200).send(courses);
+    const { studentID, questionID } = req.query;
+    const submissions = await Submission.find({ studentID, questionID });
+    res.status(200).json(submissions);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
 
 // Get all submissions for an assignment
 const getAllSubmissions = asyncHandler(async (req, res) => {
   try {
-    const { courseID, assignmentID } = req.body;
-    const submissions = await Submission.find({
-      courseID: courseID,
-      assignmentID: assignmentID,
-    });
-
-    res.status(200).send(submissions);
+    const { courseID, assignmentID } = req.query;
+    const submissions = await Submission.find({ courseID, assignmentID });
+    res.status(200).json(submissions);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
 
@@ -101,55 +91,42 @@ const getAllSubmissions = asyncHandler(async (req, res) => {
 const getCustomSubmissions = asyncHandler(async (req, res) => {
   try {
     const { courseID, assignmentID, questionID, languageName, studentID } =
-      req.body;
+      req.query;
     const submissions = await Submission.find({
-      courseID: courseID,
-      assignmentID: assignmentID,
-      questionID: questionID,
-      languageName: languageName,
+      courseID,
+      assignmentID,
+      questionID,
+      languageName,
     });
 
     const finalSubmissions = submissions.filter(
-      (item) => item.studentID !== studentID
+      (submission) => submission.studentID !== studentID
     );
-
-    res.status(200).send(finalSubmissions);
+    res.status(200).json(finalSubmissions);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
 
 // Update a submission
 const updateSubmission = asyncHandler(async (req, res) => {
   try {
-    const {
-      courseID,
-      assignmentID,
-      questionID,
-      studentID,
-      answer,
-      languageName,
-      testCases,
-    } = req.body;
-    const submissions = await Submission.updateOne(
-      {
-        courseID: courseID,
-        assignmentID: assignmentID,
-        questionID: questionID,
-        studentID: studentID,
-      },
-      {
-        answer: answer,
-        languageName: languageName,
-        testCases: testCases,
-      }
+    const { courseID, assignmentID, questionID, studentID } = req.query;
+    const { answer, languageName, testCases } = req.body;
+
+    const updatedSubmission = await Submission.findOneAndUpdate(
+      { courseID, assignmentID, questionID, studentID },
+      { answer, languageName, testCases },
+      { new: true }
     );
 
-    res.status(200).send(submissions);
+    if (!updatedSubmission) {
+      res.status(404).send("Submission not found");
+    } else {
+      res.status(200).json(updatedSubmission);
+    }
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
 

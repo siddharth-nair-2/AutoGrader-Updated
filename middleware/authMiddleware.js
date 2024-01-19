@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/userModel")
+const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 
 const protect = asyncHandler(async (req, res, next) => {
@@ -10,23 +10,34 @@ const protect = asyncHandler(async (req, res, next) => {
     req.headers.authorization.startsWith("Bearer")
   ) {
     try {
+      // Extract token from header
       token = req.headers.authorization.split(" ")[1];
 
-      // decodes token id
+      // Decodes token id
       const decoded = jwt.verify(token, process.env.JWT_TOKEN);
 
+      // Attach user (without password) to the request object
       req.user = await User.findById(decoded.id).select("-password");
 
       next();
     } catch (error) {
-      res.status(401);
-      throw new Error("User is not authorized!");
+      // Differentiate between invalid token and other errors
+      if (error instanceof jwt.JsonWebTokenError) {
+        return res
+          .status(401)
+          .json({ message: "Invalid token. Authorization denied." });
+      } else {
+        return res
+          .status(500)
+          .json({ message: "Server error during authentication." });
+      }
     }
   }
 
   if (!token) {
-    res.status(401);
-    throw new Error("User is not authorized!");
+    return res
+      .status(401)
+      .json({ message: "No token provided. Authorization denied." });
   }
 });
 

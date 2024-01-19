@@ -1,5 +1,8 @@
 const asyncHandler = require("express-async-handler");
-const { Assignment } = require("../models/trackerModel");
+const { Assignment } = require("../models/assignmentModel");
+const { Submission } = require("../models/submissionModel");
+const { Plagiarism } = require("../models/plagiarismModel");
+const { TheoryAssignment } = require("../models/theoryAssignmentModel");
 
 // -----------------------------
 // Assignment Management Controllers
@@ -10,11 +13,11 @@ const AssignmentCreate = asyncHandler(async (req, res) => {
   const {
     name,
     description,
-    notes,
     due_date,
     courseID,
     questions,
     visibleToStudents,
+    instructorFiles,
   } = req.body;
 
   if (
@@ -25,23 +28,30 @@ const AssignmentCreate = asyncHandler(async (req, res) => {
     !questions ||
     visibleToStudents === null
   ) {
-    res.status(400);
-    throw new Error("Please enter all the fields!");
+    return res.status(400).json({ message: "Missing required fields" });
   }
-  const assignmentExists = await Assignment.findOne({ courseID, name });
-  if (assignmentExists) {
-    res.status(400).send("Exists");
-    throw new Error("This assignment name already exists!");
+
+  const theoryAssignmentExists = await TheoryAssignment.findOne({
+    courseID,
+    name,
+  });
+  const existingAssignment = await Assignment.findOne({ courseID, name });
+
+  if (theoryAssignmentExists || existingAssignment) {
+    return res.status(409).json({
+      message: "An assignment with this name already exists in this course.",
+    });
   }
+
   let finalDue = new Date(due_date);
   const assignment = await Assignment.create({
     courseID,
     name,
     description,
-    notes,
     due_date: finalDue,
     visibleToStudents,
     questions,
+    instructorFiles,
   });
 
   if (assignment) {
@@ -50,7 +60,6 @@ const AssignmentCreate = asyncHandler(async (req, res) => {
       courseID: assignment.courseID,
       name: assignment.name,
       description: assignment.description,
-      notes: assignment.notes,
       due_date: finalDue,
       questions: assignment.questions,
     });
@@ -60,83 +69,84 @@ const AssignmentCreate = asyncHandler(async (req, res) => {
 // Update an existing assignment
 const updateAssignment = asyncHandler(async (req, res) => {
   try {
-    const { assignmentID, courseID, visibleToStudents } = req.body;
+    const assignmentID = req.params.assignmentID;
+    const { visibleToStudents } = req.body;
+
     const assignment = await Assignment.updateOne(
-      {
-        courseID: courseID,
-        _id: assignmentID,
-      },
-      {
-        visibleToStudents,
-      }
+      { _id: assignmentID },
+      { visibleToStudents },
+      { new: true }
     );
-    res.status(200).send(assignment);
+
+    if (!assignment) {
+      res.status(404).send("Assignment not found");
+    } else {
+      res.status(200).json(assignment);
+    }
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(400).json({ message: error.message || "Server Error" });
   }
 });
 
 // Delete an assignment
 const AssignmentDelete = asyncHandler(async (req, res) => {
-  const { assignmentID } = req.body;
+  const assignmentID = req.params.assignmentID; // Get assignmentID from URL params
 
-  if (!assignmentID) {
-    res.status(400);
-    throw new Error("Please enter all the fields!");
-  }
   try {
-    const assignmentExists = await Assignment.deleteOne({ _id: assignmentID });
-  } catch (error) {
-    res.status(400);
-    throw new Error("Assignment deletion failed");
-  }
-  try {
-    const submissionExists = await Submission.deleteMany({ assignmentID });
-  } catch (error) {
-    res.status(400);
-    throw new Error("Submission deletion failed");
-  }
-  try {
-    const plagiarismExists = await Plagiarism.deleteMany({ assignmentID });
-  } catch (error) {
-    res.status(400);
-    throw new Error("Plagiarism deletion failed");
-  }
+    await Assignment.deleteOne({ _id: assignmentID });
+    await Submission.deleteMany({ assignmentID });
+    await Plagiarism.deleteMany({ assignmentID });
 
-  res
-    .status(200)
-    .send(
-      "The assignment and related submissions and plagiarism checks were deleted!"
-    );
+    res
+      .status(200)
+      .send(
+        "The assignment and related submissions and plagiarism checks were deleted!"
+      );
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Server Error" });
+  }
 });
 
 // Get assignments for a course
 const getAssignments = asyncHandler(async (req, res) => {
-  try {
-    const { _id } = req.body;
-    const courses = await Assignment.find({ courseID: _id });
+  const courseID = req.query.courseID; // Get courseID from query parameters
 
-    res.status(200).send(courses);
+  try {
+    const assignments = await Assignment.find({ courseID: courseID });
+
+    if (assignments.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "No assignments found for this course." });
+    }
+
+    res.status(200).json(assignments);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
 
 // Get assignments visible to students
 const getStudentAssignments = asyncHandler(async (req, res) => {
+  const courseID = req.query.courseID; // Get courseID from query parameters
+
   try {
-    const { _id } = req.body;
-    const courses = await Assignment.find({
-      courseID: _id,
+    const assignments = await Assignment.find({
+      courseID,
       visibleToStudents: true,
     });
 
-    res.status(200).send(courses);
+    if (assignments.length === 0) {
+      // No assignments found for the given courseID
+      return res.status(200).json({
+        message:
+          "No assignments found for this course, that are avaiable for the students.",
+      });
+    }
+
+    res.status(200).json(assignments);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(500).json({ message: error.message || "Server Error" });
   }
 });
 
