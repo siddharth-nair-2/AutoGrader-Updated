@@ -24,6 +24,12 @@ const ModuleSchema = new mongoose.Schema(
         ref: "Assignment",
       },
     ],
+    theoryAssignments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "TheoryAssignment",
+      },
+    ],
     tests: [
       {
         type: mongoose.Schema.Types.ObjectId,

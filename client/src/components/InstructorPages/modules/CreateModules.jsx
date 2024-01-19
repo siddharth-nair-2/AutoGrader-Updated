@@ -169,7 +169,29 @@ const CreateModules = () => {
   };
 
   const CreateModules = async (formData, uploadedFiles) => {
-    const { name, description, assignments, tests } = formData;
+    const { name, description, assignments = [], tests = [] } = formData;
+
+    // Categorize the selected assignments into assignments and theoryAssignments
+    const categorizedAssignments = {
+      assignments: [],
+      theoryAssignments: [],
+    };
+
+    assignments.forEach((assignmentId) => {
+      const fullAssignment = availableAssignments.find(
+        (a) => a._id === assignmentId
+      );
+
+      if (
+        fullAssignment &&
+        fullAssignment.questions &&
+        fullAssignment.questions.length > 0
+      ) {
+        categorizedAssignments.assignments.push(assignmentId);
+      } else {
+        categorizedAssignments.theoryAssignments.push(assignmentId);
+      }
+    });
 
     try {
       const { data } = await axios.post(
@@ -177,8 +199,9 @@ const CreateModules = () => {
         {
           courseID: selectedCourse._id,
           title: name,
-          content: description,
-          assignments: assignments,
+          content: description ? description : "",
+          assignments: categorizedAssignments.assignments,
+          theoryAssignments: categorizedAssignments.theoryAssignments,
           tests: tests,
           files: uploadedFiles,
         }
@@ -208,7 +231,7 @@ const CreateModules = () => {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", "kgen9eiq");
-      formData.append("folder", "test-files");
+      formData.append("folder", "module-files");
       return axios.post(
         `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUD_NAME}/upload`,
         formData

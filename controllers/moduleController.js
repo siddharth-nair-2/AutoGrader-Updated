@@ -7,14 +7,21 @@ const { Module } = require("../models/moduleModel");
 
 // Create a new module
 const createModule = asyncHandler(async (req, res) => {
-  const { title, courseID, content, assignments, tests, files } =
-    req.body;
+  const {
+    title,
+    courseID,
+    content,
+    assignments,
+    theoryAssignments,
+    tests,
+    files,
+  } = req.body;
 
   if (
     !title ||
     !courseID ||
-    !content ||
     !assignments ||
+    !theoryAssignments ||
     !tests ||
     !files
   ) {
@@ -28,6 +35,7 @@ const createModule = asyncHandler(async (req, res) => {
     courseID,
     content,
     assignments,
+    theoryAssignments,
     tests,
     files,
   });
@@ -39,6 +47,7 @@ const createModule = asyncHandler(async (req, res) => {
       courseID: module.courseID,
       content: module.content,
       assignments: module.assignments,
+      theoryAssignments: module.theoryAssignments,
       tests: module.tests,
       files: module.files,
     });
@@ -49,7 +58,14 @@ const createModule = asyncHandler(async (req, res) => {
 const updateModule = asyncHandler(async (req, res) => {
   try {
     const moduleID = req.params.moduleID;
-    const { title, content, newAssignments, newTests, newFiles } = req.body;
+    const {
+      title,
+      content,
+      newAssignments,
+      newTheoryAssignments,
+      newTests,
+      newFiles,
+    } = req.body;
 
     const module = await Module.findById(moduleID);
 
@@ -64,16 +80,15 @@ const updateModule = asyncHandler(async (req, res) => {
     if (content) {
       module.content = content;
     }
-    if (newAssignments && newAssignments.length > 0) {
-      module.assignments.push(...newAssignments);
-    }
-    if (newTests && newTests.length > 0) {
-      module.tests.push(...newTests);
-    }
-    if (newFiles && newFiles.length > 0) {
-      module.files.push(...newFiles);
-    }
 
+    module.assignments = newAssignments || module.assignments;
+    module.theoryAssignments = newTheoryAssignments || module.theoryAssignments;
+    module.tests = newTests || module.tests;
+
+    if (newFiles !== undefined) {
+      module.files = newFiles;
+    }
+    
     const updatedModule = await module.save();
 
     res.status(200).json(updatedModule);
@@ -100,7 +115,10 @@ const deleteModule = asyncHandler(async (req, res) => {
 const getModulesForCourse = asyncHandler(async (req, res) => {
   const courseID = req.params.courseID;
 
-  const modules = await Module.find({ courseID: courseID });
+  const modules = await Module.find({ courseID: courseID })
+    .populate("tests")
+    .populate("assignments")
+    .populate("theoryAssignments");
 
   if (!modules || modules.length === 0) {
     return res
@@ -116,7 +134,10 @@ const getSingleModule = asyncHandler(async (req, res) => {
   const moduleID = req.params.moduleID;
 
   try {
-    const module = await Module.findById(moduleID);
+    const module = await Module.findById(moduleID)
+      .populate("tests")
+      .populate("assignments")
+      .populate("theoryAssignments");
 
     if (!module) {
       return res.status(404).json({ message: "Module not found" });
@@ -131,7 +152,10 @@ const getSingleModule = asyncHandler(async (req, res) => {
 // Get all modules
 const getAllModules = asyncHandler(async (req, res) => {
   try {
-    const modules = await Module.find({});
+    const modules = await Module.find({})
+      .populate("tests")
+      .populate("assignments")
+      .populate("theoryAssignments");
 
     if (!modules || modules.length === 0) {
       return res.status(404).json({ message: "Modules not found" });

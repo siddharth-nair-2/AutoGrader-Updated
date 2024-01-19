@@ -11,7 +11,6 @@ import ViewAssignmentSubmission from "./components/InstructorPages/assignments/V
 import SingleSubmission from "./components/InstructorPages/assignments/SingleSubmission";
 import PlagiarismPage from "./components/InstructorPages/assignments/PlagiarismPage";
 import ViewAllAssignments from "./components/InstructorPages/assignments/ViewAllAssignments";
-import ViewAllModules from "./components/InstructorPages/modules/ViewAllModules";
 import ViewAllTests from "./components/InstructorPages/tests/ViewAllTests";
 import StudentTheoryAssignments from "./components/StudentPages/assignments/StudentTheoryAssignments";
 import ViewTheoryAssignmentSubmission from "./components/InstructorPages/assignments/ViewTheoryAssignmentSubmission";
@@ -21,6 +20,8 @@ import StudentTests from "./components/StudentPages/tests/StudentTests";
 import ViewTestSubmissions from "./components/InstructorPages/tests/ViewTestSubmissions";
 import SingleTestSubmission from "./components/InstructorPages/tests/SingleTestSubmission";
 import CreateModules from "./components/InstructorPages/modules/CreateModules";
+import ViewAllStudentTests from "./components/StudentPages/tests/ViewAllStudentTests";
+import ViewAllStudentAssignments from "./components/StudentPages/assignments/ViewAllStudentAssignments";
 
 export const instructorRoutes = [
   { path: "/", element: <Instructor /> },
@@ -55,13 +56,20 @@ export const instructorRoutes = [
 
   // Modules
   { path: "/createmodule", element: <CreateModules /> },
-  { path: "/viewallmodules", element: <ViewAllModules /> },
 ];
 
 export const studentRoutes = [
   { path: "/", element: <Student /> },
+
+  // Course
   { path: "/course", element: <StudentCourses /> },
-  { path: "/viewassignment", element: <StudentAssignments /> },
+
+  // Test
+  { path: "/viewalltests", element: <ViewAllStudentTests /> },
   { path: "/viewtest", element: <StudentTests /> },
+
+  // Assignments
+  { path: "/viewallassignments", element: <ViewAllStudentAssignments /> },
+  { path: "/viewassignment", element: <StudentAssignments /> },
   { path: "/viewtheoryassignment", element: <StudentTheoryAssignments /> },
 ];
