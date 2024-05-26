@@ -45,18 +45,19 @@ const ViewAllStudentTests = () => {
       // Mark tests as completed based on submissions
       const testsWithCompletion = testsData.map((test) => {
         const isCompleted = submissionsData.some(
-          (submission) => submission.testId._id === test._id
+          (submission) => submission.testId?._id === test?._id
         );
         const marks =
           isCompleted &&
           submissionsData.find(
-            (submission) => submission.testId._id === test._id
+            (submission) => submission.testId?._id === test?._id
           )?.totalMarks;
         return { ...test, isCompleted, marks };
       });
 
       setTests(testsWithCompletion);
     } catch (error) {
+      console.log(error)
       notification.error({
         message: "Error Occurred!",
         description: "Failed to load tests",
