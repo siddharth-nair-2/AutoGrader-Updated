@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
     Form,
     Input,
@@ -21,24 +21,24 @@ import {
 import axios from "axios";
 import Navbar from "../../misc/Navbar";
 import Heading from "../../misc/Heading";
-import {useNavigate} from "react-router-dom";
-import {useTracker} from "../../../context/TrackerProvider";
-import {useAuth} from "../../../context/AuthProvider";
+import { useNavigate } from "react-router-dom";
+import { useTracker } from "../../../context/TrackerProvider";
+import { useAuth } from "../../../context/AuthProvider";
 import moment from "moment";
 import QuestionForm from "./QuestionForm";
 import QuestionListDisplay from "./QuestionListDisplay";
 
-const {TextArea} = Input;
-const {Dragger} = Upload;
+const { TextArea } = Input;
+const { Dragger } = Upload;
 
 const CreateTest = () => {
     const [form] = Form.useForm();
     const [testType, setTestType] = useState("test");
-    const {notification, modal} = App.useApp();
+    const { notification, modal } = App.useApp();
     const [fileList, setFileList] = useState([]);
     const navigate = useNavigate();
-    const {selectedCourse, setSelectedCourse} = useTracker();
-    const {user} = useAuth();
+    const { selectedCourse, setSelectedCourse } = useTracker();
+    const { user } = useAuth();
     const [questions, setQuestions] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -78,7 +78,7 @@ const CreateTest = () => {
     };
 
     const onFinish = async (values) => {
-        const {name, description, scheduledAt, duration} = values;
+        const { name, description, scheduledAt, duration } = values;
         // Basic validations
         if (!name.trim() || name.length > 64) {
             notification.error({
@@ -102,81 +102,7 @@ const CreateTest = () => {
                 description: "Scheduled date and time cannot be in the past.",
             });
             return;
-      }
-    }
-    if (fileList.length > 0) {
-      // If files are uploaded, show modal to confirm file upload
-      modal.confirm({
-        title: "Confirm File Upload and Test Creation!",
-        content: (
-          <div>
-            <p>You have uploaded the following files:</p>
-            <ul>
-              {fileList.map((file) => (
-                <li key={file.uid}>{file.name}</li>
-              ))}
-            </ul>
-          </div>
-        ),
-        onOk: () => handleUpload(values),
-        okButtonProps: {
-          className: " main-black-btn",
-        },
-      });
-    } else {
-      // If no files are uploaded, show modal to confirm test creation
-      modal.confirm({
-        title: "Confirm Test Creation",
-        content: "Are you sure you want to create the test without any files?",
-        onOk: () => createTest(values, []),
-        okButtonProps: {
-          className: " main-black-btn",
-        },
-      });
-    }
-  };
-
-  const createTest = async (formData, uploadedFiles) => {
-    const {
-      name,
-      description,
-      scheduledAt,
-      duration,
-      questions,
-      visibleToStudents,
-    } = formData;
-
-    // Calculate and add responseType for each question
-    const modifiedQuestions = questions.map((question) => {
-      // Check if the question is subjective
-      if (!question.options || question.options?.length === 0) {
-        return { ...question, responseType: "subjective" };
-      }
-
-      // For MCQs, determine if it's single or multiple choice
-      const correctAnswersCount = question.options.filter(
-        (option) => option.isCorrect
-      ).length;
-      const responseType = correctAnswersCount > 1 ? "multiple" : "single";
-
-      return { ...question, responseType };
-    });
-
-    try {
-      const { data } = await axios.post(
-        "http://localhost:5000/api/tracker/test",
-        {
-          courseID: selectedCourse._id,
-          name: name,
-          description: description,
-          scheduledAt: scheduledAt,
-          duration: duration,
-          questions: modifiedQuestions,
-          visibleToStudents: visibleToStudents ? true : false,
-          testType: testType,
-          files: uploadedFiles,
         }
-
         if (duration <= 0) {
             notification.error({
                 message: "Invalid Duration",
@@ -188,7 +114,7 @@ const CreateTest = () => {
         if (fileList.length > 0) {
             // If files are uploaded, show modal to confirm file upload
             modal.confirm({
-                title: "Confirm File Upload and Test Creation",
+                title: "Confirm File Upload and Test Creation!",
                 content: (
                     <div>
                         <p>You have uploaded the following files:</p>
@@ -226,10 +152,9 @@ const CreateTest = () => {
             visibleToStudents,
         } = formData;
 
-        console.log(questions);
 
         try {
-            const {data} = await axios.post(
+            const { data } = await axios.post(
                 "http://localhost:5000/api/tracker/test",
                 {
                     courseID: selectedCourse._id,
@@ -323,9 +248,9 @@ const CreateTest = () => {
 
     return (
         <>
-            <Navbar/>
+            <Navbar />
             <div className="h-full overflow-auto bg-gray-100 px-6 py-2">
-                <Heading link="/viewtests" title="CREATE A TEST/QUIZ"/>
+                <Heading link="/viewtests" title="CREATE A TEST/QUIZ" />
 
                 <Form
                     form={form}
@@ -336,23 +261,23 @@ const CreateTest = () => {
                         questions: [
                             {
                                 questionInfo: "",
-                                options: [{value: "", isCorrect: false}],
+                                options: [{ value: "", isCorrect: false }],
                             },
                         ],
                     }}
                 >
                     <Form.Item
                         name="name"
-                        rules={[{required: true}]}
+                        rules={[{ required: true }]}
                         label={<span className="font-bold">Name</span>}
                     >
-                        <Input/>
+                        <Input />
                     </Form.Item>
                     <Form.Item
                         name="description"
                         label={<span className="font-bold">Description</span>}
                     >
-                        <TextArea autoSize={{minRows: 3}}/>
+                        <TextArea autoSize={{ minRows: 3 }} />
                     </Form.Item>
 
                     <div className="flex justify-between items-center space-x-4">
@@ -380,7 +305,7 @@ const CreateTest = () => {
                         <Form.Item
                             name="type"
                             label={<span className="font-bold">Type</span>}
-                            rules={[{required: true, message: "Please select a type!"}]}
+                            rules={[{ required: true, message: "Please select a type!" }]}
                         >
                             <Select
                                 onChange={onTypeChange}
@@ -399,15 +324,14 @@ const CreateTest = () => {
                         <Form.Item
                             name="duration"
                             label={
-                                <span className="font-bold">{`Duration (${
-                                    testType === "test" ? "in minutes" : "in days"
-                                })`}</span>
+                                <span className="font-bold">{`Duration (${testType === "test" ? "in minutes" : "in days"
+                                    })`}</span>
                             }
                             rules={[
-                                {required: true, message: "Please input the test duration!"},
+                                { required: true, message: "Please input the test duration!" },
                             ]}
                         >
-                            <InputNumber min={1} style={{width: "100%"}}/>
+                            <InputNumber min={1} style={{ width: "100%" }} />
                         </Form.Item>
 
                         {/* Visible to Students */}
@@ -416,20 +340,20 @@ const CreateTest = () => {
                             label={<span className="font-bold">Visible to Students</span>}
                             valuePropName="checked"
                         >
-                            <Switch/>
+                            <Switch />
                         </Form.Item>
                     </div>
                     <Button type="primary" onClick={showModal} className={"my-4 main-black-btn"}>
                         Add Question
                     </Button>
-                    <QuestionListDisplay questions={questions} onRemove={handleRemoveQuestion}/>
+                    <QuestionListDisplay questions={questions} onRemove={handleRemoveQuestion} />
                     <Modal
                         title="Add a New Question"
                         open={isModalVisible}
                         footer={null}
                         onCancel={handleCancel}
                     >
-                        <QuestionForm onSave={handleSave}/>
+                        <QuestionForm onSave={handleSave} />
                     </Modal>
 
                     {/* File Upload */}
