@@ -15,8 +15,8 @@ import { InboxOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../misc/Navbar";
 import Heading from "../../misc/Heading";
-import { useAuth } from "../../../context/AuthProvider";
-import { useTracker } from "../../../context/TrackerProvider";
+import { useAuth } from "../../../context/AuthProvider.js";
+import { useTracker } from "../../../context/TrackerProvider.js";
 import TextArea from "antd/es/input/TextArea";
 
 const { Text } = Typography;

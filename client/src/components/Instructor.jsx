@@ -7,8 +7,8 @@ import { Button, Row, Typography, App } from "antd";
 
 import Navbar from "./misc/Navbar";
 import CourseCardMain from "./misc/CourseCard";
-import { useAuth } from "../context/AuthProvider";
-import { useTracker } from "../context/TrackerProvider";
+import { useAuth } from "../context/AuthProvider.js";
+import { useTracker } from "../context/TrackerProvider.js";
 
 const { Title } = Typography;
 

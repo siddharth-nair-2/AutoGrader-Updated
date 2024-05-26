@@ -5,8 +5,8 @@ import axios from "axios";
 import Navbar from "../../misc/Navbar";
 import Heading from "../../misc/Heading";
 import { useNavigate } from "react-router-dom";
-import { useTracker } from "../../../context/TrackerProvider";
-import { useAuth } from "../../../context/AuthProvider";
+import { useTracker } from "../../../context/TrackerProvider.js";
+import { useAuth } from "../../../context/AuthProvider.js";
 
 const { TextArea } = Input;
 const { Dragger } = Upload;

@@ -12,7 +12,7 @@ import {
   App,
 } from "antd";
 import Navbar from "../../misc/Navbar";
-import { useTracker } from "../../../context/TrackerProvider";
+import { useTracker } from "../../../context/TrackerProvider.js";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 
 const { Title } = Typography;

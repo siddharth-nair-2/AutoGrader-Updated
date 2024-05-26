@@ -5,7 +5,7 @@ import Title from "antd/es/typography/Title";
 import Heading from "../../misc/Heading";
 import Navbar from "../../misc/Navbar";
 import axios from "axios";
-import {useTracker} from "../../../context/TrackerProvider";
+import {useTracker} from "../../../context/TrackerProvider.js";
 import {useNavigate} from "react-router-dom";
 
 const ViewAllStudentTests = () => {

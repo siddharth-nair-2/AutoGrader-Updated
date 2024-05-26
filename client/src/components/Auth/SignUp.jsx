@@ -11,7 +11,7 @@ import {
   App,
 } from "antd";
 
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "../../context/AuthProvider.js";
 
 const { Option } = Select;
 

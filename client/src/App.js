@@ -1,7 +1,7 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 import { instructorRoutes, studentRoutes } from "./routes";
 
-import { useAuth } from "./context/AuthProvider"; // Adjust the path as needed
+import { useAuth } from "./context/AuthProvider.js"; // Adjust the path as needed
 
 import Login from "./components/Auth/Login";
 import Signup from "./components/Auth/SignUp";

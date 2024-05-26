@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTracker } from "../../../context/TrackerProvider";
+import { useTracker } from "../../../context/TrackerProvider.js";
 import Editor from "@monaco-editor/react";
 import Navbar from "../../misc/Navbar";
 import {

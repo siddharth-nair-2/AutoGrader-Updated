@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../misc/Navbar";
-import { useTracker } from "../../../context/TrackerProvider";
+import { useTracker } from "../../../context/TrackerProvider.js";
 
 import {
   Form,
@@ -21,7 +21,7 @@ import {
 } from "@ant-design/icons";
 import Dragger from "antd/es/upload/Dragger";
 import Heading from "../../misc/Heading";
-import {useAuth} from "../../../context/AuthProvider";
+import {useAuth} from "../../../context/AuthProvider.js";
 
 const { TextArea } = Input;
 const { Text } = Typography;

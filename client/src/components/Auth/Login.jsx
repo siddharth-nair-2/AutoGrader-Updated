@@ -1,6 +1,6 @@
 import { Row, Col, Form, Input, Button, App } from "antd";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "../../context/AuthProvider.js";
 
 const Login = () => {
   const { notification } = App.useApp();

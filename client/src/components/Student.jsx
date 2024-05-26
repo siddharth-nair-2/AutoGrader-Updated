@@ -1,10 +1,10 @@
 import axios from "axios";
 import { useEffect } from "react";
-import { useAuth } from "../context/AuthProvider";
+import { useAuth } from "../context/AuthProvider.js";
 import { Button, Row, Typography, Card, App } from "antd";
 import CourseCardMain from "./misc/CourseCard";
 import Navbar from "./misc/Navbar";
-import { useTracker } from "../context/TrackerProvider";
+import { useTracker } from "../context/TrackerProvider.js";
 
 const { Title } = Typography;
 

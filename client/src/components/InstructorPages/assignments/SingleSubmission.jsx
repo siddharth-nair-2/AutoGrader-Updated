@@ -1,7 +1,7 @@
 import Editor from "@monaco-editor/react";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useTracker } from "../../../context/TrackerProvider";
+import { useTracker } from "../../../context/TrackerProvider.js";
 import Navbar from "../../misc/Navbar";
 import { Button, Card, Typography, Select, Slider } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";

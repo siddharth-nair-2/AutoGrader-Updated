@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Typography, Button, Tooltip } from "antd";
 import { HiArrowNarrowRight } from "react-icons/hi";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "../../context/AuthProvider.js";
 
 const { Meta } = Card;
 

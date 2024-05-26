@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Form, Input, Button, Select, Typography, App } from "antd";
 import Navbar from "../../misc/Navbar";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { useAuth } from "../../../context/AuthProvider";
+import { useAuth } from "../../../context/AuthProvider.js";
 import Heading from "../../misc/Heading";
 
 const { TextArea } = Input;

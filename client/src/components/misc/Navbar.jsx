@@ -2,7 +2,7 @@ import React from "react";
 import { Layout, Button, Avatar, Typography } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "../../context/AuthProvider.js";
 const { Header } = Layout;
 const { Text } = Typography;
 

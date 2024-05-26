@@ -1,5 +1,5 @@
 import React from "react";
-import { useTracker } from "../../context/TrackerProvider";
+import { useTracker } from "../../context/TrackerProvider.js";
 import { useNavigate } from "react-router-dom";
 import { HiUserGroup, HiArrowNarrowRight } from "react-icons/hi";
 import { Card, Typography, Button, Tooltip } from "antd";
