@@ -31,18 +31,21 @@ const ViewAllTests = () => {
   const fetchTests = async () => {
     try {
       const res = await axios.get(
-        `/api/tracker/tests/course/${
+        `http://localhost:5000/api/tracker/tests/course/${
           JSON.parse(localStorage.getItem("courseInfo"))._id
         }`
       );
       settests(res.data);
     } catch (error) {
-      notification.error({
-        message: "Error Occured!",
-        description: "Failed to load the tests!",
-        duration: 5,
-        placement: "bottomLeft",
-      });
+      if (error.response?.status === 404) settests([]);
+      else {
+        notification.error({
+          message: "Error Occured!",
+          description: "Failed to load the tests!",
+          duration: 5,
+          placement: "bottomLeft",
+        });
+      }
     }
   };
   return (

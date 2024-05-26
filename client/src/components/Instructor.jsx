@@ -28,7 +28,7 @@ const Instructor = () => {
   const fetchCourses = async () => {
     try {
       const data = await axios.get(
-        `/api/tracker/courses?instructor=${user._id}`
+        `http://localhost:5000/api/tracker/courses?instructor=${user._id}`
       );
       setCourses(data.data);
     } catch (error) {

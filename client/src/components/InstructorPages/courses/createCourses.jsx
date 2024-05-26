@@ -70,7 +70,7 @@ const CreateCourses = () => {
         },
       };
       await axios.post(
-        "/api/tracker/courses",
+        "http://localhost:5000/api/tracker/courses",
         {
           courseID,
           name,

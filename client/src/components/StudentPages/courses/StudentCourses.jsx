@@ -50,11 +50,11 @@ const StudentCourses = () => {
       }
 
       const { data: modulesData } = await axios.get(
-        `/api/tracker/modules/course/${courseId}`
+        `http://localhost:5000/api/tracker/modules/course/${courseId}`
       );
 
       const { data: submissionsData } = await axios.get(
-        `/api/tracker/test-submissions/student/${studentId}`
+        `http://localhost:5000/api/tracker/test-submissions/student/${studentId}`
       );
 
       const modulesWithTestStatus = modulesData.map((module) => {

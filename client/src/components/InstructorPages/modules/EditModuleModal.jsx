@@ -99,7 +99,7 @@ const EditModuleModal = ({
     };
 
     values.assignments.forEach((assignmentId) => {
-      const fullAssignment = availableAssignments.find(
+      const fullAssignment = availableAssignments?.find(
         (a) => a._id === assignmentId
       );
       if (
@@ -123,7 +123,7 @@ const EditModuleModal = ({
 
     try {
       const response = await axios.patch(
-        `/api/tracker/module/${moduleData._id}`,
+        `http://localhost:5000/api/tracker/module/${moduleData._id}`,
         updatedModuleData
       );
 
@@ -155,7 +155,7 @@ const EditModuleModal = ({
       onOk: async () => {
         try {
           await axios.delete(
-            `/api/tracker/module/${moduleData._id}`
+            `http://localhost:5000/api/tracker/module/${moduleData._id}`
           );
 
           notification.success({
@@ -228,7 +228,7 @@ const EditModuleModal = ({
         </Form.Item>
         <Form.Item name="assignments" label="Assignments">
           <Select mode="multiple" placeholder="Select Assignments">
-            {availableAssignments.map((assn) => (
+            {availableAssignments?.map((assn) => (
               <Select.Option key={assn._id} value={assn._id}>
                 {assn.name}
               </Select.Option>

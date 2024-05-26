@@ -264,7 +264,7 @@ const StudentAssignments = () => {
 
     try {
       const existingSubmissions = await axios.get(
-        `/api/tracker/submission/compare?studentID=${user._id}&questionID=${selectedQuestion._id}`
+        `http://localhost:5000/api/tracker/submission/compare?studentID=${user._id}&questionID=${selectedQuestion._id}`
       );
 
       const isUpdate = existingSubmissions.data.length > 0;
@@ -337,8 +337,8 @@ const StudentAssignments = () => {
     };
 
     const url = isUpdate
-      ? `/api/tracker/submission/update?courseID=${selectedCourse._id}&assignmentID=${selectedAssignment._id}&questionID=${selectedQuestion._id}&studentID=${user._id}`
-      : "/api/tracker/submission";
+      ? `http://localhost:5000/api/tracker/submission/update?courseID=${selectedCourse._id}&assignmentID=${selectedAssignment._id}&questionID=${selectedQuestion._id}&studentID=${user._id}`
+      : "http://localhost:5000/api/tracker/submission";
 
     try {
       const { data } = await axios[isUpdate ? "patch" : "post"](
@@ -354,7 +354,7 @@ const StudentAssignments = () => {
 
   const checkForPlagiarism = async () => {
     try {
-      let url = `/api/tracker/submission/custom?courseID=${selectedCourse._id}&assignmentID=${selectedAssignment._id}&questionID=${selectedQuestion._id}&languageName=${userLang}&studentID=${user._id}`;
+      let url = `http://localhost:5000/api/tracker/submission/custom?courseID=${selectedCourse._id}&assignmentID=${selectedAssignment._id}&questionID=${selectedQuestion._id}&languageName=${userLang}&studentID=${user._id}`;
       const { data } = await axios.get(url);
 
       if (data.length > 0) {

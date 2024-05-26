@@ -30,7 +30,7 @@ const ViewAllStudentAssignments = () => {
   const fetchAssignments = async () => {
     try {
       const data = await axios.get(
-        `/api/tracker/allAssignments/visible?courseID=${
+        `http://localhost:5000/api/tracker/allAssignments/visible?courseID=${
           JSON.parse(localStorage.getItem("courseInfo"))._id
         }`
       );

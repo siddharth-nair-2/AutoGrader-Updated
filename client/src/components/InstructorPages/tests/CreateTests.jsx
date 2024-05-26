@@ -11,6 +11,7 @@ import {
   InputNumber,
   App,
   Select,
+  Modal,
 } from "antd";
 import {
   MinusCircleOutlined,
@@ -24,6 +25,8 @@ import { useNavigate } from "react-router-dom";
 import { useTracker } from "../../../context/TrackerProvider";
 import { useAuth } from "../../../context/AuthProvider";
 import moment from "moment";
+import QuestionForm from "./QuestionForm";
+import QuestionListDisplay from "./QuestionListDisplay";
 
 const { TextArea } = Input;
 const { Dragger } = Upload;
@@ -36,6 +39,25 @@ const CreateTest = () => {
   const navigate = useNavigate();
   const { selectedCourse, setSelectedCourse } = useTracker();
   const { user } = useAuth();
+  const [questions, setQuestions] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleSave = (question) => {
+    const questionWithNumber = {
+      ...question,
+      questionNum: questions.length + 1,
+    };
+    setQuestions([...questions, questionWithNumber]);
+    setIsModalVisible(false);
+  };
 
   useEffect(() => {
     if (!user) {
@@ -172,7 +194,7 @@ const CreateTest = () => {
     // Calculate and add responseType for each question
     const modifiedQuestions = questions.map((question) => {
       // Check if the question is subjective
-      if (!question.options ||  question.options?.length === 0) {
+      if (!question.options || question.options?.length === 0) {
         return { ...question, responseType: "subjective" };
       }
 
@@ -184,10 +206,10 @@ const CreateTest = () => {
 
       return { ...question, responseType };
     });
-    
+
     try {
       const { data } = await axios.post(
-        "/api/tracker/test",
+        "http://localhost:5000/api/tracker/test",
         {
           courseID: selectedCourse._id,
           name: name,
@@ -273,11 +295,16 @@ const CreateTest = () => {
     fileList,
   };
 
+  const handleRemoveQuestion = (index) => {
+    const newQuestions = questions.filter((_, i) => i !== index);
+    setQuestions(newQuestions);
+  };
+
   return (
     <>
       <Navbar />
       <div className="h-full overflow-auto bg-gray-100 px-6 py-2">
-        <Heading link="/viewtests" title="CREATE A TEST/QUIZ" />
+        <Heading link="/viewalltests" title="CREATE A TEST/QUIZ" />
 
         <Form
           form={form}
@@ -372,137 +399,26 @@ const CreateTest = () => {
             </Form.Item>
           </div>
 
-          {/* Dynamic Question List */}
-          <Form.List
-            name="questions"
-            label={<span className="font-bold">Questions</span>}
-            rules={[
-              { required: true, message: "Please input the test duration!" },
-            ]}
+          <Button
+            type="primary"
+            onClick={showModal}
+            className={"my-4 main-black-btn"}
           >
-            {(questions, { add, remove }) => (
-              <>
-                {questions.map(({ key, name, ...restField }, index) => (
-                  <Space
-                    key={key + "question"}
-                    style={{ display: "flex", marginBottom: 8 }}
-                    align="baseline"
-                  >
-                    {/* Question Number */}
-                    <Form.Item
-                      {...restField}
-                      name={[name, "questionNum"]}
-                      label={<span className=" font-bold">#</span>}
-                      initialValue={key + 1}
-                    >
-                      <Input
-                        type="number"
-                        min={1}
-                        placeholder="1"
-                        disabled={true}
-                        className=" w-[50px]"
-                      />
-                    </Form.Item>
+            Add Question
+          </Button>
 
-                    {/* Question Info */}
-                    <Form.Item
-                      {...restField}
-                      name={[name, "questionInfo"]}
-                      label={<span className="font-bold">Info</span>}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Info is required",
-                        },
-                      ]}
-                      className=" w-[145px]"
-                    >
-                      <TextArea
-                        placeholder="Info"
-                        autoSize={{ minRows: 1, maxRows: 6 }}
-                      />
-                    </Form.Item>
-
-                    {/* Marks */}
-                    <Form.Item
-                      {...restField}
-                      name={[name, "marks"]}
-                      label={<span className="font-bold">Marks</span>}
-                      rules={[
-                        { required: true, message: "Marks are required" },
-                      ]}
-                    >
-                      <InputNumber
-                        min={1}
-                        placeholder="Marks"
-                        className=" w-[100px]"
-                      />
-                    </Form.Item>
-
-                    {/* Options for the question (now optional) */}
-                    <Form.List name={[name, "options"]}>
-                      {(options, { add: addOption, remove: removeOption }) => (
-                        <>
-                          {options.map((optionField) => (
-                            <Space
-                              key={optionField.key + "option"}
-                              align="baseline"
-                            >
-                              <Form.Item
-                                {...optionField}
-                                name={[optionField.name, "value"]}
-                                key={optionField.key + "option text"}
-                                label={
-                                  <span className="font-bold">Option</span>
-                                }
-                              >
-                                <Input placeholder="Option text" />
-                              </Form.Item>
-                              <Form.Item
-                                {...optionField}
-                                name={[optionField.name, "isCorrect"]}
-                                valuePropName="checked"
-                                key={optionField.key + "option checkbox"}
-                                label={<span className="font-bold">✅❌</span>}
-                                initialValue={false}
-                              >
-                                <Checkbox>Correct</Checkbox>
-                              </Form.Item>
-                              <MinusCircleOutlined
-                                onClick={() => removeOption(optionField.name)}
-                              />
-                            </Space>
-                          ))}
-                          <Button
-                            type="dashed"
-                            onClick={() => addOption()}
-                            icon={<PlusOutlined />}
-                            className=" ml-5"
-                          >
-                            Add Option
-                          </Button>
-                        </>
-                      )}
-                    </Form.List>
-
-                    {/* Remove Question Button */}
-                    {index > 0 && (
-                      <MinusCircleOutlined onClick={() => remove(name)} />
-                    )}
-                  </Space>
-                ))}
-                <Form.Item>
-                  <Button
-                    type="dashed"
-                    onClick={() => add()}
-                    icon={<PlusOutlined />}
-                  >
-                    Add Question
-                  </Button>
-                </Form.Item>
-              </>
-            )}
-          </Form.List>
+          <QuestionListDisplay
+            questions={questions}
+            onRemove={handleRemoveQuestion}
+          />
+          <Modal
+            title="Add a New Question"
+            open={isModalVisible}
+            footer={null}
+            onCancel={handleCancel}
+          >
+            <QuestionForm onSave={handleSave} />
+          </Modal>
 
           {/* File Upload */}
           <Form.Item

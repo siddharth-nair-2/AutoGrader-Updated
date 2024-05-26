@@ -27,6 +27,7 @@ import axios from "axios";
 import AssignmentCard from "../../misc/AssignmentCard";
 import TestCard from "../../misc/TestCard";
 import EditModuleModal from "../modules/EditModuleModal";
+
 const { Title } = Typography;
 
 const Courses = () => {
@@ -58,36 +59,42 @@ const Courses = () => {
   const fetchAvailableAssignments = async () => {
     try {
       const { data } = await axios.get(
-        `/api/tracker/allAssignments?courseID=${
+        `http://localhost:5000/api/tracker/allAssignments?courseID=${
           JSON.parse(localStorage.getItem("courseInfo"))._id
         }`
       );
-      setAvailableAssignments(data);
+      setAvailableAssignments(Array.isArray(data) ? data : []);
     } catch (error) {
-      notification.error({
-        message: "Failed to fetch assignments",
-        description:
-          error.response?.data?.message ||
-          "An error occurred while fetching assignments.",
-      });
+      if (error.response?.status === 404) setAvailableAssignments([]);
+      else {
+        notification.error({
+          message: "Failed to fetch assignments",
+          description:
+            error.response?.data?.message ||
+            "An error occurred while fetching assignments.",
+        });
+      }
     }
   };
 
   const fetchAvailableTests = async () => {
     try {
       const { data } = await axios.get(
-        `/api/tracker/tests/course/${
+        `http://localhost:5000/api/tracker/tests/course/${
           JSON.parse(localStorage.getItem("courseInfo"))._id
         }`
       );
       setAvailableTests(data);
     } catch (error) {
-      notification.error({
-        message: "Failed to fetch assignments",
-        description:
-          error.response?.data?.message ||
-          "An error occurred while fetching assignments.",
-      });
+      if (error.response?.status === 404) setAvailableTests([]);
+      else {
+        notification.error({
+          message: "Failed to fetch assignments",
+          description:
+            error.response?.data?.message ||
+            "An error occurred while fetching assignments.",
+        });
+      }
     }
   };
   const fetchModulesForCourse = async () => {
@@ -103,16 +110,20 @@ const Courses = () => {
       }
 
       const response = await axios.get(
-        `/api/tracker/modules/course/${courseId}`
+        `http://localhost:5000/api/tracker/modules/course/${courseId}`
       );
       setModules(response.data);
     } catch (error) {
-      notification.error({
-        message: "Failed to Fetch Modules",
-        description:
-          error.response?.data?.message ||
-          "An error occurred while fetching modules.",
-      });
+      if (error.response?.status === 404) {
+        setModules([]);
+      } else {
+        notification.error({
+          message: "Failed to Fetch Modules",
+          description:
+            error.response?.data?.message ||
+            "An error occurred while fetching modules.",
+        });
+      }
     }
   };
 
@@ -153,7 +164,7 @@ const Courses = () => {
           <Link to="/">
             <Button
               icon={<ArrowLeftOutlined />}
-              className=" sm:mb-0 bg-black border-black text-white rounded-lg text-sm font-medium flex 
+              className=" sm:mb-0 bg-black border-black text-white rounded-lg text-sm font-medium flex
             items-center justify-center hover:bg-white hover:text-black hover:border-black"
             >
               Back
@@ -165,7 +176,7 @@ const Courses = () => {
           <Link to="/createmodule" className=" w-[85px]">
             <Button
               icon={<PlusOutlined />}
-              className="bg-[#46282F] border-[#46282F] text-white rounded-lg text-sm font-medium flex 
+              className="bg-[#46282F] border-[#46282F] text-white rounded-lg text-sm font-medium flex
           items-center justify-center hover:bg-white hover:text-[#ff5a5a] hover:border-[#46282F] -ml-4"
             >
               Module
@@ -278,5 +289,4 @@ const Courses = () => {
     </>
   );
 };
-
 export default Courses;

@@ -2,7 +2,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../misc/Navbar";
-import { useTracker, useAuth } from "../../../context/TrackerProvider";
+import { useTracker } from "../../../context/TrackerProvider";
+
 import {
   Form,
   Input,
@@ -20,6 +21,7 @@ import {
 } from "@ant-design/icons";
 import Dragger from "antd/es/upload/Dragger";
 import Heading from "../../misc/Heading";
+import {useAuth} from "../../../context/AuthProvider";
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -142,7 +144,7 @@ const CreateAssignments = () => {
         },
       };
       await axios.post(
-        "/api/tracker/assignments",
+        "http://localhost:5000/api/tracker/assignments",
         {
           courseID: selectedCourse._id,
           name: formData.name,
