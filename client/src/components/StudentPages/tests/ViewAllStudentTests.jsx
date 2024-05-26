@@ -42,25 +42,30 @@ const ViewAllStudentTests = () => {
             const testsData = testsResponse.data;
             const submissionsData = submissionsResponse.data;
 
-            // Mark tests as completed based on submissions
-            const testsWithCompletion = testsData.map(test => {
-                const isCompleted = submissionsData.some(submission => submission.testId?._id === test?._id);
-                const marks = isCompleted &&
-                    submissionsData.find(submission => submission.testId?._id === test?._id)?.totalMarks;
-                return {...test, isCompleted, marks};
-            });
+      // Mark tests as completed based on submissions
+      const testsWithCompletion = testsData.map((test) => {
+        const isCompleted = submissionsData.some(
+          (submission) => submission.testId?._id === test?._id
+        );
+        const marks =
+          isCompleted &&
+          submissionsData.find(
+            (submission) => submission.testId?._id === test?._id
+          )?.totalMarks;
+        return { ...test, isCompleted, marks };
+      });
 
-            setTests(testsWithCompletion);
-        } catch (error) {
-            console.log(error);
-            notification.error({
-                message: "Error Occurred!",
-                description: "Failed to load tests",
-                duration: 5,
-                placement: "bottomLeft",
-            });
-        }
-    };
+      setTests(testsWithCompletion);
+    } catch (error) {
+      console.log(error)
+      notification.error({
+        message: "Error Occurred!",
+        description: "Failed to load tests",
+        duration: 5,
+        placement: "bottomLeft",
+      });
+    }
+  };
 
     return (
         <>
