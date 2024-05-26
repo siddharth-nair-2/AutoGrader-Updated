@@ -102,6 +102,79 @@ const CreateTest = () => {
                 description: "Scheduled date and time cannot be in the past.",
             });
             return;
+      }
+    }
+    if (fileList.length > 0) {
+      // If files are uploaded, show modal to confirm file upload
+      modal.confirm({
+        title: "Confirm File Upload and Test Creation!",
+        content: (
+          <div>
+            <p>You have uploaded the following files:</p>
+            <ul>
+              {fileList.map((file) => (
+                <li key={file.uid}>{file.name}</li>
+              ))}
+            </ul>
+          </div>
+        ),
+        onOk: () => handleUpload(values),
+        okButtonProps: {
+          className: " main-black-btn",
+        },
+      });
+    } else {
+      // If no files are uploaded, show modal to confirm test creation
+      modal.confirm({
+        title: "Confirm Test Creation",
+        content: "Are you sure you want to create the test without any files?",
+        onOk: () => createTest(values, []),
+        okButtonProps: {
+          className: " main-black-btn",
+        },
+      });
+    }
+  };
+
+  const createTest = async (formData, uploadedFiles) => {
+    const {
+      name,
+      description,
+      scheduledAt,
+      duration,
+      questions,
+      visibleToStudents,
+    } = formData;
+
+    // Calculate and add responseType for each question
+    const modifiedQuestions = questions.map((question) => {
+      // Check if the question is subjective
+      if (!question.options ||  question.options?.length === 0) {
+        return { ...question, responseType: "subjective" };
+      }
+
+      // For MCQs, determine if it's single or multiple choice
+      const correctAnswersCount = question.options.filter(
+        (option) => option.isCorrect
+      ).length;
+      const responseType = correctAnswersCount > 1 ? "multiple" : "single";
+
+      return { ...question, responseType };
+    });
+    
+    try {
+      const { data } = await axios.post(
+        "/api/tracker/test",
+        {
+          courseID: selectedCourse._id,
+          name: name,
+          description: description,
+          scheduledAt: scheduledAt,
+          duration: duration,
+          questions: modifiedQuestions,
+          visibleToStudents: visibleToStudents ? true : false,
+          testType: testType,
+          files: uploadedFiles,
         }
 
         if (duration <= 0) {

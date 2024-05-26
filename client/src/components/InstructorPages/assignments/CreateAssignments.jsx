@@ -2,8 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../misc/Navbar";
-import { useAuth } from "../../../context/AuthProvider";
-import { useTracker } from "../../../context/TrackerProvider";
+import { useTracker, useAuth } from "../../../context/TrackerProvider";
 import {
   Form,
   Input,
@@ -143,7 +142,7 @@ const CreateAssignments = () => {
         },
       };
       await axios.post(
-        "http://localhost:5000/api/tracker/assignments",
+        "/api/tracker/assignments",
         {
           courseID: selectedCourse._id,
           name: formData.name,
