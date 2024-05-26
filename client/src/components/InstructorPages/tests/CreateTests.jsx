@@ -155,7 +155,7 @@ const CreateTest = () => {
 
         try {
             const { data } = await axios.post(
-                "http://localhost:5000/api/tracker/test",
+                "/api/tracker/test",
                 {
                     courseID: selectedCourse._id,
                     name: name,
@@ -250,7 +250,7 @@ const CreateTest = () => {
         <>
             <Navbar />
             <div className="h-full overflow-auto bg-gray-100 px-6 py-2">
-                <Heading link="/viewtests" title="CREATE A TEST/QUIZ" />
+                <Heading link="/viewalltests" title="CREATE A TEST/QUIZ" />
 
                 <Form
                     form={form}

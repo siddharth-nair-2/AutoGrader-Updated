@@ -34,8 +34,8 @@ const ViewAllStudentTests = () => {
 
                 // Use Promise.all to fetch all tests and submissions concurrently
                 const [testsResponse, submissionsResponse] = await Promise.all([
-                axios.get(`http://localhost:5000/api/tracker/tests/student/${courseId}`),
-                axios.get(`http://localhost:5000/api/tracker/test-submissions/student/${studentId}`)
+                axios.get(`/api/tracker/tests/student/${courseId}`),
+                axios.get(`/api/tracker/test-submissions/student/${studentId}`)
             ]);
 
             // Extract data from both responses
