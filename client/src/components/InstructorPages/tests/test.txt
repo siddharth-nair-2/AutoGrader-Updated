@@ -1,0 +1,132 @@
+
+          {/* Dynamic Question List */}
+          <Form.List
+            name="questions"
+            label={<span className="font-bold">Questions</span>}
+            rules={[
+              { required: true, message: "Please input the test duration!" },
+            ]}
+          >
+            {(questions, { add, remove }) => (
+              <>
+                {questions.map(({ key, name, ...restField }, index) => (
+                  <Space
+                    key={key + "question"}
+                    style={{ display: "flex", marginBottom: 8 }}
+                    align="baseline"
+                  >
+                    {/* Question Number */}
+                    <Form.Item
+                      {...restField}
+                      name={[name, "questionNum"]}
+                      label={<span className=" font-bold">#</span>}
+                      initialValue={key + 1}
+                    >
+                      <Input
+                        type="number"
+                        min={1}
+                        placeholder="1"
+                        disabled={true}
+                        className=" w-[50px]"
+                      />
+                    </Form.Item>
+
+                    {/* Question Info */}
+                    <Form.Item
+                      {...restField}
+                      name={[name, "questionInfo"]}
+                      label={<span className="font-bold">Info</span>}
+                      rules={[
+                        {
+                          required: true,
+                          message: "Info is required",
+                        },
+                      ]}
+                      className=" w-[145px]"
+                    >
+                      <TextArea
+                        placeholder="Info"
+                        autoSize={{ minRows: 1, maxRows: 6 }}
+                      />
+                    </Form.Item>
+
+                    {/* Marks */}
+                    <Form.Item
+                      {...restField}
+                      name={[name, "marks"]}
+                      label={<span className="font-bold">Marks</span>}
+                      rules={[
+                        { required: true, message: "Marks are required" },
+                      ]}
+                    >
+                      <InputNumber
+                        min={1}
+                        placeholder="Marks"
+                        className=" w-[100px]"
+                      />
+                    </Form.Item>
+
+                    {/* Options for the question (now optional) */}
+                    <Form.List name={[name, "options"]}>
+                      {(options, { add: addOption, remove: removeOption }) => (
+                        <>
+                          {options.map((optionField) => (
+                            <Space
+                              key={optionField.key + "option"}
+                              align="baseline"
+                            >
+                              <Form.Item
+                                {...optionField}
+                                name={[optionField.name, "value"]}
+                                key={optionField.key + "option text"}
+                                label={
+                                  <span className="font-bold">Option</span>
+                                }
+                              >
+                                <Input placeholder="Option text" />
+                              </Form.Item>
+                              <Form.Item
+                                {...optionField}
+                                name={[optionField.name, "isCorrect"]}
+                                valuePropName="checked"
+                                key={optionField.key + "option checkbox"}
+                                label={<span className="font-bold">✅❌</span>}
+                                initialValue={false}
+                              >
+                                <Checkbox>Correct</Checkbox>
+                              </Form.Item>
+                              <MinusCircleOutlined
+                                onClick={() => removeOption(optionField.name)}
+                              />
+                            </Space>
+                          ))}
+                          <Button
+                            type="dashed"
+                            onClick={() => addOption()}
+                            icon={<PlusOutlined />}
+                            className=" ml-5"
+                          >
+                            Add Option
+                          </Button>
+                        </>
+                      )}
+                    </Form.List>
+
+                    {/* Remove Question Button */}
+                    {index > 0 && (
+                      <MinusCircleOutlined onClick={() => remove(name)} />
+                    )}
+                  </Space>
+                ))}
+                <Form.Item>
+                  <Button
+                    type="dashed"
+                    onClick={() => add()}
+                    icon={<PlusOutlined />}
+                  >
+                    Add Question
+                  </Button>
+                </Form.Item>
+              </>
+            )}
+          </Form.List>
